@@ -67,6 +67,12 @@ they are frequently mistranslated.
 | cookie-cutter / prescriptive | 規範性的 |
 | reference implementation | 參考實作 |
 | workbench | workbench（保留原文） |
+| repository map / repo map | 儲存庫地圖 |
+| code context | 程式脈絡 |
+| symbol definition | 符號定義 |
+| call signature | 呼叫簽名 |
+| Abstract Syntax Tree (AST) | 抽象語法樹（AST） |
+| binary wheel | binary wheel（保留原文） |
 | managed agent | 託管代理 |
 | Claude Managed Agents | Claude 託管代理 |
 

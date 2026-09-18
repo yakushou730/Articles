@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用 tree-sitter 打造更好的儲存庫地圖（Building a better repository map with tree sitter）</title>
+<meta name="description" content="Tree-sitter 讓 aider 能建立儲存庫地圖（repo map），更有效率地摘要大型程式碼庫。">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">aider</p>
+  <h1>用 tree-sitter 打造更好的儲存庫地圖（Building a better repository map with tree sitter）</h1>
+  <p class="pubdate">2023 年 10 月 22 日</p>
+</header>
+
+<main id="main-content">
+
+<figure>
+  <img src="assets/robot-ast.png" alt="機器人流程圖（robot flowchart）">
+</figure>
+
+<p>GPT-4 在「自成一體」的程式任務上非常有用，例如產生或修改一個沒有相依性的簡單函式。GitHub CoPilot 這類工具很擅長處理這種單純的程式任務。</p>
+
+<p>但在既有的較大型程式碼庫裡做複雜的修改，對人和 AI 都困難得多。想順利完成，你得做到三件事：</p>
+
+<ol>
+  <li>找出需要修改的程式碼。</li>
+  <li>理解這段程式碼與程式碼庫其餘部分之間的關係。</li>
+  <li>正確修改程式碼，完成任務。</li>
+</ol>
+
+<p>只要告訴 GPT 哪些檔案需要改（1），再讓它看看這些檔案怎麼融入程式碼庫的其他部分（2），GPT 其實很擅長改程式碼（3）。</p>
+
+<p>本文聚焦第（2）步，也就是提供「程式脈絡」（code context）：</p>
+
+<ul>
+  <li>我們得幫 GPT 理解整個程式碼庫。</li>
+  <li>這能幫它理解自己需要修改的程式碼，因為這些程式碼可能相依於程式碼庫的其他部分。</li>
+  <li>這也能幫 GPT 在寫新程式碼、改既有程式碼時，尊重並運用程式碼庫其他地方既有的函式庫、模組與抽象層。</li>
+  <li>我們必須用有效率的方式，把這些「程式脈絡」全部傳達給 GPT，讓它塞得進有限的脈絡視窗（context window）。</li>
+</ul>
+
+<p>為了解決這些問題，aider 會送給 GPT 一份<strong>整個 git 儲存庫（repository）的簡明地圖</strong>，裡頭包含最重要的類別與函式，以及各自的型別與呼叫簽名。</p>
+
+<p>這份<strong>儲存庫地圖（repository map）</strong>現在改用 <a href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a> 自動建立，從原始檔中擷取符號定義。許多 IDE、編輯器與 LSP 伺服器都用 tree-sitter 幫人類搜尋、瀏覽大型程式碼庫。Aider 現在用它幫 GPT 更了解、更容易瀏覽與編輯較大型儲存庫裡的程式碼。</p>
+
+<p><em>想用本文談到的技巧搭配 GPT-4 寫程式，只要安裝 <a href="https://aider.chat/docs/install.html">aider</a> 即可。</em></p>
+
+<h2>問題所在：程式脈絡（The problem: code context）</h2>
+
+<p>GPT-4 很擅長「自成一體」的程式任務，例如撰寫或修改一個沒有外部相依性的純函式。像「寫一個 Fibonacci 函式」或「用 list comprehension 改寫這個迴圈」這類要求，GPT 應付起來輕鬆，因為它們除了正在討論的那段程式碼之外，不需要任何脈絡。</p>
+
+<p>真實的程式碼大多不純粹、不自成一體，而是和儲存庫裡許多不同檔案的程式碼互相交纏、彼此相依。假如你要 GPT「把 Foo 類別裡所有的 print 陳述式改成使用 BarLog 日誌系統」，它需要看到並修改 Foo 類別裡的程式碼，但同時也得知道專案的 BarLog 子系統該怎麼用。</p>
+
+<p>簡單的做法是把<strong>整個程式碼庫</strong>連同每次修改要求一起送給 GPT。這樣 GPT 就有全部脈絡了。但即使是中等大小的儲存庫也辦不到，因為塞不進脈絡視窗。</p>
+
+<p>比較好的做法是有選擇性地<strong>挑出要送的檔案</strong>。以上面的例子來說，你可以送出含有 Foo 類別的檔案，以及含有 BarLog 日誌子系統的檔案。這招效果不差，aider 也支援：你可以手動指定要把哪些檔案「加進聊天」。</p>
+
+<p>但送整個檔案來傳達程式脈絡太笨重，浪費了珍貴的脈絡視窗。GPT 不需要看到 BarLog 的完整實作，只要了解得足以使用它就好。只為了傳達脈絡而送出整份程式碼檔案，很可能一下子就把脈絡視窗用光。</p>
+
+<p>Aider 也努力減少用 AI 寫程式時的手動工作。所以在理想世界裡，我們希望 aider 能自動找出並提供所需的程式脈絡。</p>
+
+<h2>用儲存庫地圖提供脈絡（Using a repo map to provide context）</h2>
+
+<p>使用者一提出修改要求，aider 就會連同一份<strong>儲存庫地圖（repo map）</strong>一起送給 GPT。地圖裡有儲存庫中的檔案清單，以及每個檔案裡定義的關鍵符號。它藉由納入每個定義的關鍵程式碼行，呈現這些符號在原始碼中怎麼定義。</p>
+
+<p>下面是 aider 儲存庫地圖的一小段範例，只顯示 <a href="https://github.com/Aider-AI/aider/blob/main/aider/coders/base_coder.py">base_coder.py</a> 與 <a href="https://github.com/Aider-AI/aider/blob/main/aider/commands.py">commands.py</a> 的地圖：</p>
+
+<pre><code>aider/coders/base_coder.py:
+⋮...
+│class Coder:
+│    abs_fnames = None
+⋮...
+│    @classmethod
+│    def create(
+│        self,
+│        main_model,
+│        edit_format,
+│        io,
+│        skip_model_availabily_check=False,
+│        **kwargs,
+⋮...
+│    def abs_root_path(self, path):
+⋮...
+│    def run(self, with_message=None):
+⋮...
+
+aider/commands.py:
+⋮...
+│class Commands:
+│    voice = None
+│
+⋮...
+│    def get_commands(self):
+⋮...
+│    def get_command_completions(self, cmd_name, partial):
+⋮...
+│    def run(self, inp):
+⋮...
+</code></pre>
+
+<p>這樣把儲存庫畫成地圖，帶來幾個重要好處：</p>
+
+<ul>
+  <li>GPT 能看到儲存庫各處的類別、方法與函式簽名。光是這樣，可能就足以讓它解決許多任務。例如，只靠地圖上顯示的細節，它大概就能想出怎麼使用某個模組匯出的 API。</li>
+  <li>如果需要看更多程式碼，GPT 可以用地圖自己判斷該進一步查看哪些檔案。接著它會要求看這些特定檔案，aider 就會自動把它們加進聊天脈絡。</li>
+</ul>
+
+<h2>最佳化地圖（Optimizing the map）</h2>
+
+<p>當然，對大型儲存庫來說，光是一份儲存庫地圖可能就超過 GPT 的脈絡視窗。Aider 的解法是只送地圖中<strong>最相關</strong>的部分。做法是用圖排序演算法分析完整地圖：每個原始檔是一個節點，有相依關係的檔案之間連上邊。分析完，aider 再挑出程式碼庫裡最重要的部分，塞進使用者指定的 token 預算（透過 <code>--map-tokens</code> 參數設定，預設為 1k token），藉此最佳化儲存庫地圖。</p>
+
+<p>上面那張範例地圖並沒有包含那些檔案的<em>每一個</em>類別、方法與函式。它只納入最重要的識別字，也就是程式碼其他部分引用最頻繁的那些。這些正是 GPT 理解整個程式碼庫所需的關鍵脈絡。</p>
+
+<h2>用 tree-sitter 製作地圖（Using tree-sitter to make the map）</h2>
+
+<p>底層實作上，aider 用 <a href="https://tree-sitter.github.io/tree-sitter/">tree sitter</a> 建立這份地圖。具體來說是使用 <a href="https://github.com/grantjenks/py-tree-sitter-languages">py-tree-sitter-languages</a> python 模組，它為<a href="https://github.com/Aider-AI/grep-ast/blob/main/grep_ast/parsers.py">大多數熱門程式語言</a>提供簡單、可用 pip 安裝的 binary wheel。</p>
+
+<p>Tree-sitter 依程式語言的語法把原始碼解析成抽象語法樹（Abstract Syntax Tree，AST）。有了 AST，我們就能辨識函式、類別、變數、型別與其他定義在原始碼裡的什麼位置，也能找出這些東西在程式碼其他地方使用與引用的位置。</p>
+
+<p>Aider 用這些定義與引用判斷儲存庫裡哪些識別字最重要，並產出只顯示那些關鍵程式碼行的儲存庫地圖。</p>
+
+<h2>那 ctags 呢？（What about ctags?）</h2>
+
+<p>tree-sitter 版儲存庫地圖取代了 aider 最初使用的 <a href="https://aider.chat/docs/ctags.html">ctags 版地圖</a>。從 ctags 換到 tree-sitter 帶來不少好處：</p>
+
+<ul>
+  <li>地圖更豐富，直接從原始檔顯示完整的函式呼叫簽名與其他細節。</li>
+  <li>靠著 <code>py-tree-sitter-languages</code>，我們透過一個 python 套件就能完整支援許多程式語言，而這個套件在一般的 <code>python -m pip install -U aider-chat</code> 過程中會自動安裝。</li>
+  <li>使用者不必再透過外部工具或套件管理器（brew、apt、choco 等）手動安裝 <code>universal-ctags</code>。</li>
+  <li>tree-sitter 整合是 aider 未來工作與功能的關鍵推手。</li>
+</ul>
+
+<h2>未來工作（Future work）</h2>
+
+<p>還記得我們點出用 GPT 在既有的較大型程式碼庫裡完成程式任務所需的 3 個關鍵步驟：</p>
+
+<ol>
+  <li>找出需要修改的程式碼。</li>
+  <li>理解這段程式碼與程式碼庫其餘部分之間的關係。</li>
+  <li>正確修改程式碼，完成任務。</li>
+</ol>
+
+<p>我們現在用 tree-sitter 幫忙解決程式脈絡問題（2），但它也是未來工作的關鍵基礎，用來自動找出所有需要修改的程式碼（1）。</p>
+
+<p>目前 aider 仍仰賴使用者指定哪些原始檔需要修改才能完成要求。使用者用 aider 的 <code>/add</code> 指令手動「把檔案加進聊天」，讓 GPT 能修改這些檔案。</p>
+
+<p>這方法行得通，但未來的一項重點工作，是運用 GPT 與 tree-sitter 的力量，自動辨識程式碼的哪些部分需要修改。</p>
+
+<h2>試用看看（Try it out）</h2>
+
+<p>想用本文談到的技巧搭配 GPT-4 寫程式，只要安裝 <a href="https://aider.chat/docs/install.html">aider</a> 即可。</p>
+
+<h2>致謝（Credits）</h2>
+
+<p>Aider 使用了以下開源 tree-sitter 語言實作中<a href="https://github.com/Aider-AI/aider/tree/main/aider/queries">修改過的 tags.scm 檔案版本</a>：</p>
+
+<ul>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-c">https://github.com/tree-sitter/tree-sitter-c</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-c-sharp">https://github.com/tree-sitter/tree-sitter-c-sharp</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-cpp">https://github.com/tree-sitter/tree-sitter-cpp</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/Wilfred/tree-sitter-elisp">https://github.com/Wilfred/tree-sitter-elisp</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/elixir-lang/tree-sitter-elixir">https://github.com/elixir-lang/tree-sitter-elixir</a>，以 Apache License, Version 2.0 授權。</li>
+  <li><a href="https://github.com/elm-tooling/tree-sitter-elm">https://github.com/elm-tooling/tree-sitter-elm</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-go">https://github.com/tree-sitter/tree-sitter-go</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-java">https://github.com/tree-sitter/tree-sitter-java</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-javascript">https://github.com/tree-sitter/tree-sitter-javascript</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-ocaml">https://github.com/tree-sitter/tree-sitter-ocaml</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-php">https://github.com/tree-sitter/tree-sitter-php</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-python">https://github.com/tree-sitter/tree-sitter-python</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-ql">https://github.com/tree-sitter/tree-sitter-ql</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/r-lib/tree-sitter-r">https://github.com/r-lib/tree-sitter-r</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-ruby">https://github.com/tree-sitter/tree-sitter-ruby</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-rust">https://github.com/tree-sitter/tree-sitter-rust</a>，以 MIT License 授權。</li>
+  <li><a href="https://github.com/tree-sitter/tree-sitter-typescript">https://github.com/tree-sitter/tree-sitter-typescript</a>，以 MIT License 授權。</li>
+</ul>
+
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://aider.chat/2023/10/22/repomap.html">Building a better repository map with tree sitter</a>（2023-10-22）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>
