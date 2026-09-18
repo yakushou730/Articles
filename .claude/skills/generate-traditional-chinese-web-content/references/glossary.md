@@ -114,6 +114,60 @@ they are frequently mistranslated.
 | adversarial review | 對抗式審查 |
 | status line | 狀態列 |
 
+## Self-improving agent loops (Addy Osmani, 2026-01-31)
+
+| English | 繁中 |
+|---|---|
+| self-improving agent loop | 自我改進的代理迴路 |
+| agent loop | 代理迴路 |
+| continuous coding loop | 連續編碼迴路 |
+| Ralph Wiggum technique | Ralph Wiggum 技巧 |
+| compound loop | 複合迴路 |
+| compound learning loop | 複合學習迴路 |
+| cycle | 循環 |
+| atomic user story | 原子化的使用者故事 |
+| acceptance criteria | 驗收標準 |
+| task divergence | 任務偏離 |
+| persistence mechanism | 持久化機制 |
+| progress log | 進度日誌 |
+| task state | 任務狀態 |
+| memory channel | 記憶管道 |
+| context file | 脈絡檔案 |
+| context bloat | 脈絡膨脹 |
+| prompt additive | 提示的添加物 |
+| prompt template | 提示模板 |
+| context injection | 脈絡注入 |
+| retrieval | 檢索 |
+| ledger / running notebook | 隨身筆記本 |
+| commit | 提交 |
+| checkpoint commit | 檢查點提交 |
+| pull request | pull request（保留原文） |
+| audit trail | 稽核軌跡 |
+| static analysis | 靜態分析 |
+| type checker | 型別檢查器 |
+| linter | linter（保留原文） |
+| test-driven style | 測試驅動風格 |
+| headless browser | 無頭瀏覽器 |
+| vector database | 向量資料庫 |
+| planner agent | 規劃者代理 |
+| worker agent | 工作者代理 |
+| judge agent | Judge 代理 |
+| swarm | 群集（swarm） |
+| risk-averse | 風險趨避 |
+| throughput | 吞吐量 |
+| confirmation gate | 確認關卡 |
+| allowlist | 白名單 |
+| emergency stop | 緊急停止 |
+| live logs | 即時日誌 |
+| introspection | 內省 |
+| self-reflection | 自我反思 |
+| instrumentation | 量測 |
+| ROI | ROI |
+| grunt work | 粗活 |
+| online learning | 線上學習 |
+| drift | 偏離 |
+| tunnel vision | 隧道視野 |
+
 ## Kept in English
 
 Acronyms and product or project names: LLM, API, SDK, CLI, JSON, HTML, CSS,

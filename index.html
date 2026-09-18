@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文章目錄（Article Index）</title>
+<meta name="description" content="本機保存的繁體中文翻譯文章目錄，依上架時間排序，並可用標籤篩選。">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+
+  /* ---------- index-specific ---------- */
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.45rem;
+    margin:0 0 .6rem;
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  }
+  .chip{
+    font:inherit;
+    font-size:.82rem;
+    line-height:1.5;
+    padding:.25rem .7rem;
+    border:1px solid var(--rule);
+    border-radius:999px;
+    background:transparent;
+    color:var(--fg-soft);
+    cursor:pointer;
+  }
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .chip[aria-pressed="true"]{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:var(--bg);
+  }
+  .status{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.8rem;
+    color:var(--fg-soft);
+    margin:0 0 2rem;
+    min-height:1.4em;
+  }
+  ol.entries{list-style:none;margin:0;padding:0}
+  ol.entries>li{
+    padding:1.4rem 0;
+    border-top:1px solid var(--rule);
+  }
+  ol.entries>li:first-child{border-top:0;padding-top:0}
+  ol.entries>li[hidden]{display:none}
+  .entry-head{
+    display:flex;
+    gap:.75rem;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+  }
+  .entry-title{font-size:1.15rem;font-weight:600;margin:0;line-height:1.5}
+  .entry-title a{text-decoration:none}
+  .entry-title a:hover{color:var(--accent)}
+  .entry-date{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.78rem;
+    color:var(--fg-soft);
+    white-space:nowrap;
+  }
+  .entry-desc{color:var(--fg-soft);font-size:.95rem;margin:.4rem 0 .6rem}
+  .entry-meta{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    color:var(--fg-soft);
+    display:flex;
+    gap:.5rem .9rem;
+    flex-wrap:wrap;
+  }
+  .entry-tags{display:flex;gap:.35rem;flex-wrap:wrap}
+  .tag{
+    padding:.1rem .55rem;
+    border:1px solid var(--rule);
+    border-radius:999px;
+    font-size:.74rem;
+  }
+  .empty{color:var(--fg-soft);font-style:italic}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    .controls,.status{display:none}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">Article Index</p>
+  <h1>文章目錄</h1>
+  <p class="pubdate">依上架時間排序，最新的在最前面</p>
+</header>
+
+<main id="main-content">
+
+<nav class="controls" id="tag-filter" aria-label="依標籤篩選"></nav>
+<p class="status" id="filter-status" role="status" aria-live="polite"></p>
+
+<ol class="entries" id="entries">
+
+  <li data-added="2026-09-18T16:51:27" data-tags="Martin Fowler|代理|程式碼品質|人為監督">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="mf-role-developer-skills/mf-role-developer-skills.zh-Hant.html">代理式編碼中開發者技能的角色（The role of developer skills in agentic coding）</a></h2>
+      <span class="entry-date">2026-09-18 上架</span>
+    </div>
+    <p class="entry-desc">Birgitta Böckeler 記錄自己在代理式編碼工作階段中必須介入修正的具體案例，並依影響半徑分成三類，說明開發者的經驗與技能為何仍然關鍵。</p>
+    <div class="entry-meta">
+      <span>Exploring Gen AI</span>
+      <span>原文 2025-03-25</span>
+      <span class="entry-tags"><span class="tag">Martin Fowler</span><span class="tag">代理</span><span class="tag">程式碼品質</span><span class="tag">人為監督</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-18T15:45:18" data-tags="Addy Osmani|代理|記憶與脈絡|自動化迴路">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="self-improving-agents/self-improving-agents.zh-Hant.html">自我改進的程式編寫代理（Self-Improving Coding Agents）</a></h2>
+      <span class="entry-date">2026-09-18 上架</span>
+    </div>
+    <p class="entry-desc">把開發拆成小任務，讓 AI 代理在迴路中反覆挑任務、寫程式、跑測試、提交，在你睡覺時持續交付，並靠脈絡檔案與驗證機制累積學習。</p>
+    <div class="entry-meta">
+      <span>AddyOsmani.com</span>
+      <span>原文 2026-01-31</span>
+      <span class="entry-tags"><span class="tag">Addy Osmani</span><span class="tag">代理</span><span class="tag">記憶與脈絡</span><span class="tag">自動化迴路</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-18T14:54:11" data-tags="Addy Osmani|工作流|記憶與脈絡|提示工程">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="ai-coding-workflow/ai-coding-workflow.zh-Hant.html">我邁向 2026 的 LLM 寫程式工作流（My LLM coding workflow going into 2026）</a></h2>
+      <span class="entry-date">2026-09-18 上架</span>
+    </div>
+    <p class="entry-desc">AI 寫程式助手在 2025 年成了改變全局的戰力，但要有效駕馭它們，得靠技巧與結構。本文分享我規劃、寫程式，以及與 AI 協作的工作流。</p>
+    <div class="entry-meta">
+      <span>AddyOsmani.com</span>
+      <span>原文 2026-01-04</span>
+      <span class="entry-tags"><span class="tag">Addy Osmani</span><span class="tag">工作流</span><span class="tag">記憶與脈絡</span><span class="tag">提示工程</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-18T14:24:35" data-tags="aider|記憶與脈絡|工具鏈|程式碼檢索">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="repomap-treesitter/repomap-treesitter.zh-Hant.html">用 tree-sitter 打造更好的儲存庫地圖（Building a better repository map with tree sitter）</a></h2>
+      <span class="entry-date">2026-09-18 上架</span>
+    </div>
+    <p class="entry-desc">Tree-sitter 讓 aider 能建立儲存庫地圖（repo map），更有效率地摘要大型程式碼庫。</p>
+    <div class="entry-meta">
+      <span>aider</span>
+      <span>原文 2023-10-22</span>
+      <span class="entry-tags"><span class="tag">aider</span><span class="tag">記憶與脈絡</span><span class="tag">工具鏈</span><span class="tag">程式碼檢索</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-18T13:18:49" data-tags="Claude Code|記憶與脈絡|工具鏈|實務技巧">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="claude-code-best-practices/claude-code-best-practices.zh-Hant.html">Claude Code 最佳實務（Best practices for Claude Code）</a></h2>
+      <span class="entry-date">2026-09-18 上架</span>
+    </div>
+    <p class="entry-desc">充分發揮 Claude Code 的技巧與模式，從環境設定到跨平行工作階段的規模化。</p>
+    <div class="entry-meta">
+      <span>Claude Code 文件</span>
+      <span>原文 2026-09-15</span>
+      <span class="entry-tags"><span class="tag">Claude Code</span><span class="tag">記憶與脈絡</span><span class="tag">工具鏈</span><span class="tag">實務技巧</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-18T09:19:38" data-tags="Anthropic|代理|架構模式">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="building-effective-agents/building-effective-agents.zh-Hant.html">打造高效的代理（Building effective agents）</a></h2>
+      <span class="entry-date">2026-09-18 上架</span>
+    </div>
+    <p class="entry-desc">Anthropic 對於如何開發可靠 AI 代理（agent）的方法：代理系統（agentic systems）、工作流（workflows）與代理（agents）的架構區分與實務模式。</p>
+    <div class="entry-meta">
+      <span>Engineering at Anthropic</span>
+      <span>原文 2024-12-19</span>
+      <span class="entry-tags"><span class="tag">Anthropic</span><span class="tag">代理</span><span class="tag">架構模式</span></span>
+    </div>
+  </li>
+
+</ol>
+
+<p class="empty" id="empty-note" hidden>沒有符合所選標籤的文章。</p>
+
+</main>
+
+<footer class="mastfoot">
+  <p>本頁彙整本機保存的繁體中文翻譯文章。排序依上架時間（新到舊），原文日期另列於各條目。</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var list = document.getElementById('entries');
+  var bar = document.getElementById('tag-filter');
+  var status = document.getElementById('filter-status');
+  var emptyNote = document.getElementById('empty-note');
+  var entries = Array.prototype.slice.call(list.children);
+
+  // 依 data-added 由新到舊排序：改排序規則只需改這一行。
+  entries
+    .sort(function (a, b) {
+      return b.dataset.added.localeCompare(a.dataset.added);
+    })
+    .forEach(function (li) { list.appendChild(li); });
+
+  // 標籤清單由 DOM 自動蒐集：新增文章時只要填好 data-tags，不必改這裡。
+  var tags = [];
+  entries.forEach(function (li) {
+    (li.dataset.tags || '').split('|').forEach(function (t) {
+      if (t && tags.indexOf(t) === -1) tags.push(t);
+    });
+  });
+  tags.sort(function (a, b) { return a.localeCompare(b, 'zh-Hant'); });
+
+  var selected = [];
+  var allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  allBtn.className = 'chip';
+  allBtn.textContent = '全部';
+  allBtn.setAttribute('aria-pressed', 'true');
+  bar.appendChild(allBtn);
+
+  var tagButtons = tags.map(function (tag) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.textContent = tag;
+    b.setAttribute('aria-pressed', 'false');
+    bar.appendChild(b);
+    return b;
+  });
+
+  function apply() {
+    var shown = 0;
+    entries.forEach(function (li) {
+      var own = (li.dataset.tags || '').split('|');
+      var hit = selected.length === 0 || selected.some(function (t) {
+        return own.indexOf(t) !== -1;
+      });
+      li.hidden = !hit;
+      if (hit) shown++;
+    });
+    allBtn.setAttribute('aria-pressed', selected.length === 0 ? 'true' : 'false');
+    tagButtons.forEach(function (b) {
+      b.setAttribute('aria-pressed', selected.indexOf(b.textContent) !== -1 ? 'true' : 'false');
+    });
+    emptyNote.hidden = shown !== 0;
+    status.textContent = selected.length === 0
+      ? '共 ' + shown + ' 篇，未套用篩選。'
+      : '標籤：' + selected.join('、') + ' — 顯示 ' + shown + ' / ' + entries.length + ' 篇。';
+  }
+
+  allBtn.addEventListener('click', function () {
+    selected = [];
+    apply();
+  });
+
+  tagButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = b.textContent;
+      var i = selected.indexOf(t);
+      if (i === -1) selected.push(t);
+      else selected.splice(i, 1);
+      apply();
+    });
+  });
+
+  apply();
+})();
+</script>
+
+</body>
+</html>
