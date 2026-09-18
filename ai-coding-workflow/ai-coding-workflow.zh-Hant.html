@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我邁向 2026 的 LLM 寫程式工作流（My LLM coding workflow going into 2026）</title>
+<meta name="description" content="AI 寫程式助手在 2025 年成了改變全局的戰力，但要有效駕馭它們，得靠技巧與結構。本文分享我規劃、寫程式，以及與 AI 協作的工作流。">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">AddyOsmani.com</p>
+  <h1>我邁向 2026 的 LLM 寫程式工作流（My LLM coding workflow going into 2026）</h1>
+  <p class="pubdate">2026 年 1 月 4 日</p>
+</header>
+
+<main id="main-content">
+
+<p><strong>AI 寫程式助手在 2025 年成了改變全局的戰力，但要有效駕馭它們，得靠技巧與結構。</strong>這些工具大幅擴張了 LLM 在真實寫程式場景能做的事，許多開發者（包括我自己）都擁抱了它們。</p>
+
+<p>以 Anthropic 為例，工程師對 Claude Code 的採用程度高到<a href="https://newsletter.pragmaticengineer.com/p/software-engineering-with-llms-in-2025#:~:text=,%E2%80%9D"><strong>如今</strong></a> <strong>Claude Code 約 90% 的程式碼由 Claude Code 自己寫成</strong>。不過，拿 LLM 來寫程式<em>不是</em>按下按鈕就變魔術的體驗：它「困難又違反直覺」，想拿到好結果得學新的模式。<a href="https://addyo.substack.com/p/critical-thinking-during-the-age">批判性思考</a>依然是關鍵。走過一年多的專案，我收斂出一套工作流，和許多資深開發者正在摸索的方向差不多：把 LLM 當成強大的結對程式設計師（pair programmer），它<strong>需要明確的方向、脈絡與監督</strong>，而不是自主判斷。</p>
+
+<p>這篇文章要分享我邁向 2026 時怎麼規劃、寫程式、與 AI 協作，把來自我自身經驗與社群集體學習的技巧與最佳實務整理出來。這是一套更有紀律的<strong>「AI 輔助工程」（AI-assisted engineering）</strong>做法：積極運用 AI，同時<strong>對產出的軟體驕傲地負起責任</strong>。</p>
+
+<p>想多看一些我的工作流，可以參考「The AI-Native Software Engineer」；否則我們就直接進入我學到的一些教訓。</p>
+
+<h2>從清楚的計畫開始，先規格後程式（Start with a clear plan (specs before code)）</h2>
+
+<p><strong>別只是對 LLM 許願，先定義問題、規劃解法。</strong></p>
+
+<p>常見的錯誤，是拿一句模糊的提示就直接跳進程式生成。在我的工作流，也在很多人的工作流裡，第一步是<em>和</em> AI 一起<strong>腦力激盪出詳細規格（spec）</strong>，接著在寫任何實際程式碼<em>之前</em>先擬出逐步計畫。碰上一個新專案，我會描述構想，請 LLM <strong>反覆問我問題</strong>，直到把需求與邊界情況都談清楚。最後我們把它整理成一份完整的 <strong>spec.md</strong>，裡頭有需求、架構決策、資料模型，甚至測試策略。這份規格就是開發的基礎。</p>
+
+<p>接著我把規格丟給具備推理能力的模型，請它<strong>產出專案計畫</strong>：把實作拆成合乎邏輯、一口大小的任務或里程碑。AI 基本上就是幫我做一份迷你「設計文件」或專案計畫。我常在這份計畫上來回修改，邊編輯邊請 AI 批評、打磨，直到它連貫又完整。<em>到這時候</em>我才動工寫程式。這種前期投入感覺很慢，但回收極大。就像 Les Orchard <a href="https://blog.lmorchard.com/2025/06/07/semi-automatic-coding/#:~:text=Accidental%20waterfall%20">說的</a>，這好比做一場<strong>「15 分鐘的瀑布式開發」</strong>：快速而結構化地規劃，後面的程式寫起來順暢得多。</p>
+
+<p>有了清楚的規格與計畫，等到我們放開手讓程式生成跑起來，人和 LLM 都清楚自己在建什麼、為什麼要建。簡單說，<strong>先規劃</strong>會把你和 AI 逼到同一個頁面上，省下白費的來回。這一步很多人忍不住想跳過，但如今有經驗的 LLM 開發者都把它當成整條工作流的基石。</p>
+
+<h2>把工作切成小塊、反覆迭代（Break work into small, iterative chunks）</h2>
+
+<p><strong>範圍管理就是一切：餵給 LLM 可以消化的任務，而不是一次丟進整個程式碼庫。</strong></p>
+
+<p>我學到的一個關鍵教訓，是別要求 AI 產出又大又完整的成品。改成把<strong>專案拆成一段段可迭代的步驟或票（ticket）</strong>，<a href="https://blog.fsck.com/2025/10/05/how-im-using-coding-agents-in-september-2025/#:~:text=please%20write%20out%20this%20plan%2C,in%20full%20detail%2C%20into%20docs%2Fplans">一次處理一個</a>。這和良好的軟體工程實務一致，但把 AI 放進迴路之後更形重要。LLM 拿到聚焦的提示時表現最好：一次實作一個函式、修一個 bug、加一個功能。舉例來說，規劃完之後我會對程式生成模型說：<em>「好，我們來實作計畫裡的第 1 步。」</em>我們寫完、測過，再前進第 2 步，依此類推。每個區塊都小到 AI 能在脈絡內處理，你也能看懂它產出的程式。</p>
+
+<p>這樣做能防止模型失控。你要是一次要得太多，它很可能搞混，或產出一團<strong>「難解的爛攤子」</strong>。有開發者<a href="https://albertofortin.com/writing/coding-with-ai#:~:text=No%20consistency%2C%20no%20overarching%20plan,the%20other%209%20were%20doing">回報</a>，他們試著讓 LLM 生成應用程式的一大片功能，結果換來不一致與重複：有人說「像是有 10 個開發者各做各的，彼此沒講過話」。這種痛我懂；解法就是<strong>停下來、退一步，把問題切成更小的碎片</strong>。每迭代一輪，我們帶著已經建好的部分往前推進，一點一點加上去。這也很適合<strong>測試驅動開發（test-driven development，TDD）</strong>：我們可以邊做邊為每個片段寫或生成測試（後面會多談測試）。</p>
+
+<p>現在有幾款寫程式代理工具明確支援這種分塊工作流。例如我常產出一份結構化的<strong>「提示計畫」（prompt plan）</strong>檔案，裡頭是每個任務對應的一串提示，讓 Cursor 這類工具能逐一執行。重點是<strong>不要跨太大步</strong>。用小迴圈反覆迭代，災難性錯誤的機會大幅降低，也能很快修正方向。LLM 擅長快速、範圍明確的任務，把這一點用起來。</p>
+
+<h2>提供充足的脈絡與引導（Provide extensive context and guidance）</h2>
+
+<p><strong>LLM 的表現取決於你給的脈絡：把相關的程式、文件與限制<em>拿給它看</em>。</strong></p>
+
+<p>在程式碼庫裡工作時，我會確保<strong>把 AI 需要的一切資訊餵給它</strong>，讓它好好發揮。這包括它該修改或參考的程式碼、專案在技術上的限制，以及已知的坑或團隊偏好的做法。現代工具有幫助：例如 Anthropic 的 Claude 能在「Projects」模式把整個 GitHub 儲存庫匯入脈絡，Cursor 或 Copilot 這類 IDE 助手則會自動把開啟的檔案納入提示。但我通常做得更多：只要懷疑模型手上沒有，我就會用像 <a href="https://context7.com/">Context7</a> 這樣的 MCP，或手動把程式碼庫、API 文件的重要片段複製到對話裡。</p>
+
+<p>熟悉 LLM 的人很強調這個「脈絡打包」（context packing）步驟。例如在寫程式前對模型做一次<strong>「腦內大掃除」（brain dump）</strong>，把該知道的東西全倒出來：高階目標與不變條件（invariant）、好解法的範例，以及該避開哪些做法的警告。如果要 AI 實作一個棘手的解法，我可能會告訴它哪些天真做法太慢，或從別處找一份參考實作給它。如果用上冷門函式庫或全新 API，我會貼上官方文件或 README，免得 AI 兩眼一抹黑。這些前期脈絡會大幅提升輸出品質，因為模型不是在猜：事實與限制就攤在它面前。</p>
+
+<p>現在也有工具能自動打包脈絡。我試過 <a href="https://gitingest.com/"><strong>gitingest</strong></a> 和 <a href="https://github.com/abinthomasonline/repo2txt"><strong>repo2txt</strong></a>，它們基本上是把<strong>程式碼庫裡相關的部分「倒」成一個文字檔，讓 LLM 去讀</strong>。面對大型專案時這能救命：你產生一個裝著關鍵原始檔的 output.txt，讓模型吃進去。原則是：<strong>別讓 AI 靠殘缺的資訊辦事</strong>。如果修一個 bug 得看懂四個不同模組，就把那四個模組給它看。沒錯，token 上限得留意，但當前的前沿模型脈絡視窗相當大（數萬個 token），好好用。我常只挑和手邊任務相關的程式碼片段，並且明確告訴 AI 哪些東西<em>不在</em>範圍內（省 token）。</p>
+
+<p>我覺得 <a href="https://github.com/anthropics/skills"><strong>Claude Skills</strong></a> 有潛力，因為它把過去脆弱、得反覆重貼的提示，變成<strong>耐用又可重用</strong>的東西：把指令、腳本與領域專業打包成模組化能力，工具在請求符合某個 Skill 時會自動套用。這代表你能拿到比一般提示更可靠、更貼合脈絡的結果，也從一次性的互動，走向把可重複的流程與團隊知識固定下來的做法。社群整理了<a href="https://www.x-cmd.com/skill/">不少 Skill 集合</a>，我自己最喜歡的例子之一是 <a href="https://x.com/trq212/status/1989061937590837678">frontend-design</a> 這個 skill，它能「終結」LLM 生成的 UI 裡那種常見的紫色美學。在更多工具正式支援 Skills 之前，也有人做了<a href="https://github.com/intellectronica/skillz">變通方案</a>。</p>
+
+<p>最後，<strong>用提示裡的註解與規則引導 AI</strong>。我可能會在程式碼片段前面加一句：「這是 X 目前的實作。我們要擴充它去做 Y，但小心別弄壞 Z。」這些小提示很管用。LLM 是<strong>字面派</strong>，它會照著指令走，所以給它詳細、帶脈絡的指令。主動提供脈絡與引導，就能把<a href="/agentic-engineering/hallucination/">幻覺</a>和離譜的建議減到最少，拿到的程式也更符合專案需求。</p>
+
+<h2>挑對模型，必要時並用多個（Choose the right model (and use multiple when needed)）</h2>
+
+<p><strong>寫程式的 LLM 並非生而平等：有意識地挑工具，也別怕中途換模型。</strong></p>
+
+<p>2025 年我們被各種能寫程式的 LLM 寵壞了。我工作流的一部分，就是<strong>為每個任務挑最合適的模型或服務</strong>。有時候，同時試兩個以上 LLM、交叉比對它們怎麼用不同方式解同一個問題，也很有價值。</p>
+
+<p>每個模型都有自己的「個性」。關鍵是：<strong>某個模型卡住或輸出平庸時，就換一個。</strong>我真的做過把同一段提示從一個對話複製到另一個服務，看它能不能處理得更好。這種<a href="https://blog.lmorchard.com/2025/06/07/semi-automatic-coding/#:~:text=I%20bounced%20between%20Claude%20Sonnet,Each%20had%20its%20own%20personality">「模型大風吹」</a>能在你撞上某個模型的盲點時救你一命。</p>
+
+<p>另外，確認你用的是<em>最好的版本</em>。情況允許就用最新的「pro」等級模型，品質有差。這通常代表得付費，但生產力的提升撐得起這筆錢。說到底，挑那個<strong>「氣場」和你合得來</strong>的 AI 結對程式設計師。我知道有些人偏好某個模型，單純因為喜歡它回應的<em>感覺</em>。這很合理：當你基本上是在跟 AI 持續對話，UX 與語氣就是有差。</p>
+
+<p>就我個人而言，現在很多寫程式的工作我偏好 Gemini（先聲明，我在 Google 做 Gemini，自然比較熟），因為互動起來更自然，也常第一次就聽懂我的要求。但需要時我會毫不猶豫換到別的模型；有時第二意見能讓解法浮現。總結：<strong>用最合適的工具，也記得你手邊有一整櫃的 AI 可用。</strong></p>
+
+<h2>在整個生命週期裡運用 AI 寫程式（Leverage AI coding across the lifecycle）</h2>
+
+<p><strong>用貫穿 SDLC 的寫程式專用 AI 協助，把你的工作流推到更高檔。</strong></p>
+
+<p>命令列上也冒出了新的 AI 代理。<strong>Claude Code、OpenAI 的 Codex CLI</strong> 與 <strong>Google 的 Gemini CLI</strong> 都是 CLI 工具，你可以在專案目錄裡直接和它們對話：它們能讀檔、跑測試，甚至多步驟修好問題。我也用過 Google 的 <strong>Jules</strong> 和 GitHub 的 <strong>Copilot Agent</strong>，這些是<strong>非同步寫程式代理（asynchronous coding agents）</strong>，真的會把你的儲存庫複製到雲端 VM，在背景處理任務（寫測試、修 bug，然後替你開一個 PR）。目睹這一切有點詭異：你下個指令「把付款模組重構成 X」，過一陣子就收到一個帶著程式變更與通過測試的 pull request。我們真的活在未來。想多了解，可以讀<a href="https://addyo.substack.com/p/conductors-to-orchestrators-the-future">從指揮到編排</a>。</p>
+
+<p>話說回來，<strong>這些工具並非萬無一失，你得明白它們的極限</strong>。它們加速的是寫程式裡機械性的部分：生成樣板、套用重複的變更、自動跑測試；但依然很需要你的引導。比如我用 Claude 或 Copilot 這類代理實作某個東西時，常把前面步驟的計畫或待辦清單交給它，讓它知道任務的確切順序。如果代理支援，我會先把 spec.md 或 plan.md 載進脈絡，再叫它執行。這樣能讓它走在軌道上。</p>
+
+<p><strong>我們還沒走到能讓 AI 代理無人看管地寫完一整個功能</strong>，還期待結果完美。所以我用監督的方式操作這些工具：讓它們生成、甚至執行程式，但每一步都盯著，一有苗頭不對就介入。也有像 <strong>Conductor</strong> 這樣的編排工具，讓你在不同任務上平行跑多個代理（基本上就是放大 AI 的助力），有些工程師正在實驗同時跑 3、4 個代理處理不同功能。這種「大規模平行」的做法我玩過：快速完成大量工作出乎意料地有效，但盯著多條 AI 執行緒也很耗心神！大多數情況下，我一次只用一個主代理，也許再加一個負責審查的次要代理（下面會談）。</p>
+
+<p>記住這些都是強力工具：扳機還在你手上，結果也由你引導。</p>
+
+<h2>讓人留在迴路裡：驗證、測試、審查每一件事（Keep a human in the loop - verify, test, and review everything）</h2>
+
+<p><strong>AI 會樂於產出看起來合理的程式碼，但品質<em>由你</em>負責：永遠要仔細審查與測試。</strong>我的首要原則之一，是絕不盲目相信 LLM 的輸出。就像 Simon Willison 貼切<a href="https://simonwillison.net/2025/Mar/11/using-llms-for-code/#:~:text=Instead%2C%20use%20them%20to%20augment,on%20tedious%20tasks%20without%20complaint">說的</a>，把 LLM 結對程式設計師想成<strong>「過度自信、容易犯錯」</strong>。它寫程式時信心滿滿，包括 bug 和胡說八道在內，而且除非你抓到，它不會告訴你哪裡有問題。所以我對待每一段 AI 生成的程式碼，都像它出自一個資淺開發者：讀過、跑過，需要就測。<strong>它寫的東西你一定要測</strong>：跑那些單元測試，或手動操作那個功能，確認它做到自己宣稱的事。想多讀，可以看 <a href="https://addyo.substack.com/p/vibe-coding-is-not-an-excuse-for">vibe coding 不是低品質工作的藉口</a>。</p>
+
+<p>事實上，我把測試織進工作流本身。前面的規劃階段常會包含為每個步驟產出一份測試清單或測試計畫。如果用 Claude Code 這類工具，我會叫它在實作完任務後跑測試套件，有失敗就除錯。這種緊密的回饋迴路（寫程式 → 跑測試 → 修正）正是 AI 的強項，<em>前提是測試存在</em>。難怪最能從寫程式代理榨出成果的人，往往也是測試實務最扎實的人。有好的測試套件當安全網，Claude 這樣的代理能「飛快」推進整個專案。沒有測試，代理可能傻乎乎地以為一切正常（「沒問題，都很好！」），實際上已經弄壞了好幾樣東西。所以，<strong>投資測試</strong>：它會放大 AI 的用處，也放大你對結果的信心。</p>
+
+<p>除了自動化測試，也要<strong>做程式碼審查：人工的和 AI 輔助的都做</strong>。我經常停下來，逐行審查目前生成的程式碼。有時我會開第二個 AI 工作階段（或換個模型），請<em>它</em>批評或審查第一個產出的程式碼。比如讓 Claude 寫程式，然後問 Gemini：「你可以審一下這個函式有沒有錯或能改進的地方嗎？」這能抓到細微的問題。關鍵是：<em>不要</em>因為程式是 AI 寫的就跳過審查。真要說，AI 寫的程式需要<strong>額外的檢視</strong>，因為它有時表面很有說服力，底下卻藏著人一時看不出來的缺陷。</p>
+
+<p>我也用 <a href="https://github.com/chromeDevTools/chrome-devtools-mcp/">Chrome DevTools MCP</a>（和我上一支團隊一起做的）來做我的<strong>除錯與品質迴路</strong>，在靜態程式分析和瀏覽器實際執行之間搭橋。它「給了你的代理一雙眼睛」：讓我能授予 AI 工具直接存取瀏覽器所見的一切，檢視 DOM，取得豐富的效能追蹤、主控台日誌或網路追蹤。這個整合消除了手動切換脈絡的摩擦，讓 UI 測試能直接透過 LLM 自動化。這代表你能依據實際執行資料，高精確度地診斷並修好 bug。</p>
+
+<p>跳過人為監督的慘痛後果，是有紀錄的。一位在趕工專案裡大量依賴 AI 生成的開發者<a href="https://albertofortin.com/writing/coding-with-ai#:~:text=No%20consistency%2C%20no%20overarching%20plan,the%20other%209%20were%20doing">描述</a>，結果是一團不一致的亂局：重複的邏輯、對不上的方法名稱、沒有一致的架構。他發現自己一直「建、建、建」，從沒退一步真正看清 AI 到底織出了什麼。補救的代價是一次痛苦的重構，還有從此不再讓事情失控的決心。我把這件事放在心上。<strong>無論我用多少 AI，我仍然是那個負責任的工程師。</strong></p>
+
+<p>實際來說，這代表我只合併或交付自己已理解的程式碼。如果 AI 生成的東西拐彎抹角，我會請它補上註解解釋，或自己用更簡單的方式重寫。如果哪裡感覺不對，我就深挖，就像人類同事送來的程式碼亮了紅旗時我會做的一樣。</p>
+
+<p>這一切關乎心態：<strong>LLM 是助手，不是能自主信任的寫程式者</strong>。我是資深開發者，LLM 是來加速我的，不是來取代我的判斷。守住這個立場，不只讓程式碼更好，也保護你身為開發者的成長。（我聽過有人擔心太依賴 AI 會讓自己的能力變鈍。我認為只要你留在迴路裡，主動審查、理解每一件事，你仍是在磨練直覺，只是速度更快。）簡單說：<strong>保持警覺、經常測試、永遠審查。</strong>說到底，這仍然是你的程式碼庫。</p>
+
+<h2>經常提交，把版本控制當安全網；絕不提交自己解釋不了的程式碼（Commit often and use version control as a safety net. Never commit code you can’t explain.）</h2>
+
+<p><strong>頻繁提交是你的存檔點：它們讓你能撤銷 AI 的失誤，也讓你理解變更。</strong></p>
+
+<p>和一個能快速生成大量程式碼的 AI 共事，事情很容易偏離軌道。我的應對是採用極細粒度的版本控制習慣：比平常手寫程式更早、更頻繁地提交。每完成一個小任務，或每次自動編輯成功，我就做一次帶清楚訊息的 git commit。這樣一來，如果 AI 的下一個建議引入 bug 或一團亂的變更，我有一個最近的檢查點可以還原（或從中 cherry-pick），不會損失好幾個小時。有位實踐者把它比作把 commit 當成<strong>「遊戲存檔點」</strong>：LLM 工作階段一旦走偏，你總能退回上一個穩定 commit。我覺得這個建議極好用。知道必要時一句 git reset 就能撤銷，實驗大膽的 AI 重構時壓力小得多。</p>
+
+<p>妥善的版本控制，也和 AI 協作時幫得上忙。我不能指望 AI 記得它做過的每件事（脈絡視窗有限等等），於是 git 歷史成了寶貴的紀錄。我常翻最近的 commit，向 AI（或自己）簡報改了什麼。其實只要提供 commit 歷史，LLM 本身也能利用它：我把 git diff 或 commit log 貼進提示，AI 就知道哪些程式是新的、先前狀態是什麼。有趣的是，LLM <em>非常</em>擅長解析 diff，也擅長用 git bisect 這類工具找出 bug 是哪次引入的。它們有無窮的耐心翻遍 commit 歷史，能補強你的除錯。但前提是，你本來就得有一份整齊的 commit 歷史。</p>
+
+<p>還有一個好處：訊息寫得好的小 commit，本身就是開發過程的紀錄，做程式碼審查（AI 或人工）時幫得上忙。如果 AI 代理一次做了五項變更然後壞了，把這些變更拆在各自的 commit 裡，就更容易鎖定是哪一筆造成的。要是全塞在一筆叫「AI changes」的巨大 commit 裡，祝你好運！所以我要求自己：<em>做完任務、跑測試、提交。</em>這也和前面把工作切成小塊的建議相合：每個片段最後都成了自己的 commit 或 PR。</p>
+
+<p>最後，別怕<strong>用分支或 worktree</strong> 隔離 AI 實驗。我採用的一套進階做法（受 Jesse Vincent 等人啟發）是為新功能或子專案開一個全新的 git worktree。這讓我能同一個儲存庫上平行跑多個 AI 寫程式工作階段而不互相干擾，之後再合併變更。有點像把每個 AI 任務放進自己的沙箱分支。實驗失敗，就丟掉那個 worktree，main 什麼都沒少；實驗成功，就合併進來。如果我這邊讓 AI 實作功能 A，自己（或另一個 AI）同時做功能 B，這套做法就很關鍵。版本控制正是讓這種協調得以成立的原因。簡單說：<strong>經常提交、用分支整理工作，並且擁抱 git</strong>，把它當成控制機制，讓 AI 生成的變更保持在可管理、可還原的範圍內。</p>
+
+<h2>用規則與範例自訂 AI 的行為（Customize the AI’s behavior with rules and examples）</h2>
+
+<p><strong>用風格指南、範例，甚至「規則檔」來引導你的 AI 助手：事前一點調校，輸出好得多。</strong></p>
+
+<p>我學到的一點是，你不必接受 AI 的預設風格或做法：給它準則，就能大幅影響它。例如我有一份 <strong>CLAUDE.md</strong>，會定期更新，裡頭是希望 Claude（Anthropic 的模型）遵循的流程規則與偏好（用 Gemini CLI 時則有類似的 GEMINI.md）。內容包括「用我們專案的風格寫程式、遵守 lint 規則、別用某些函式、偏好函式風格而非 OOP」等等。開始一個工作階段時，我把這份檔案餵給 Claude，讓它對齊我們的慣例。正如 Jesse Vincent <a href="https://blog.fsck.com/2025/10/05/how-im-using-coding-agents-in-september-2025/#:~:text=I%27m%20still%20primarily%20using%20Claude,Code">指出的</a>，這對讓模型「走在軌道上」的效果好得驚人，能減少 AI 脫稿演出或引入我們不想要的模式。</p>
+
+<p>就算沒有花俏的規則檔，你也可以<strong>用自訂指令或系統提示定調</strong>。GitHub Copilot 和 Cursor 都推出了功能，讓你為專案<a href="https://benjamincongdon.me/blog/2025/02/02/How-I-Use-AI-Early-2025/#:~:text=stuck,my%20company%E2%80%99s%20%2F%20team%E2%80%99s%20codebase">全域</a>配置 AI 的行為。我利用這點，寫了一小段關於我們寫程式風格的說明，例如「縮排用 4 個空格、React 裡避免箭頭函式、偏好描述性的變數名稱、程式碼要通過 ESLint」。有了這些指令，AI 的建議會更貼近人類隊友可能寫出的樣子。Ben Congdon <a href="https://benjamincongdon.me/blog/2025/02/02/How-I-Use-AI-Early-2025/#:~:text=roughly%20on%20par,get%20past%20a%20logical%20impasse">提到</a>，他很驚訝很少人用 <strong>Copilot 的自訂指令</strong>，因為它們效果這麼好：只要事前給一些範例與偏好，他就能引導 AI 輸出符合團隊慣用語的程式。我完全同意：花時間教 AI 你的期待。</p>
+
+<p>另一個有力技巧，是提供<strong>行內範例</strong>，示範你想要的輸出格式或做法。如果要 AI 用很特定的方式寫一個函式，我可能會先給它看程式碼庫裡一個類似的函式：「我們是這樣實作 X 的，Y 就用類似的做法。」如果想要某種註解風格，我可能自己寫一段註解，請 AI 用同樣風格接下去。本質上是<em>先給</em>模型一個可依循的模式。LLM 很會模仿：給它一兩個範例，它就會照著那個路子走。</p>
+
+<p>社群也想出了一些有創意的「規則集」來馴服 LLM 的行為。你可能聽過<a href="https://harper.blog/2025/04/17/an-llm-codegen-heros-journey/#:~:text=repository,it%20in%20a%20few%20steps">「Big Daddy」規則</a>，或在提示裡加一條「不幻覺／不欺瞞」條款。這些基本上是提醒 AI 說實話、別過度捏造不存在的程式碼。例如我有時會在提示前面加：「如果你對某事不確定，或缺少程式碼庫的脈絡，請要求釐清，而不是編一個答案。」這能減少幻覺。我還會用另一條規則：「修 bug 時，總是在註解裡簡短說明你的理由。」這樣一來，AI 生成修正時也會留下一行註解，像「// Fixed: Changed X to Y to prevent Z (as per spec).」這對之後審查非常有用。</p>
+
+<p>總結來說，<strong>別把 AI 當黑盒子：調校它</strong>。透過配置系統指令、分享專案文件，或寫下明確規則，你把 AI 變成團隊裡更專門的開發者。這就像帶一個新進員工：你會給他風格指南和一些入門提示，對吧？對你的 AI 結對程式設計師也這麼做。投資報酬率極高：你拿到的輸出需要微調的地方更少，和程式碼庫整合得更順。</p>
+
+<h2>把測試與自動化當成力量倍增器（Embrace testing and automation as force multipliers）</h2>
+
+<p><strong>把 CI/CD、linter 與程式碼審查機器人用起來：AI 在能自動抓錯的環境裡表現最好。</strong></p>
+
+<p>這是「留在迴路裡」與「提供脈絡」的推論：一條運轉順暢的開發流水線會提升 AI 的生產力。我確保任何大量使用 AI 寫程式的儲存庫都有健全的<strong>持續整合（continuous integration）設定</strong>：每次 commit 或 PR 都跑自動化測試，強制執行程式風格檢查（如 ESLint、Prettier 等），最好還為每個新分支準備一個 staging 部署。為什麼？因為這樣我就能讓 AI 觸發這些流程並評估結果。例如 AI 透過 Jules 或 GitHub Copilot Agent 開了 pull request，我們的 CI 會跑測試並回報失敗。我可以把那些失敗日誌餵回給 AI：「整合測試在 XYZ 失敗了，我們來除錯。」這把修 bug 變成一條有快速回饋的協作迴路，而 AI 處理得不錯（它們提出修正，我們再跑 CI，如此反覆）。</p>
+
+<p>自動化的程式品質檢查（linter、型別檢查器）也在引導 AI。我有時真的會把 linter 輸出放進提示。如果 AI 寫的程式過不了 linter，我就把 linter 錯誤複製到對話裡，說「請處理這些問題」。模型就會清楚知道要做什麼，像是有個嚴格的老師在 AI 背後盯著。依我的經驗，AI 一旦知道工具的輸出（例如失敗的測試或 lint 警告），就會非常努力去改正，畢竟它「想」給出正確答案。這又扣回提供脈絡：把 AI 在環境中行動的結果（測試失敗等）給它，它就會從中學習。</p>
+
+<p>AI 寫程式代理本身也越來越多納入自動化 hook。有些代理在所有測試通過之前，會拒絕宣稱一個寫程式任務「完成」，這正是你要的嚴謹。程式碼審查機器人（AI 與否）是另一道濾網，我把它的意見當成額外的改進提示。例如 CodeRabbit 或其他審查者留言「這個函式做的事情不太理想」，我就會問 AI：「你可以根據這個意見重構嗎？」</p>
+
+<p>把 AI 和自動化結合，就會開始出現良性循環：AI 寫程式，自動化工具抓問題，AI 修正，如此往復，你負責監督高階方向。感覺像有個快得離譜的資淺開發者，他的產出立刻被一位不知疲倦的 QA 工程師檢查。但記住，那個環境是<em>你</em>建立的。如果你的專案缺少測試或任何自動化檢查，AI 的成果可能帶著細微的 bug 或欠佳的品質一路溜過去，直到很久以後才被發現。</p>
+
+<p>所以邁向 2026，我的目標之一，是強化 AI 程式貢獻周邊的品質關卡：更多測試、更多監控，甚至 AI 審 AI 的程式碼審查。這聽起來或許矛盾（AI 審 AI），但我看過它抓到某個模型漏掉的東西。底線是：<strong>對 AI 友善的工作流，就是自動化夠強的工作流：用這些工具讓 AI 保持誠實。</strong></p>
+
+<h2>持續學習與調適：AI 會放大你的能力（Continuously learn and adapt (AI amplifies your skills)）</h2>
+
+<p><strong>把每一場 AI 寫程式的工作階段都當成學習機會：你懂得越多，AI 越能幫你，形成良性循環。</strong></p>
+
+<p>在開發中使用 LLM，最令人興奮的一面之一，是我<em>自己</em>在這個過程裡學到了多少。AI 沒有取代我對知識的需求，反而讓我接觸到原本不會自己嘗試的新語言、框架與技巧。</p>
+
+<p>這個模式普遍成立：如果你本身就有扎實的軟體工程基礎，AI 會把你的生產力<strong>放大</strong>好幾倍。缺了這個底子，AI 放大的可能只是混亂。資深開發者觀察到，LLM「會獎勵既有的最佳實務」：寫清楚的規格、有好的測試、做程式碼審查這些事，一旦有 AI 參與，全部變得更有威力。依我的經驗，AI 讓我在更高的抽象層次上工作（專注設計、介面、架構），由它生產樣板程式；但那些高階能力我得先<em>具備</em>。正如 Simon Willison 指出的，幾乎所有讓人成為<strong>資深工程師</strong>的能力（設計系統、管理複雜度、知道什麼該自動化、什麼該手寫），正是如今搭配 AI 最能拿到好結果的能力。所以用 AI 反而推著我<strong>把工程功力往上提</strong>：我對規劃更嚴謹，對架構更有意識，因為我實際上是在「管理」一個很快但有點天真的寫程式者（就是 AI）。</p>
+
+<p>至於那些擔心用 AI 會讓能力退化的人，我認為做得對的話，結果恰恰相反。審查 AI 的程式，讓我接觸到新的慣用寫法與解法；替 AI 的錯誤除錯，加深了我對語言與問題領域的理解。我常請 AI 解釋程式，或某個修正背後的理由，有點像不斷面試一個候選人、請他說明自己的程式，我從回答裡汲取洞見。我也把 AI 當研究助手：對某個函式庫或做法沒把握時，請它列出選項或比較取捨。像是一個隨時待命、百科全書般的導師。這一切都讓我成了懂得更多的程式設計師。</p>
+
+<p>大方向是：<strong>AI 工具會放大你的專業</strong>。邁向 2026，我不怕它們「搶走我的工作」，反而興奮它們把我從苦工裡解放出來，讓我能花更多時間在軟體工程中創造性、複雜的那一面。但我也清楚，對沒有扎實底子的人來說，AI 可能導致打了類固醇的達克效應（Dunning-Kruger）：你可能<em>以為</em>自己做出了很棒的東西，直到它崩解。所以我的建議是：繼續磨練手藝，並用 AI 加速這個過程。也要有意識地定期不用 AI 寫程式，讓原始能力保持鋒利。到頭來，開發者加 AI 的組合遠比單獨一方強大，而這個組合裡<em>開發者</em>的那一半，得把自己的責任扛好。</p>
+
+<h2>結論（Conclusion）</h2>
+
+<p>我在開發工作流裡已徹底擁抱 AI，但用的是深思熟慮、由專家主導的方式。我的做法本質上是<strong>「AI 增強的軟體工程」</strong>，而不是 AI 自動化的軟體工程。</p>
+
+<p>我學到的是：<strong>把經典的軟體工程紀律套用到你和 AI 的協作上，成果最好</strong>。事實證明，那些辛苦累積的實務（先設計再寫程式、寫測試、用版本控制、維持標準）不僅依然適用，而且有 AI 寫掉你一半程式碼時還更加重要。</p>
+
+<p>我對接下來的事很期待。工具不斷進步，我的工作流必然也會跟著演進。也許全自主的「AI 開發實習生」會接手更多粗活，讓我們專注更高階的任務。也許會出現新的除錯與程式碼探索範式。無論如何，我打算繼續<em>留在迴路裡</em>：引導這些 AI、向它們學習，並負責任地放大我的生產力。</p>
+
+<p>對我來說，底線是：<strong>AI 寫程式助手是了不起的力量倍增器，但人類工程師仍然是這場秀的導演。</strong></p>
+
+<p><em>我很興奮能分享：我和 O’Reilly 出了一本新書 <a href="https://beyond.addy.ie/">AI-assisted engineering book</a>。書的網站上有一些免費的建議，有興趣的話可以看看。</em></p>
+
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://addyosmani.com/blog/ai-coding-workflow/">My LLM coding workflow going into 2026</a>（2026-01-04）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

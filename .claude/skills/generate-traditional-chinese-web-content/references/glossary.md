@@ -73,6 +73,15 @@ they are frequently mistranslated.
 | call signature | 呼叫簽名 |
 | Abstract Syntax Tree (AST) | 抽象語法樹（AST） |
 | binary wheel | binary wheel（保留原文） |
+| pair programmer | 結對程式設計師 |
+| context packing | 脈絡打包 |
+| brain dump | 腦內大掃除 |
+| prompt plan | 提示計畫 |
+| asynchronous coding agent | 非同步寫程式代理 |
+| save point | 存檔點 |
+| force multiplier | 力量倍增器 |
+| quality gate | 品質關卡 |
+| ticket | 票（ticket） |
 | managed agent | 託管代理 |
 | Claude Managed Agents | Claude 託管代理 |
 
