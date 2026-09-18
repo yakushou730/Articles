@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>自我改進的程式編寫代理（Self-Improving Coding Agents）</title>
+<meta name="description" content="把開發拆成小任務，讓 AI 代理在迴路中反覆挑任務、寫程式、跑測試、提交，在你睡覺時持續交付，並靠脈絡檔案與驗證機制累積學習。">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">AddyOsmani.com</p>
+  <h1>自我改進的程式編寫代理（Self-Improving Coding Agents）</h1>
+  <p class="pubdate">2026 年 1 月 31 日</p>
+</header>
+
+<main id="main-content">
+
+<p class="lede"><strong>想像你結束一天的工作，隔天醒來，新功能已經寫好、測試完成，等著你審查。</strong>這是自主 AI 編碼代理（autonomous AI coding agents）的承諾：用 <strong>Claude Code</strong> 這類工具跑連續迴路（continuous loops），在你睡覺時持續改進並交付程式碼。</p>
+
+<p>這篇文章要談怎麼建立這類自我改進的代理迴路（self-improving agent loops），從編排迴路、組織脈絡檔案，一路講到記憶持久化、QA 驗證、規模化、除錯與風險管理。希望其中有些內容對其他人有幫助。</p>
+
+<p><strong><em>本文是對 Ryan Carson 那篇優秀的 <a href="https://x.com/ryancarson/status/2016520542723924279">How to make your agent learn and ship while you sleep</a> 的補充，我高度推薦一讀。</em></strong>我們最近在晚餐時聊了不少代理式編碼（agentic coding）的未來，我想把他提到的部分技巧再延伸一些。</p>
+
+<h2>「連續編碼迴路」（The “continuous coding loop”，Ralph Wiggum 技巧）</h2>
+
+<p>這套方法的核心是一個迭代式的<strong>代理迴路（agent loop）</strong>，常被暱稱為「Ralph Wiggum」技巧（由 Geoffrey Huntley 與 Ryan Carson 等人推廣）。關鍵想法是把開發拆成許多小任務，讓 AI 代理在迴路中一次處理一個。</p>
+
+<p>每次迭代都走一個<strong>循環（cycle）</strong>：</p>
+
+<ol>
+  <li><strong>挑下一個任務</strong>：從待辦清單（例如<a href="https://github.com/snarktank/compound-product#:~:text=Each%20iteration%20of%20the%20loop%3A">任務的 JSON</a>）挑出還沒完成的一項。</li>
+  <li><strong>實作任務</strong>：代理針對該功能或修正撰寫、修改程式碼。</li>
+  <li><strong>驗證變更</strong>：為這個任務跑測試、型別檢查或其他品質檢查。</li>
+  <li><strong>提交程式碼</strong>：檢查通過就提交，把變更整合進程式庫。</li>
+  <li><strong>更新任務狀態</strong>：標記為完成，並記下學到的事。</li>
+  <li><strong>重設代理脈絡</strong>：接著處理下一個任務，直到所有任務完成或觸發停止條件。</li>
+</ol>
+
+<p>每次迭代都重設記憶，代理就<a href="https://www.aifire.co/p/automated-coding-build-apps-while-you-sleep-using-ai-agent#:~:text=This%20approach%20solves%20the%20common,both%20founders%20and%20experienced%20developers">不會累積混淆</a>，能保持專注。這種「無狀態但迭代」的設計是可靠性的關鍵，它<strong>解決了脈絡溢出的問題</strong>，也就是叫 AI 一次做完一整個功能時常碰上的毛病。</p>
+
+<p>不用一個巨大提示（prompt）讓模型跑偏或忘掉細節，代理每個回合只拿到一份全新、範圍受限的提示，對應單一且定義明確的任務。</p>
+
+<p>結果是程式碼更乾淨、幻覺更少，因為每次執行都從空白狀態與明確指示開始。</p>
+
+<p>在這裡，代理會不斷挑任務、寫程式、跑測試、更新任務清單，直到所有任務都通過。</p>
+
+<h3>任務要小，標準要明確</h3>
+
+<p>把工作拆成<strong>原子化的使用者故事（atomic user stories）</strong>或任務很重要。每個任務都要<strong>小到能在一次 AI 工作階段內完成</strong>，而且通過／不通過的標準不能有模糊空間。</p>
+
+<p>舉例來說，不要寫「建立整個儀表板」，而是拆成「加一個導覽列，連到 Home、About、Contact」，並在驗收標準裡寫明具體期望（例如「目前頁面的連結以藍色標示」）。</p>
+
+<p>拆到這種粒度，代理才知道每一步的「完成」長什麼樣。它也降低代理走偏的機率：任務沒通過測試或標準，迴路立刻就能抓到並修正方向。</p>
+
+<p><em>實作要點：</em><strong>先定義 SPEC，再轉成任務 JSON。</strong>先為功能寫一份清楚的規格，邊界情況可以借助 AI 補齊。</p>
+
+<p>接著把它轉成結構化任務清單（例如 prd.json），納入所有小型使用者故事與驗收標準。Carson 為 Amp／Claude 寫的 <a href="https://github.com/snarktank/compound-product#:~:text=Two%20skills%20are%20included%20for,PRD%20creation%20and%20task%20generation"><strong>/prd 與 /tasks skill</strong></a> 可以<a href="https://github.com/snarktank/compound-product#:~:text=Key%20features%3A">自動完成這個轉換</a>。</p>
+
+<p>產出是一份機器可讀的待辦清單，交由代理迴路逐步執行。</p>
+
+<h3>編排迴路</h3>
+
+<p>跑迴路用一支簡單腳本就行。在 <a href="https://github.com/snarktank/ralph">Carson 的實作</a>裡，這<a href="https://ghuntley.com/ralph/#:~:text=If%20you%27ve%20seen%20my%20socials,Ralph%20is%20a%20Bash%20loop">確實就只是一支 Bash 腳本</a>或 Python 腳本（例如 ralph.sh），反覆用提示模板呼叫 AI 代理。用 Amp 或 Claude Code，也可以靠 CLI 指令或外掛達成同樣效果。例如用 Amp 的 CLI，可以跑像這樣的虛擬碼迴路：</p>
+
+<pre><code>while :; do  
+   amp run \-s prompt.md \-o progress.txt  \# Run Amp with the prompt, save output  
+   if grep \-q "\&lt;promise\&gt;COMPLETE\&lt;/promise\&gt;" progress.txt; then break; fi  
+done
+</code></pre>
+
+<p>實務上，迴路腳本會載入任務清單、挑下一個未完成的任務、組出提示（包含相關程式檔與準則等脈絡），然後呼叫 AI 模型。模型回應指出成功或失敗後，腳本負責套用程式碼變更、跑測試。整個過程重複到所有任務完成，或達到最大迭代次數為止。</p>
+
+<p>重點是每次迭代彼此隔離：代理<strong>每次都重新啟動</strong>，通常是新的 Claude 或 GPT 行程，等於真的把狀態清空，再重新餵進必要的脈絡。</p>
+
+<p><strong>複合迴路（Compound loops）：</strong>除了單一任務序列，進階工作流會編排多個階段的迴路。</p>
+
+<p>舉例來說，<a href="https://github.com/snarktank/compound-product#:~:text=A%20self,priority%2C%20and%20autonomously%20implements%20it"><strong>Compound Product</strong></a> 是一套開源系統，先跑<strong>分析迴路（Analysis loop）</strong>（讓 AI 讀每日報告，判斷該做什麼），再跑<strong>規劃迴路（Planning loop）</strong>（產生 PRD 與任務），最後跑<strong>執行迴路（Execution loop）</strong>（由編碼代理實作任務）。這條複合流程讓代理不只寫功能，也決定<em>最高優先</em>的功能是什麼。</p>
+
+<p>不是每個專案都需要這種程度的自動化，但它示範了迴路怎麼串起來：一個代理的輸出（例如任務清單或分支名稱）成為另一個代理的輸入，構成更大的持續交付系統。</p>
+
+<h2>脈絡與記憶的最佳實務：AGENTS.md 手冊</h2>
+
+<p>這類代理迴路最有力的機制之一，是使用持久的<strong>脈絡檔案（context files）</strong>，讓知識在迭代之間延續。</p>
+
+<p>與其硬要單一 AI 工作階段記住所有事（超過脈絡視窗就辦不到），我們把重要資訊明確寫進磁碟，讓它能在未來的提示裡<em>重新注入</em>。主要檔案通常命名為 <strong>AGENTS.md</strong>（也有人用 <a href="https://ericmjl.github.io/blog/2025/11/8/safe-ways-to-let-your-coding-agent-work-autonomously/#:~:text=When%20you%20catch%20an%20agent,An%20example%20prompt">MEMORY.md</a> 之類的名字）。</p>
+
+<p><strong>AGENTS.md 是什麼？</strong>它基本上是代理的隨身筆記本，記下代理的發現、專案慣例，以及任何你希望未來所有代理都知道的指引。</p>
+
+<p>每完成一個任務，迴路可以追加關鍵學習，例如「注意：這個程式庫用 Library X 處理 Y，請沿用這個模式」，或「坑：每次更新 user model 時，也要更新 audit log」。</p>
+
+<p>久而久之，這會變成一座提示寶庫，讓代理不再重複過去的錯誤。在 Carson 的 Compound Product 哲學裡，<a href="https://github.com/snarktank/compound-product#:~:text=Compound%20Product%20is%20based%20on,should%20make%20future%20improvements%20easier"><em>「代理會更新 AGENTS.md，把發現的模式記錄下來供未來迭代使用」</em></a>。這表示每次改進都真的讓下一次改進更容易，因為代理累積出一套知識庫，知道這個程式庫長什麼樣、該怎麼跟它打交道。</p>
+
+<p><strong>組織知識庫：</strong>把 AGENTS.md 分成幾個區塊，讓人與 AI 都好讀。例如：</p>
+
+<ul>
+  <li><strong>模式與慣例（Patterns &amp; Conventions）：</strong>高階模式（例如「本專案使用 SSR，UI 元件放在 /components，API 放在 /routes」）。</li>
+  <li><strong>坑（Gotchas）：</strong>曾讓代理或開發者栽跟頭的事（「新增 enum 時要更新 constants.ts，否則測試會失敗」）。</li>
+  <li><strong>風格／偏好（Style/Preferences）：</strong>程式風格筆記（「依照設定遵循 ESLint 規則；優先用函式元件而非 class」、「測試用 pytest fixture，跟現有測試一致」）。</li>
+  <li><strong>近期學習／變更（Recent Learnings/Changes）：</strong>近期問題的摘要，以及怎麼解決的。</li>
+</ul>
+
+<p>條目要簡短、就事論事，它們是<strong>提示的添加物（prompt additives）</strong>，用來引導模型。許多 AI 編碼工具（Claude Code、Cursor、Amp）只要看到 AGENTS.md 或 README.md 這類檔案，就會<a href="https://github.com/snarktank/ralph#:~:text=After%20each%20iteration%2C%20Ralph%20updates,discovered%20patterns%2C%20gotchas%2C%20and%20conventions">自動把它們納入提示脈絡</a>。例如 Amp 在代理開始新一輪迭代時，會掃描儲存庫並把 AGENTS.md 內容拉進來，給模型專案的背景。</p>
+
+<p><strong>脈絡注入策略：</strong>留意脈絡大小。知識檔案變大之後，未必每個任務都值得注入全部內容（脈絡膨脹會拖慢效能，或讓模型忽略指示）。</p>
+
+<p>好習慣是讓 AGENTS.md 保持聚焦、隨時更新，過時的資訊就封存到另一個檔案。有些進階做法會用檢索：把 AGENTS.md 拆成多個主題檔，只放進跟當前任務相關的區塊。但簡單一點的做法通常就夠了：把檔案修剪到只剩最相關的提示，隨著專案慢慢長大。</p>
+
+<p><strong>使用範例：</strong>假設你發現代理試著用一個過時的 API。</p>
+
+<p>你可以停掉迴路，在 AGENTS.md 加一條註記：</p>
+
+<p><em>「v1/users 端點已棄用；請改用 v2/users。」</em></p>
+
+<p>下次代理處理相關任務時就會看到這條註記，避開已棄用的 API。你也可以直接叫代理自己做這件事：</p>
+
+<p><em>「不對，別用舊端點。改用新的 v2/users API，把這件事記進 AGENTS.md，然後繼續。」</em></p>
+
+<p>這個<a href="https://ericmjl.github.io/blog/2025/11/8/safe-ways-to-let-your-coding-agent-work-autonomously/#:~:text=Correct%20agent%20behavior%20in%20real">即時回饋技巧</a>由開發者 Eric J. Ma 提出，用來<em>「建立一份持久的偏好記錄，改善代理未來的行為」</em>。</p>
+
+<p>代理會乖乖把修正追加到 AGENTS.md，然後帶著新指示繼續做事，等於從錯誤中學了一課。</p>
+
+<p>最後，可以考慮讓 AGENTS.md 的知識在代理或執行之間共享。如果你跑多條迴路（不同專案或平行任務），可以把一部分共通知識集中管理。Eric Ma 的 <a href="https://ericmjl.github.io/blog/2025/11/8/safe-ways-to-let-your-coding-agent-work-autonomously/#:~:text=This%20approach%20creates%20a%20persistent,preferences%20across%20different%20agent%20platforms"><strong>MCP（Model Context Protocol）server</strong></a> 就是一個例子，用統一的方式儲存並提供這類脈絡給不同代理。講得更簡單一點：如果你有多個自主代理協同工作，即使只是一個共用 wiki 或一組所有代理工作階段都會參考的 markdown 檔，也能確保一致性。</p>
+
+<h2>記憶持久化與複合學習策略</h2>
+
+<p>除了 AGENTS.md，穩健的代理迴路還會用幾種<strong>持久化機制（persistence mechanisms）</strong>保存狀態，避免迭代之間健忘。Carson 的 Ralph 迴路實作在每次執行之間至少用了<a href="https://github.com/snarktank/compound-product#:~:text=Memory%20Between%20Iterations">四種記憶管道</a>：</p>
+
+<ul>
+  <li><strong>Git 提交歷史（Git Commit History）：</strong>每次迭代的程式碼變更都會提交，所以下一輪可以跑 git diff 或檢查儲存庫，看看改了什麼。這樣代理不必回想先前的程式碼，直接從儲存庫讀就好。提交訊息本身也能提供脈絡（「Iteration 5: Added navbar component」）。Amp 或 Cursor 這類工具允許代理<a href="https://ericmjl.github.io/blog/2025/11/8/safe-ways-to-let-your-coding-agent-work-autonomously/#:~:text=Safe%20to%20auto">自主執行 git log 或 git diff</a>（在權限允許下），從版本控制取得脈絡。</li>
+
+  <li><strong>進度日誌（Progress Log，progress.txt）：</strong>每個循環追加的純文字日誌，記錄發生什麼事，例如嘗試了哪個任務、通過還是失敗，以及任何錯誤訊息或發現。這是一份按時間排序的記憶。迴路停住或你需要除錯時，翻 progress.txt 就知道哪裡出了問題。也可以叫代理在迭代開始時讀 progress.txt（或其中相關段落），回想先前試過什麼。就把它當成代理的日誌。</li>
+
+  <li><strong>任務狀態（Task State，prd.json 或任務清單）：</strong>任務的 JSON 檔會隨任務標記完成、passes: true/false 欄位切換而更新。這個檔案保存每項需求的<em>狀態</em>。代理崩潰重啟後，載入 prd.json 就知道還剩哪些任務。代理迴路腳本會跳過已完成的任務，專注在待辦項目，避免重工，也讓人看得出進度。</li>
+
+  <li><strong>代理知識（Agents’ Knowledge，AGENTS.md）：</strong>如前述，這是長期語意記憶，過去每次執行累積下來的經驗。</li>
+</ul>
+
+<p>這些合起來形成一個<strong>複合學習迴路（compound learning loop）</strong>：代理並不是機器學習意義上的「線上學習」，但它<em>系統性地記錄結果</em>，讓下一輪迭代（甚至下一個專案！）能受益。</p>
+
+<p>代理想通的每個修正或模式，都會滾進下一次的脈絡。正如 Compound Product 的 README 所說，其哲學是<a href="https://github.com/snarktank/compound-product#:~:text=Compound%20Product%20is%20based%20on,should%20make%20future%20improvements%20easier"><em>每次改進都應該讓未來的改進更容易</em></a>。</p>
+
+<p>迭代數十次之後，代理的效益真的可能上升，因為它不再重複犯錯，也會遵循學到的慣例。</p>
+
+<p>還有一些<strong>以外掛為基礎的記憶擴充</strong>可以運用。</p>
+
+<p>例如 Claude Code 支援「skill」乃至市集外掛，你可以想像（或自己寫）一個 skill，自動保存每次編碼工作階段的摘要，下次載入。Amp 的自動交接（auto-handoff）功能實際上就是短期記憶：當<a href="/agentic-engineering/context-window/">脈絡視窗</a>快要溢出，它可以把對話交接給新的工作階段，附上至今的濃縮摘要。這能避免任務中途流失脈絡，對超大任務或複雜重構很有用。</p>
+
+<p>在更實驗性的做法裡，開發者用<strong>向量資料庫（vector databases）</strong>儲存與檢索記憶。例如每次迭代後，把 diff 或錯誤訊息做 embedding，連同描述存成向量。新一輪開始前，查資料庫找相似的過去案例，提供給代理。</p>
+
+<p>這有助於辨認出像是「喔，我之前看過這種失敗的測試，當時是這樣修的」。不過這類做法增加複雜度，只要你認真維護代理能直接讀取的簡單產物（檔案與日誌），未必需要。</p>
+
+<p><strong>提示：</strong>不管你用哪種持久化方式，都要定期<strong>確認代理真的有在用。</strong>記憶檔案只有在未來執行時被注入提示才有用。</p>
+
+<p>檢查你的提示模板或代理設定，確認 AGENTS.md 與近期的 progress.txt 條目都包含在內。在 Amp 與 Claude 裡，progress.txt 這類檔案預設可能不會自動載入，所以你可以改提示，寫上<em>「以下是前幾次執行的筆記：」</em>再把內容附進去。</p>
+
+<p>Carson 的做法鼓勵你為專案自訂提示模板（例如 prompt.md 或 CLAUDE.md），可以加入載入專案特定脈絡的區塊，或強調特定指示。</p>
+
+<h2>品質保證：測試與驗證迴路</h2>
+
+<p>想讓自主代理穩定產出可用的程式碼，<strong>自動化驗證是首要條件</strong>。少了檢查，代理可能在自以為成功的同時，開開心心地引入 bug 或弄壞建置。穩健的代理迴路會把測試與其他驗證當成循環中的一等公民：</p>
+
+<ul>
+  <li><strong>單元與整合測試（Unit and Integration Tests）：</strong>有紮實的測試套件，成果會改善很多。代理可以在實作完任務後跑 npm test 或 pytest。測試失敗，迴路就知道任務其實沒完成，可以叫代理修。理想上 prd.json 裡每個使用者故事至少對應一個測試，無論是驗收標準的一部分，或放在儲存庫的測試檔裡。有些系統更進一步，例如要求代理先寫測試再寫程式（測試驅動風格），或對 App 的 UI 狀態做快照以供比對。但最低要求是<strong>每次迭代都跑現有測試</strong>。</li>
+
+  <li><strong>型別檢查與 Lint（Type Checking and Linting）：</strong>靜態分析工具（MyPy、tsc 這類型別檢查器，ESLint／Flake8 這類 linter）是很好的自動化回饋，很快就能抓到錯誤。可以把它們排進迴路提交程式碼前的品質檢查。例如在 config.json 設定代理寫完程式碼後執行 npm run typecheck &amp;&amp; npm run lint，只有成功結束才繼續。這能避免代理一錯再錯。</li>
+
+  <li><strong>迴路中的持續整合（Continuous Integration，CI）：</strong>有些進階做法甚至串進 CI 流程。例如 Cursor 的多代理實驗裡有<a href="https://cursor.com/blog/scaling-agents#:~:text=,planning%20itself%20parallel%20and%20recursive">一個「judge」代理來判斷</a>專案是否完成，其中可能包括確認 GitHub Actions CI 是綠燈。在較簡單的單代理迴路裡，你可以在本地跑建置腳本或任何 CI 檢查來模擬。<strong>遇到紅旗就該停下</strong>：檢查失敗時，代理要去處理（或把任務標為仍失敗，卡住 N 次後可能換下一個）。</li>
+
+  <li><strong>AI 自我評估（選用）：</strong>遇到不容易寫自動化測試的情況（例如沒有測試框架的 UI 變更），可以讓代理自己驗證。例如 Carson 的代理在處理前端任務時會用 <strong>dev-browser skill</strong>：代理起一個無頭瀏覽器，前往頁面，確認某個 UI 元素存在或某個互動有效。這基本上就是代理驅動的整合測試。驗證失敗，代理就知道要重試。這招很有力，但要確保沙箱機制到位（後面會再談安全），因為這代表代理在執行程式碼、操控瀏覽器。</li>
+</ul>
+
+<p><strong>專家見解：</strong><em>要怎麼讓 AI 代理一開始就寫出好測試？</em>Simon Willison 認為最好的方式是<a href="https://simonwillison.net/tags/coding-agents/#:~:text=Generally%20though%20the%20best%20way,any%20extra%20prompting%20at%20all"><strong>以身作則</strong></a>：在程式庫裡維護高品質測試，代理自然會模仿這些模式。以 LLM 為基礎的程式編寫者傾向遵循眼前看到的風格。如果你的儲存庫裡既有元件都有清楚、簡單的測試，你要求代理加新功能時，它通常也會為新程式碼產出類似的測試。</p>
+
+<p>Willison 指出，專案一旦有乾淨的測試，<a href="https://simonwillison.net/tags/coding-agents/#:~:text=sure%20it%27s%20working%20in%20a,any%20extra%20prompting%20at%20all"><em>「代理新增的測試品質往往會與之一致」</em></a>。他也建議<a href="https://simonwillison.net/tags/coding-agents/#:~:text=One%20last%20tip%20I%20use,a%20lot%20is%20this">主動叫代理參考已知的良好範例</a>，例如<em>「測試風格請比照 [某個檔案]」</em>，甚至叫它複製另一個儲存庫來看某些模式。這種脈絡播種能大幅改善代理的輸出，也減少日後修爛測試的時間。</p>
+
+<p>實務上，你未必總放心讓代理從零寫測試，很多開發者偏好自己寫、至少自己審。但即使如此，<strong>在迴路裡跑那些測試仍然必要</strong>。它形成一個回饋迴路：只有程式碼真正符合規格時，代理才算「認為」自己做完了，而測試通過就是這件事的判斷依據。這個代理式 QA 迴路，是把天真的「生一些程式碼」流程變成可靠工程工作流的關鍵。</p>
+
+<h2>規模化：並行代理與多迴路編排</h2>
+
+<p>到目前為止，我們談的都是一個代理序列處理一份任務清單。如果你想快一點，同時處理多個任務甚至多個專案呢？這個領域近期的實驗已經試過<a href="https://cursor.com/blog/scaling-agents#:~:text=This%20post%20describes%20what%20we%27ve,code%20and%20trillions%20of%20tokens">同時跑數十甚至數百個代理</a>。</p>
+
+<p>這還很前沿，日常開發中並不常見，但對於理解這類迴路的規模極限與可能性很有啟發。</p>
+
+<p><strong>並行代理的挑戰：</strong>天真地在同一個儲存庫上跑很多代理，就會碰到<strong>協調與衝突</strong>問題。例如兩個代理可能挑到同一任務，或其中一個改了程式碼，弄壞另一個正在做的事。早期嘗試用<a href="https://cursor.com/blog/scaling-agents#:~:text=Our%20initial%20approach%20gave%20agents,we%20used%20a%20locking%20mechanism">共用檔案鎖機制</a>，結果代理會卡住，或把時間浪費在等彼此。它們也可能變得<a href="https://cursor.com/blog/scaling-agents#:~:text=We%20tried%20replacing%20locks%20with,there%20were%20still%20deeper%20problems"><strong>風險趨避</strong></a>，每個只敢做小幅、安全的變更，避開大型複雜任務，因為在這種自由混戰的系統裡，沒有哪個代理覺得自己「該負責」難的部分。</p>
+
+<p><a href="https://cursor.com/blog/scaling-agents#:~:text="><strong>規劃者－工作者模型（Planner-Worker model）</strong></a>：更成功的模式是在代理之間引入階層或分工。例如 Cursor 的 Wilson Lin 描述在一個群集（swarm）裡使用<strong>規劃者代理（Planner agents）</strong>與<strong>工作者代理（Worker agents）</strong>。規劃者像專案經理：讀完整個程式庫，決定要做什麼，並產生任務（甚至遞迴地建立子任務）。工作者接著接下這些任務去實作，不用操心全局。</p>
+
+<p>迭代結束時，由一個 Judge 代理評估目標（例如完成專案）是否達成。這個做法避免了漫無目的的遊蕩，吞吐量也大幅提升：Cursor 團隊讓<em>數百個代理協同工作</em>打造一個網頁瀏覽器，一週內在 1,000 多個檔案中產出超過一百萬行程式碼。</p>
+
+<p>你大概不需要這種規模，但<strong>你可以為了不同目的平行跑多條迴路</strong>。例如一條代理迴路專做前端任務，另一條同時做後端任務（分別在不同部分的程式庫或不同分支上運作）。</p>
+
+<p>真要這麼做，就把工作清楚切分，盡量減少衝突。</p>
+
+<p>另一種情境是為不同的功能分支跑各自的夜間迴路：假設排了 10 個功能，你就對 10 個分支開 10 個代理行程。Ryan Carson 預測，<a href="https://x.com/ryancarson/status/2016797196222370226#:~:text=,turns%20prioritized%20reports%20into"><em>創辦人終究會每晚跑 10 條以上這樣的迴路</em></a>來加速開發。每條迴路仍遵循同樣的原則，但你需要良好的 CI 實務來整合所有產出（就像同時有多位真人工程師在工作一樣）。</p>
+
+<p><strong>協調工具：</strong>如果多個代理非得碰同一個專案，可以考慮用協調檔案或簡單的 API 溝通。共用一份帶鎖機制的 tasks.json 是一種做法（但如前述，檔案鎖並不簡單）。另一種輕量做法是用一支「交通警察」腳本，透過佇列把任務分配給代理。</p>
+
+<p>市面上也開始出現處理多代理工作流的編排平台，但現在多半是自製或研究專案，而不是現成可用的方案。</p>
+
+<p>對今天多數進階使用者來說，<strong>規模化指的是往深處迭代，而不是單純往寬處鋪開</strong>。讓一個能力夠強的代理迴路在複雜專案上跑更久（整晚或好幾天），通常比開一個難以管理的 swarm 更有成果。模型能力提升之後，長時間執行的單一代理也在進步。</p>
+
+<h2>監控、除錯與回饋量測</h2>
+
+<p>把寫程式交給自主代理，你就需要看得到它在做什麼。把代理當成真的工程師，它的工作你要審查。以下是監控與除錯代理迴路的一些最佳實務：</p>
+
+<ul>
+  <li><strong>即時日誌（Live Logs）：</strong>開一個終端機即時追蹤代理輸出或 progress.txt 日誌。迴路應該印出它正在處理哪個任務，你也要能看到測試結果或錯誤。如果發現代理在同一個錯誤上反覆打轉，它可能卡住了，你可以介入（停掉它或給個提示）。很多框架讓你看得到 AI 的訊息，例如 Claude Code 桌面 App 會在代理工作時顯示對話串，Amp 的 CLI 會逐步印出模型輸出。</li>
+
+  <li><strong>檢查點提交（Checkpoint Commits）：</strong>既然每次迭代都提交到 git，你就有一份很好的稽核軌跡。經常使用 git log 和 git diff。一行 git log --oneline -5 就能看到代理最近幾次提交。diff 裡有哪裡不對，你可以在它跑太遠之前抓到。你甚至可以自動化 diff 審查：例如 diff 比預期大很多，或動到任務範圍外的關鍵檔案（代表代理可能「走偏了」），就中止迴路。</li>
+
+  <li><strong>檢查指令（Inspection Commands）：</strong>把一些除錯指令放進迴路，或讓它們容易執行。例如用腳本顯示所有任務狀態（jq ‘.tasks[] | {id, story, passes}’ prd.json）就能快速掌握進度。在 progress.txt 裡找「ERROR」或讀最後 N 行，可以知道某個任務為何失敗。</li>
+
+  <li><strong>代理內省（Agent Introspection）：</strong>有需要時可以叫代理解釋自己。例如它卡在某個任務，你可以改提示寫「如果測試重試 3 次仍失敗，輸出你的推理與計畫。」這能讓代理內部的<a href="/agentic-engineering/chain-of-thought/">思維鏈（chain-of-thought）</a>浮現（即所謂的「自我反思」），或許能提供線索。但要節制使用：太多內省也會弄亂迴路，不過它仍是除錯工具箱裡的工具。</li>
+
+  <li><strong>效能指標（Performance Metrics）：</strong>記錄每次迭代花多久、用了多少成本（API token）很有用。你可以讓迴路記錄每個任務與整體的耗時。如果某個任務花的時間是其他的 10 倍，那代表它很複雜或卡住了。累積很多個晚上之後，你可以蒐集「每小時幾個功能」這類統計，用來判斷某次升級（換模型、調提示）有沒有差別。</li>
+
+  <li><strong>自動停止條件（Automated Stop Conditions）：</strong>有時候事情會出錯，例如代理陷入徒勞的迴圈（也許碰上解不開的難纏 bug），或外部相依服務掛掉讓測試一直失敗。除了正常的完成條件，也要設定停止條件。最簡單的是<strong>最大迭代次數上限</strong>，例如跑 50 圈就停，即使還沒做完。這能避免成本失控與無限迴圈。你也可以設定時間上限（「跑超過 3 小時就砍掉」）或閒置條件（「連續 5 次迭代都沒有新提交就跳出」）。這些能確保你回來時看到的是停滯的代理，而不是白跑一整晚。</li>
+
+  <li><strong>人工覆寫（Manual Overrides）：</strong>即使自動化程度再高，關鍵時刻還是要保留人為介入。一個好模式是讓代理最後開一個<strong>pull request</strong>，而不是自動合併。這樣你每天早上都能做最後的程式碼審查。測試漏掉的東西（邏輯問題，或只符合驗收標準字面、不符其精神的做法）通常都會被你抓到。這個「真人 QA」步驟目前仍然無可取代：它讓你放心把粗活交給代理，但最終控制權不放。</li>
+</ul>
+
+<p>如果代理某類任務老是失敗，把它當成回饋。也許你的驗收標準太模糊或太嚴；也許代理需要 AGENTS.md 裡對某個框架更好的提示。把失敗當成<strong>給你自己、也給代理的</strong>學習訊號。</p>
+
+<p>例如代理因為缺少脈絡而搞不定某個第三方 API，可以考慮下次在 AGENTS.md 或程式碼註解裡加一段簡短的使用範例。經過幾天、幾週，這種反思式改進（有點像結對程式設計的回顧）會讓系統更穩健。</p>
+
+<h2>風險管理與防護措施</h2>
+
+<p>讓會寫程式的代理擁有提交權與 shell 執行權，威力強大，風險也高。你必須刻意管理這些風險。以下是幾個關鍵面向與應對方式：</p>
+
+<h3>防止破壞性動作</h3>
+
+<p>自主代理一旦設定錯誤，可能刪檔、弄壞儲存庫，或推送不安全的程式碼。降低風險的方法：</p>
+
+<ul>
+  <li><strong>限制範圍（Limited Scope）：</strong>讓代理在功能分支或 fork 上跑，絕不直接在 main 上。這樣就算它做出離譜的事，審查前正式程式碼都不會被動到。</li>
+
+  <li><strong>唯讀與寫入權限（Read-Only vs Write Permissions）：</strong>多數代理平台對危險操作都有確認關卡。Amp 與 Claude Code 有 --dangerously-allow-all 這類旗標，讓自動化時跳過確認。</li>
+</ul>
+
+<p>這些旗標要謹慎使用。比較安全的做法是<a href="https://ericmjl.github.io/blog/2025/11/8/safe-ways-to-let-your-coding-agent-work-autonomously/#:~:text=Auto"><strong>只自動核准唯讀指令</strong></a>，寫入一律人工核准。例如允許代理不用問就跑 grep、git log 或 npm test，但<em>不准</em>未經你明確同意就 git push 或 rm -rf。把安全操作列入白名單，代理就能自由蒐集資訊，副作用仍受控。</p>
+
+<ul>
+  <li><a href="/agentic-engineering/sandboxing/"><strong>沙箱（Sandboxing）</strong></a><strong>：</strong>最理想是在受控環境裡跑代理，例如 Docker 容器或 VM，尤其它又有能力執行程式碼（跑測試通常就需要）。</li>
+</ul>
+
+<p>這能限制任何意外指令造成的損害。API key 也要用最小範圍：如果代理需要 API key 去發一則 GitHub 留言，就給它一個只能做這件事、其他都不能的 token。</p>
+
+<ul>
+  <li><strong>緊急停止（Emergency Stop）：</strong>永遠要知道怎麼在執行中途殺掉代理。可能只是在終端機按 Ctrl+C，或在代理 UI 下特定指令（Claude Code 用 Escape 鍵停止生成）。</li>
+</ul>
+
+<p>看到它在做有害的事，先終止再說，問題之後再問。也可以考慮監控資源使用：代理行程若吃掉異常高的 CPU 或記憶體（可能因為在程式碼裡觸發了瘋狂的無限迴圈），自動監控程式可以把它砍掉。</p>
+
+<h3>處理幻覺與偏離</h3>
+
+<p>AI 模型有時會產出語法上說得通、語意上卻錯誤的輸出（<a href="/agentic-engineering/hallucination/"><strong>幻覺（hallucinations）</strong></a>）。在寫程式的情境裡，這可能是呼叫不存在的函式、用錯演算法，或寫出毫無意義的註解。還有<strong>任務偏離（task divergence）</strong>的風險：代理誤解需求，把東西做錯。</p>
+
+<p>應對方式：</p>
+
+<ul>
+  <li><strong>規格與提示要夠強（Strong Specs and Prompts）：</strong>清楚的驗收標準與定義明確的任務是第一道防線。如果任務寫「POST 到 /api/login 並取得 200 OK」，代理沒什麼空間去幻想出另一個端點。模糊是敵人。事前花時間讓任務毫無歧義，並在提示模板裡明確寫出該做什麼、不該做什麼（系統提示或前言可以列舉「除非指定，否則不要引入任何新相依套件」，或「遵循本儲存庫的程式風格」）。</li>
+
+  <li><strong>用驗證抓幻覺（Validation to Catch Hallucinations）：</strong>前述的測試與型別檢查會抓到很多幻覺產物（例如呼叫未定義的函式）。型別錯誤、參考錯誤、測試失敗，這些都是代理做了一件不真實的事的訊號。迴路邏輯接著要叫代理修正。很多時候，只要執行程式碼並把錯誤輸出餵回去，模型就足以意識到錯誤並修正。</li>
+
+  <li><strong>定期重新聚焦（Periodic Refocusing）：</strong>長時間執行的迴路會隨時間偏離，也許一個小誤解就層層累積。對抗偏離的一種技巧是<strong>定期用全新的規劃重新開始</strong>。例如跑完一定數量的任務後暫停，重跑 /prd skill 或重新掃描程式庫，確認剩下的任務仍然有效。Carson 的團隊提到在<a href="https://cursor.com/blog/scaling-agents#:~:text=we%27re%20nowhere%20near%20optimal,combat%20drift%20and%20tunnel%20vision">非常長時間的代理執行</a>中需要<em>「定期重新開始，以對抗偏離與隧道視野」</em>。實務上，這代表代理完成一大塊之後就讓它停下來，審視中途成果，必要時更新任務清單，然後再繼續。</li>
+
+  <li><strong>多模型交叉檢查（Multi-Model Cross-Check）：</strong>如果可以，讓不同模型扮演不同角色。Cursor 的實驗發現，混用不同模型（規劃用能力很強的，寫程式用專精程式的）比單一模型全包更好。你的工具未必提供多種模型選項，但即使在關鍵步驟用第二個模型提供意見（例如用 GPT-4 檢查 Claude 產生的 diff），也能減少錯誤。有些開發者手動這樣做：迴路跑完後，先請 ChatGPT 審查 PR 再合併。</li>
+</ul>
+
+<h3>脈絡膨脹與最佳化</h3>
+
+<p>專案成長之後，要餵給代理的脈絡量可能變得很大。如果 AGENTS.md 與 progress.txt 累積到數百行，你不可能每次都全部塞進 10 萬 token 的視窗。一些建議：</p>
+
+<ul>
+  <li><strong>摘要較舊的內容：</strong>代理本身就能幫上忙。你可以提示它「摘要上面進度日誌的重點」，把摘要存起來，再截斷日誌。必要時就做摘要的摘要。這能用短得多的形式保留重要資訊。</li>
+
+  <li><strong>分而治之：</strong>用任務 ID 只顯示相關的日誌或程式碼片段。如果任務 7 是登入頁，提示裡就不需要購物車功能的筆記。有些自動化做法會搜尋儲存庫中與任務相關的關鍵字，只把那幾個檔案納入脈絡。</li>
+
+  <li><strong>善用模型既有的訓練知識：</strong>記得模型已經有大量一般知識（常見函式庫、演算法等）。除非專案用了很新或很冷門的東西，你不需要餵它可能早就「知道」的文件。例如大概不用貼整份 React 文件，只要註明「這是一個使用 Hooks 與 Vite 的 React 專案」，模型就能從訓練資料補上其餘部分。善用模型的強項，把脈絡留給專案特有的細節。</li>
+</ul>
+
+<h3>人為監督與持續改進</h3>
+
+<p>最後，把整套系統當成活的流程。經常監控、調整，並運用人為判斷。Ryan Carson 在建構這類迴路的經驗裡，強調調校提示與整合工作流所需的<a href="https://freeplay.ai/blog/real-talk-on-building-coding-agents-a-conversation-with-amp-s-builder-in-residence-ryan-carson#:~:text=%3E%20,%28watch%20here"><em>「苦工」（elbow grease）</em></a>。</p>
+
+<p>沒有一次到位、全自動的魔法，重點在持續微調。</p>
+
+<p>你作為開發者的角色，從寫程式變成策劃流程：寫規格、審查結果、在高層次引導 AI 代理，幾乎像是你這支 AI 開發團隊的工程經理。</p>
+
+<p>也要密切留意<strong>成本</strong>（API 用量）。代理卡在迴圈裡會燒掉大量 token，設定合理的上限，或許再加個預算警示。不過做對了，ROI 可以很驚人：Ralph 社群回報過<a href="https://ghuntley.com/ralph/#:~:text=,%24297%20USD.%20pic.twitter.com%2F0JgT8Q19bV">產能大幅提升</a>，也有傳聞案例是一個 5 萬美元的專案，只花了幾百美元的 API 費用就交付。</p>
+
+<p>自主程式編寫代理已經來了，只要設定得當，它們能持續接手寫程式的粗活。</p>
+
+<p>每一次迭代，你和代理都會變得更好。</p>
+
+<p>歡迎來到 AI 強化軟體工程的下一個階段：在你睡覺時交付，讓你的代理把你的進度複利累積下去。</p>
+
+<p><em>本文為提升可讀性，使用 Gemini 排版。</em></p>
+
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://addyosmani.com/blog/self-improving-agents/">Self-Improving Coding Agents</a>（2026-01-31）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>
