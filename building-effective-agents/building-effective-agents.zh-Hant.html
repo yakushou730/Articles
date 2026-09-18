@@ -144,110 +144,110 @@
 
 <main id="main-content">
 
-<p class="lede">我們與數十個跨產業、正在打造大型語言模型（LLM, large language model）代理（agent）的團隊合作過。結果一致地顯示：最成功的實作，採用的是簡單、可組合的模式（composable patterns），而不是複雜的框架（frameworks）。</p>
+<p class="lede">我們和數十個團隊合作過，他們橫跨不同產業，都在打造大型語言模型（LLM, large language model）代理（agent）。結果一致：最成功的實作採用簡單、可組合的模式（composable patterns），不是複雜的框架（frameworks）。</p>
 
 <blockquote>
-  <p><strong>註：</strong>本文描述的工具生態自 2024 年 12 月以來已有許多變化。關於我們目前的做法，請參閱 <a href="https://www.anthropic.com/engineering/managed-agents"><strong>我們如何打造 Claude 託管代理（Claude Managed Agents）</strong></a> 以及 <a href="https://platform.claude.com/docs/en/managed-agents/overview"><strong>託管代理（Managed Agents）文件</strong></a>。</p>
+  <p><strong>註：</strong>本文描述的工具樣貌，從 2024 年 12 月至今已經變了不少。我們目前的做法請參閱 <a href="https://www.anthropic.com/engineering/managed-agents"><strong>我們如何打造 Claude 託管代理（Claude Managed Agents）</strong></a> 以及 <a href="https://platform.claude.com/docs/en/managed-agents/overview"><strong>託管代理（Managed Agents）文件</strong></a>。</p>
 </blockquote>
 
-<p>在過去一年裡，我們與數十個跨產業、正在打造大型語言模型（LLM）代理（agent）的團隊合作。結果一致地顯示：最成功的實作並不是使用複雜的框架或專門的函式庫，而是以簡單、可組合的模式（composable patterns）來建構。</p>
+<p>過去一年，我們和數十個團隊合作，他們橫跨不同產業，都在打造大型語言模型（LLM）代理（agent）。結果一致：最成功的實作沒有用複雜的框架或專門的函式庫，而是用簡單、可組合的模式（composable patterns）建構。</p>
 
-<p>在這篇文章中，我們分享與客戶合作以及我們自己打造代理（agents）時所學到的經驗，並為開發者提供打造高效代理（effective agents）的實務建議。</p>
+<p>這篇文章分享我們和客戶合作、以及自己打造代理（agents）時學到的經驗，也給開發者一些打造高效代理（effective agents）的實務建議。</p>
 
 <h2>什麼是代理（What are agents?）</h2>
 
-<p>「代理（Agent）」可以用好幾種方式定義。有些客戶把代理定義為完全自主的系統，能在長時間內獨立運作、使用各種工具來完成複雜任務。另一些人則用這個詞來描述較為規範、依循預先定義工作流（predefined workflows）的實作。在 Anthropic，我們把這些變化通稱為<strong>代理系統（agentic systems）</strong>，但會在架構上做出一個重要的區分：<strong>工作流（workflows）</strong>與<strong>代理（agents）</strong>：</p>
+<p>「代理（Agent）」有好幾種定義方式。有些客戶把它定義成完全自主的系統，能在長時間內獨立運作、用各種工具完成複雜任務。也有人用這個詞描述比較規範性、依循預先定義工作流（predefined workflows）的實作。在 Anthropic，我們把這些都歸為<strong>代理系統（agentic systems）</strong>，但在架構上做了一個重要區分：<strong>工作流（workflows）</strong>與<strong>代理（agents）</strong>。</p>
 
 <ul>
-  <li><strong>工作流（Workflows）</strong>是透過預先定義的程式碼路徑（predefined code paths）來編排（orchestrate）LLM 與工具的系統。</li>
-  <li><strong>代理（Agents）</strong>則是 LLM 能動態地指揮自身流程與工具使用、並持續掌控如何完成任務的系統。</li>
+  <li><strong>工作流（Workflows）</strong>是透過預先定義的程式碼路徑（predefined code paths）編排（orchestrate）LLM 與工具的系統。</li>
+  <li><strong>代理（Agents）</strong>則是 LLM 能動態指揮自身流程與工具使用、持續掌控怎麼完成任務的系統。</li>
 </ul>
 
-<p>接下來，我們將詳細探討這兩類代理系統（agentic systems）。在附錄 1（「實務中的代理，Agents in Practice」）中，我們會描述兩個客戶特別感受到這類系統價值的領域。</p>
+<p>接下來我們詳細探討這兩類代理系統（agentic systems）。附錄 1（「實務中的代理，Agents in Practice」）會描述兩個領域，客戶在這些領域特別感受到這類系統的價值。</p>
 
 <h2>何時（以及何時不）該使用代理（When (and when not) to use agents）</h2>
 
-<p>在使用 LLM 建構應用時，我們建議找出最簡單可行的解法，只在必要時才增加複雜度。這可能意味著完全不建構代理系統（agentic systems）。代理系統往往以延遲（latency）與成本，換取更好的任務表現；你應該思考這種取捨（tradeoff）在何時才合理。</p>
+<p>用 LLM 建構應用時，我們建議先找最簡單可行的解法，只在必要時才增加複雜度。這也意味著，有時候根本不該建構代理系統（agentic systems）。代理系統往往拿延遲（latency）與成本，換取更好的任務表現，你得想清楚這種取捨（tradeoff）什麼時候才合理。</p>
 
-<p>當確實需要更多複雜度時，工作流（workflows）對定義明確的任務提供了可預測性與一致性；而當需要規模化的彈性與由模型驅動的決策（model-driven decision-making）時，代理（agents）則是更好的選擇。然而對許多應用而言，用檢索（retrieval）與脈絡內範例（in-context examples）來最佳化單一次 LLM 呼叫，通常就已經足夠。</p>
+<p>確實需要更多複雜度時，工作流（workflows）為定義明確的任務提供可預測性與一致性；需要彈性與由模型驅動的決策（model-driven decision-making），而且得規模化時，代理（agents）是更好的選擇。但對許多應用來說，用檢索（retrieval）與脈絡內範例（in-context examples）把單次 LLM 呼叫調好，通常就夠了。</p>
 
 <h2>何時以及如何使用框架（When and how to use frameworks）</h2>
 
-<p>有許多框架（frameworks）能讓代理系統（agentic systems）更容易實作，包括：</p>
+<p>有許多框架（frameworks）讓代理系統（agentic systems）更容易實作，包括：</p>
 
 <ul>
   <li><a href="https://platform.claude.com/docs/en/agent-sdk/overview">Claude Agent SDK</a>；</li>
-  <li><a href="https://strandsagents.com/latest/">由 AWS 提供的 Strands Agents SDK</a>；</li>
-  <li><a href="https://rivet.ironcladapp.com/">Rivet</a>，一個拖放式（drag and drop）的 GUI LLM 工作流建構工具；以及</li>
-  <li><a href="https://www.vellum.ai/">Vellum</a>，另一個用於建構與測試複雜工作流的 GUI 工具。</li>
+  <li><a href="https://strandsagents.com/latest/">AWS 的 Strands Agents SDK</a>；</li>
+  <li><a href="https://rivet.ironcladapp.com/">Rivet</a>，拖放式（drag and drop）的 GUI LLM 工作流建構工具；</li>
+  <li><a href="https://www.vellum.ai/">Vellum</a>，另一個建構與測試複雜工作流的 GUI 工具。</li>
 </ul>
 
-<p>這些框架透過簡化標準的低階任務（例如呼叫 LLM、定義與解析工具、將呼叫串接起來）讓起步變得容易。然而，它們往往會產生額外的抽象層（abstraction layers），可能遮蔽底層的提示（prompts）與回應（responses），使其更難除錯。它們也可能讓人忍不住在更簡單的設定就足夠時，額外添加複雜度。</p>
+<p>這些框架簡化標準的低階任務（呼叫 LLM、定義與解析工具、把呼叫串接起來），讓起步容易得多。但它們往往多出好幾層抽象（abstraction layers），可能遮蔽底層的提示（prompts）與回應（responses），更難除錯。設定明明更簡單就夠用時，它們也容易讓人忍不住添加複雜度。</p>
 
-<p>我們建議開發者從直接使用 LLM API 開始：許多模式只需幾行程式碼就能實作。如果你確實使用了框架，請確保你理解其底層程式碼。對「底層究竟發生什麼」的錯誤假設，是客戶犯錯的常見來源。</p>
+<p>我們建議開發者直接從 LLM API 開始：許多模式幾行程式碼就能實作。如果還是用了框架，請確認你懂底層的程式碼。對「底下到底發生什麼」想錯，是客戶常犯的錯誤來源。</p>
 
-<p>範例實作請參閱我們的 <a href="https://platform.claude.com/cookbook/patterns-agents-basic-workflows">cookbook</a>。</p>
+<p>範例實作請見我們的 <a href="https://platform.claude.com/cookbook/patterns-agents-basic-workflows">cookbook</a>。</p>
 
 <h2>積木、工作流與代理（Building blocks, workflows, and agents）</h2>
 
-<p>在本節中，我們將探討在生產環境中見過的常見代理系統（agentic systems）模式。我們會從最基礎的積木——增強型 LLM（augmented LLM）——開始，並逐步增加複雜度，從單純的組合式工作流（compositional workflows）一路推進到自主代理（autonomous agents）。</p>
+<p>這一節探討我們在生產環境中見過的常見代理系統（agentic systems）模式。從最基礎的積木講起：增強型 LLM（augmented LLM）。接著逐步增加複雜度，從單純的組合式工作流（compositional workflows）一路到自主代理（autonomous agents）。</p>
 
 <h3>積木：增強型 LLM（Building block: The augmented LLM）</h3>
 
-<p>代理系統（agentic systems）的基本積木，是一個經過增強的 LLM，加入了檢索（retrieval）、工具（tools）與記憶（memory）等擴充。我們目前的模型能主動運用這些能力——自行產生搜尋查詢、選擇合適的工具，並判斷該保留哪些資訊。</p>
+<p>代理系統（agentic systems）的基本積木，是一個加上檢索（retrieval）、工具（tools）與記憶（memory）等擴充的 LLM。我們目前的模型能主動運用這些能力：自己產生搜尋查詢、選擇合適的工具、判斷該保留哪些資訊。</p>
 
 <figure>
   <img src="assets/d3083d3f40bb2b6f477901cc9a240738d3dd1371-2401x1000.png" alt="增強型 LLM（The augmented LLM）示意圖">
   <figcaption>增強型 LLM（The augmented LLM）</figcaption>
 </figure>
 
-<p>我們建議把重點放在實作的兩個關鍵面向：將這些能力量身打造以貼合你的特定使用情境，並確保它們為你的 LLM 提供一個簡單且有完善文件（well-documented）的介面。雖然實作這些增強有許多方式，其中一種做法是透過我們近期發佈的 <a href="https://www.anthropic.com/news/model-context-protocol">Model Context Protocol</a>，它讓開發者能透過簡單的 <a href="https://modelcontextprotocol.io/tutorials/building-a-client#building-mcp-clients">client 實作</a>，與持續成長的第三方工具生態系整合。</p>
+<p>實作時建議聚焦兩件事：把這些能力調整到貼合你的使用情境，並確保它們給你的 LLM 一個簡單、文件齊全（well-documented）的介面。實作這些擴充有很多方式，其中一種是我們近期發佈的 <a href="https://www.anthropic.com/news/model-context-protocol">Model Context Protocol</a>；開發者只要寫一份簡單的 <a href="https://modelcontextprotocol.io/tutorials/building-a-client#building-mcp-clients">client 實作</a>，就能接上持續成長的第三方工具生態系。</p>
 
-<p>在本文後續內容中，我們將假設每一次 LLM 呼叫都能取用這些增強的能耐。</p>
+<p>後文我們都假設每次 LLM 呼叫都能取用這些擴充能力。</p>
 
 <h3>工作流：提示鏈接（Workflow: Prompt chaining）</h3>
 
-<p>提示鏈接（Prompt chaining）將任務分解為一連串步驟，其中每一次 LLM 呼叫都會處理前一次的輸出。你可以在任何中間步驟加入程式化的檢查（見下圖中的「閘門（gate）」），以確保流程仍在正軌上。</p>
+<p>提示鏈接（Prompt chaining）把任務拆成一連串步驟，每一次 LLM 呼叫處理前一次的輸出。中間步驟可以加入程式化的檢查（見下圖的「閘門（gate）」），確認流程還在正軌上。</p>
 
 <figure>
   <img src="assets/7418719e3dab222dccb379b8879e1dc08ad34c78-2401x1000.png" alt="提示鏈接工作流（The prompt chaining workflow）示意圖">
   <figcaption>提示鏈接工作流（The prompt chaining workflow）</figcaption>
 </figure>
 
-<p><strong>何時使用此工作流：</strong>當任務能被輕鬆且乾淨地分解為固定的子任務（subtasks）時，此工作流最為理想。其主要目標是以延遲換取更高的準確度，讓每一次 LLM 呼叫都成為更簡單的任務。</p>
+<p><strong>何時使用此工作流：</strong>任務能輕鬆、乾淨地拆成固定子任務（subtasks）時最理想。主要目標是用延遲換取更高的準確度，讓每次 LLM 呼叫都是更簡單的任務。</p>
 
 <p><strong>適合使用提示鏈接的例子：</strong></p>
 
 <ul>
-  <li>產生行銷文案，接著將其翻譯成另一種語言。</li>
-  <li>撰寫文件大綱，檢查大綱是否符合特定標準，然後依據大綱撰寫文件。</li>
+  <li>產生行銷文案，再翻譯成另一種語言。</li>
+  <li>先寫文件大綱，檢查大綱是否符合特定標準，再依大綱寫出文件。</li>
 </ul>
 
 <h3>工作流：路由（Workflow: Routing）</h3>
 
-<p>路由（Routing）會對輸入進行分類，並將其導向專門的後續任務。此工作流能實現關注點分離（separation of concerns），並建構更專門化的提示。若缺少此工作流，針對某一類輸入進行最佳化，可能會損害其他輸入的表現。</p>
+<p>路由（Routing）把輸入分類，導向專門的後續任務。這個工作流能做到關注點分離（separation of concerns），也讓你建構更專門的提示。少了它，為了某一類輸入調校，可能反而害到其他輸入的表現。</p>
 
 <figure>
   <img src="assets/5c0c0e9fe4def0b584c04d37849941da55e5e71c-2401x1000.png" alt="路由工作流（The routing workflow）示意圖">
   <figcaption>路由工作流（The routing workflow）</figcaption>
 </figure>
 
-<p><strong>何時使用此工作流：</strong>當複雜任務存在明顯不同、各自更適合分別處理的類別，且分類能被準確完成時（無論是由 LLM 或更傳統的分類模型／演算法），路由都能運作良好。</p>
+<p><strong>何時使用此工作流：</strong>複雜任務裡有明顯不同、各自更適合分別處理的類別，而且分類能做得準（不管靠 LLM 還是更傳統的分類模型／演算法），路由就運作得很好。</p>
 
 <p><strong>適合使用路由的例子：</strong></p>
 
 <ul>
-  <li>將不同類型的客戶服務查詢（一般問題、退款請求、技術支援）導向不同的下游流程、提示與工具。</li>
-  <li>將簡單／常見的問題路由到較小、更具成本效益的模型（如 Claude Haiku 4.5），把困難／不尋常的問題交給能力更強的模型（如 Claude Sonnet 4.5），以達到最佳表現。</li>
+  <li>把不同類型的客服查詢（一般問題、退款請求、技術支援）導向不同的下游流程、提示與工具。</li>
+  <li>簡單／常見的問題路由到較小、更省成本的模型（如 Claude Haiku 4.5），困難／不尋常的問題交給能力更強的模型（如 Claude Sonnet 4.5），換取最佳表現。</li>
 </ul>
 
 <h3>工作流：平行化（Workflow: Parallelization）</h3>
 
-<p>LLM 有時能同時處理一項任務，並以程式化方式彙整其輸出。這種工作流——平行化（parallelization）——呈現為兩種主要變化：</p>
+<p>LLM 有時能同時處理一項任務，再用程式化方式彙整輸出。這種工作流叫平行化（parallelization），有兩種主要變化：</p>
 
 <ul>
-  <li><strong>分段（Sectioning）</strong>：將任務拆解為可平行執行的獨立子任務。</li>
-  <li><strong>投票（Voting）</strong>：將同一任務執行多次，以取得多樣的輸出。</li>
+  <li><strong>分段（Sectioning）</strong>：把任務拆成可平行執行的獨立子任務。</li>
+  <li><strong>投票（Voting）</strong>：同一個任務跑很多次，取得多樣的輸出。</li>
 </ul>
 
 <figure>
@@ -255,83 +255,83 @@
   <figcaption>平行化工作流（The parallelization workflow）</figcaption>
 </figure>
 
-<p><strong>何時使用此工作流：</strong>當拆解出的子任務能為了速度而平行處理，或當需要多個觀點或多次嘗試以取得更高信心的結果時，平行化便很有效。對於牽涉多重考量的複雜任務，LLM 通常在每一個考量都由獨立的 LLM 呼叫處理時表現更好，因為這能讓注意力聚焦在每一個特定面向上。</p>
+<p><strong>何時使用此工作流：</strong>拆出來的子任務能為了速度平行處理，或需要多個觀點、多次嘗試才有足夠信心時，平行化很有效。複雜任務牽涉多重考量時，LLM 通常表現得更好，如果每個考量都交給獨立的 LLM 呼叫處理，注意力就能集中在單一面向。</p>
 
 <p><strong>適合使用平行化的例子：</strong></p>
 
 <ul>
   <li><strong>分段（Sectioning）</strong>：
     <ul>
-      <li>實作護欄（guardrails），由一個模型實例處理使用者查詢，另一個則篩檢其中是否含不當內容或請求。這通常比讓同一次 LLM 呼叫同時處理護欄與主要回應表現更好。</li>
-      <li>自動化評估（evals）以評量 LLM 表現，其中每一次 LLM 呼叫都評估模型在某一給定提示上表現的不同面向。</li>
+      <li>實作護欄（guardrails），一個模型實例處理使用者查詢，另一個篩檢查詢裡有沒有不當內容或請求。這通常比同一次 LLM 呼叫兼顧護欄與主要回應表現更好。</li>
+      <li>自動化評估（evals）來評量 LLM 表現，每次 LLM 呼叫評估模型在某個給定提示上表現的其中一個面向。</li>
     </ul>
   </li>
   <li><strong>投票（Voting）</strong>：
     <ul>
-      <li>審查一段程式碼是否有弱點，由數個不同的提示進行審查，發現問題時即標記該程式碼。</li>
-      <li>評估某段內容是否不當，由多個提示分別評估不同面向，或要求不同的投票門檻，以平衡偽陽性（false positives）與偽陰性（negatives）。</li>
+      <li>審查一段程式碼有沒有弱點，用幾個不同的提示各自審查，發現問題就標記那段程式碼。</li>
+      <li>評估某段內容是否不當，多個提示分別看不同面向，或設不同的投票門檻，在偽陽性（false positives）與偽陰性（negatives）之間取平衡。</li>
     </ul>
   </li>
 </ul>
 
 <h3>工作流：協調者－工作者（Workflow: Orchestrator-workers）</h3>
 
-<p>在協調者－工作者（orchestrator-workers）工作流中，一個中央 LLM 會動態地拆解任務、把它們分派給工作者 LLM（worker LLMs），並彙整其結果。</p>
+<p>協調者－工作者（orchestrator-workers）工作流裡，一個中央 LLM 動態拆解任務、分派給工作者 LLM（worker LLMs），再彙整結果。</p>
 
 <figure>
   <img src="assets/8985fc683fae4780fb34eab1365ab78c7e51bc8e-2401x1000.png" alt="協調者－工作者工作流（The orchestrator-workers workflow）示意圖">
   <figcaption>協調者－工作者工作流（The orchestrator-workers workflow）</figcaption>
 </figure>
 
-<p><strong>何時使用此工作流：</strong>當遇到無法預測所需子任務的複雜任務時，此工作流非常適合（例如在寫程式時，需要變更的檔案數量與每個檔案變更的性質，很可能取決於任務本身）。雖然它在拓撲上與平行化相似，關鍵差異在於其彈性——子任務並非預先定義，而是由協調者（orchestrator）依特定輸入來決定。</p>
+<p><strong>何時使用此工作流：</strong>複雜任務需要哪些子任務無法預測時，這個工作流很適合（例如寫程式，要改幾個檔案、每個檔案怎麼改，往往取決於任務本身）。它在拓撲上跟平行化很像，關鍵差別在彈性：子任務不是預先定義的，而是協調者（orchestrator）看當下的輸入決定。</p>
 
 <p><strong>適合使用協調者－工作者的例子：</strong></p>
 
 <ul>
-  <li>每次都要對多個檔案進行複雜變更的程式開發產品。</li>
-  <li>涉及從多個來源蒐集與分析資訊、以找出可能相關資訊的搜尋任務。</li>
+  <li>每次都要對多個檔案做複雜變更的程式開發產品。</li>
+  <li>要從多個來源蒐集與分析資訊、找出可能相關內容的搜尋任務。</li>
 </ul>
 
 <h3>工作流：評估者－最佳化者（Workflow: Evaluator-optimizer）</h3>
 
-<p>在評估者－最佳化者（evaluator-optimizer）工作流中，一次 LLM 呼叫負責產生回應，另一次則在迴圈中提供評估與回饋。</p>
+<p>評估者－最佳化者（evaluator-optimizer）工作流裡，一次 LLM 呼叫產生回應，另一次在迴圈中給評估與回饋。</p>
 
 <figure>
   <img src="assets/14f51e6406ccb29e695da48b17017e899a6119c7-2401x1000.png" alt="評估者－最佳化者工作流（The evaluator-optimizer workflow）示意圖">
   <figcaption>評估者－最佳化者工作流（The evaluator-optimizer workflow）</figcaption>
 </figure>
 
-<p><strong>何時使用此工作流：</strong>當我們有明確的評估標準，且反覆的精進能帶來可衡量的價值時，此工作流特別有效。良好契合的兩個徵象是：第一，當人類清楚表達其回饋時，LLM 的回應能被明確地改善；第二，LLM 能提供這樣的回饋。這類似於人類作者在產出精煉文件時可能經歷的反覆寫作過程。</p>
+<p><strong>何時使用此工作流：</strong>評估標準明確，而且反覆精進能帶來可衡量的價值時，這個工作流特別有效。符合的兩項跡象：第一，人類把回饋講清楚之後，LLM 的回應能明顯變好；第二，LLM 自己也給得出這種回饋。這很像人類作者寫出一份精煉文件時，會經歷的反覆修改過程。</p>
 
 <p><strong>適合使用評估者－最佳化者的例子：</strong></p>
 
 <ul>
-  <li>文學翻譯：其中有些細微之處是翻譯 LLM 起初可能無法掌握的，而評估者 LLM 則能提供有用的評論。</li>
-  <li>需要多輪搜尋與分析以蒐集完整資訊的複雜搜尋任務，由評估者決定是否需要進一步搜尋。</li>
+  <li>文學翻譯：有些細微之處，負責翻譯的 LLM 起初抓不到，評估者 LLM 能給出有用的評論。</li>
+  <li>需要多輪搜尋與分析才能蒐集完整資訊的複雜搜尋任務，由評估者判斷要不要繼續搜。</li>
 </ul>
 
 <h3>代理（Agents）</h3>
 
-<p>隨著 LLM 在關鍵能力上逐漸成熟——理解複雜輸入、進行推理與規劃（reasoning and planning）、可靠地使用工具，以及從錯誤中復原——代理（agents）正開始出現在生產環境中。代理的運作始於人類使用者下達的指令或與其互動討論。一旦任務明確，代理便獨立規劃與運作，並可能在需要更多資訊或判斷時回頭詢問人類。在執行過程中，代理必須在每一步從環境取得「真實依據（ground truth）」（例如工具呼叫結果或程式碼執行結果），以評估自身進展。之後，代理可以在檢查點（checkpoints）或遇到阻礙時暫停，以取得人類回饋。任務通常在完成時終止，但也很常見會納入停止條件（stopping conditions，例如最大迭代次數）以維持控制。</p>
+<p>LLM 在幾項關鍵能力上愈來愈成熟，包括理解複雜輸入、推理與規劃（reasoning and planning）、可靠地使用工具，以及從錯誤中復原，代理（agents）也開始出現在生產環境。代理的運作從人類使用者下指令、或與人類來回討論開始。任務明確之後，代理就獨立規劃與運作，需要更多資訊或判斷時再回頭問人。執行過程中，代理每一步都必須從環境取得「真實依據（ground truth）」（例如工具呼叫結果或程式碼執行結果），才能評估自己的進展。之後代理可以在檢查點（checkpoints）暫停，或遇到阻礙時停下來取得人類回饋。任務通常在完成時終止，不過也常加入停止條件（stopping conditions，例如最大迭代次數）來維持控制。</p>
 
-<p>代理能處理精密的任務，但其實作往往相當直接。它們通常就只是 LLM 在迴圈中，依據環境回饋來使用工具。因此，清楚地、深思熟慮地設計工具集（toolsets）及其文件至關重要。我們會在附錄 2（「為你的工具做提示工程，Prompt Engineering your Tools」）中進一步說明工具開發的最佳實務。</p>
+<p>代理能處理精密的任務，但實作往往相當直接：通常就是 LLM 在迴圈裡，依據環境回饋使用工具。所以，把工具集（toolsets）和它們的文件設計得清楚、想得仔細，就很重要。工具開發的最佳實務，我們在附錄 2（「為你的工具做提示工程，Prompt Engineering your Tools」）另外說明。</p>
 
 <figure>
   <img src="assets/58d9f10c985c4eb5d53798dea315f7bb5ab6249e-2401x1000.png" alt="自主代理（Autonomous agent）示意圖">
   <figcaption>自主代理（Autonomous agent）</figcaption>
 </figure>
 
-<p><strong>何時使用代理：</strong>當問題是開放式的、難以或不可能預測所需步驟數，且無法硬編碼（hardcode）出一條固定路徑時，便可使用代理。LLM 可能會運作許多回合，而你必須對其決策有一定程度的信任。代理的自主性，使其非常適合在受信任的環境中擴展任務規模。</p>
+<p><strong>何時使用代理：</strong>問題是開放式的、步驟數難以或不可能預測，也無法硬編碼（hardcode）出一條固定路徑時，就可以用代理。LLM 可能會跑很多回合，你得對其決策有一定程度的信任。代理的自主性，讓它很適合在受信任的環境中擴展任務規模。</p>
 
-<p>代理的自主性質意味著更高的成本，以及錯誤層層累積（compounding errors）的可能性。我們建議在沙箱環境（sandboxed environments）中進行大量測試，並搭配適當的護欄（guardrails）。</p>
+<p>代理的自主性質意味著更高的成本，還有錯誤層層累積（compounding errors）的可能。我們建議在沙箱環境（sandboxed environments）裡大量測試，並加上適當的護欄（guardrails）。</p>
 
 <p><strong>適合使用代理的例子：</strong></p>
 
 <p>以下例子來自我們自己的實作：</p>
 
 <ul>
-  <li>一個程式開發代理（coding agent），用於解決 <a href="https://www.anthropic.com/research/swe-bench-sonnet">SWE-bench 任務</a>，這些任務涉及依據任務描述對多個檔案進行編輯；</li>
-  <li>我們的 <a href="https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo">「電腦使用（computer use）」參考實作</a>，其中 Claude 使用電腦來完成任務。</li>
+  <li>一個程式開發代理（coding agent），用來解決 <a href="https://www.anthropic.com/research/swe-bench-sonnet">SWE-bench 任務</a>，這些任務要依據描述編輯多個檔案；</li>
+  <li>我們的 <a href="https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo">「電腦使用（computer use）」參考實作</a>，Claude 用它操作電腦完成任務。</li>
 </ul>
 
 <figure>
@@ -341,82 +341,82 @@
 
 <h2>組合與客製這些模式（Combining and customizing these patterns）</h2>
 
-<p>這些積木並非規範性的規定。它們是開發者可依不同使用情境加以塑造與組合的常見模式。一如任何 LLM 功能，成功的關鍵在於衡量表現並反覆改進實作。再強調一次：你應該<em>只在</em>當複雜度能被明確證明能改善結果時，才考慮加入它。</p>
+<p>這些積木並非強制性的規範。它們是常見模式，開發者可以依不同使用情境調整、組合。跟任何 LLM 功能一樣，關鍵是衡量表現、反覆改進實作。再強調一次：<em>只有</em>在複雜度明確證明能改善結果時，才該考慮加進來。</p>
 
 <h2>總結（Summary）</h2>
 
-<p>在 LLM 領域的成功，不在於打造最精密複雜的系統，而在於為你的需求打造<em>正確的</em>系統。從簡單的提示開始，用完整的評估來最佳化它們，並只在更簡單的解法不足時，才加入多步驟的代理系統（agentic systems）。</p>
+<p>LLM 領域的成功，不在於系統造得多精密，而在於為你的需求造出<em>正確的</em>系統。從簡單的提示開始，用完整的評估把它們調好，等更簡單的解法真的不夠了，再加入多步驟的代理系統（agentic systems）。</p>
 
 <p>在實作代理時，我們試著遵循三個核心原則：</p>
 
 <ol>
-  <li>在代理的設計中保持<strong>簡單（simplicity）</strong>。</li>
-  <li>透過明確展示代理的規劃步驟來優先追求<strong>透明（transparency）</strong>。</li>
-  <li>透過徹底的<strong>文件與測試（documentation and testing）</strong>，仔細打造你的代理－電腦介面（ACI, agent-computer interface）。</li>
+  <li>代理的設計保持<strong>簡單（simplicity）</strong>。</li>
+  <li>明確展示代理的規劃步驟，優先做到<strong>透明（transparency）</strong>。</li>
+  <li>靠徹底的<strong>文件與測試（documentation and testing）</strong>，仔細打造你的代理－電腦介面（ACI, agent-computer interface）。</li>
 </ol>
 
-<p>框架能幫助你快速起步，但當你邁向生產環境時，請不要猶豫去減少抽象層，並以基本元件來建構。遵循這些原則，你便能打造出不僅強大、同時可靠、可維護，且受使用者信任的代理。</p>
+<p>框架能幫你快速起步，但要進到生產環境時，請不要猶豫，直接減少抽象層，用基本元件來建構。照這些原則做，你造出的代理不只強大，也可靠、好維護，而且使用者願意信任。</p>
 
 <h3>致謝（Acknowledgements）</h3>
 
-<p>本文由 Erik S. 與 Barry Zhang 撰寫。這項工作奠基於我們在 Anthropic 打造代理的經驗，以及客戶所分享的寶貴洞見，我們對此深表感謝。</p>
+<p>本文由 Erik S. 與 Barry Zhang 撰寫。內容來自我們在 Anthropic 打造代理的經驗，以及客戶分享的寶貴洞見，我們非常感謝。</p>
 
 <hr>
 
 <h2>附錄 1：實務中的代理（Appendix 1: Agents in practice）</h2>
 
-<p>我們與客戶的合作揭示了兩個對 AI 代理特別有前景的應用，它們展示了上述模式的實務價值。這兩個應用都說明了：對於同時需要對話與行動、具備明確成功標準、能促成回饋迴路（feedback loops），並納入有意義的人為監督（human oversight）的任務，代理能帶來最大的價值。</p>
+<p>和客戶合作下來，我們看到兩個對 AI 代理特別有前景的應用，也印證了上面那些模式的實務價值。這兩個應用都說明了一件事：任務如果同時需要對話與行動、成功標準明確、能形成回饋迴路（feedback loops），又有人為監督（human oversight）把關，代理能帶來的價值最大。</p>
 
 <h3>A. 客戶支援（Customer support）</h3>
 
-<p>客戶支援結合了熟悉的聊天機器人介面與透過工具整合而來的增強能力。這對更開放式的代理而言是自然而然的契合，因為：</p>
+<p>客戶支援把熟悉的聊天機器人介面，結合工具整合帶來的增強能力。這對比較開放式的代理來說是自然的選擇，因為：</p>
 
 <ul>
-  <li>支援互動自然遵循對話流程，同時需要取用外部資訊與執行動作；</li>
-  <li>可整合工具以取得客戶資料、訂單紀錄與知識庫文章；</li>
-  <li>諸如發放退款或更新工單等動作，能以程式化方式處理；以及</li>
-  <li>成功可透過使用者定義的解決結果（resolutions）清楚地衡量。</li>
+  <li>支援互動自然照著對話流程走，同時要取用外部資訊、實際執行動作；</li>
+  <li>可以整合工具，取得客戶資料、訂單紀錄與知識庫文章；</li>
+  <li>發退款、更新工單這類動作，能用程式處理；以及</li>
+  <li>成功與否，可以從使用者定義的解決結果（resolutions）清楚衡量。</li>
 </ul>
 
-<p>多家公司已透過以用量為基礎的定價模式（usage-based pricing models），證明此做法的可行性——只針對成功解決的案例收費，展現出他們對自家代理成效的信心。</p>
+<p>已經有好幾家公司用按用量計價（usage-based pricing models）證明這條路可行：只對成功解決的結果收費。他們對自家代理的成效顯然有信心。</p>
 
 <h3>B. 程式開發代理（Coding agents）</h3>
 
-<p>軟體開發領域已展現出 LLM 功能的驚人潛力，能力從程式碼補全（code completion）演進到自主的問題解決。代理特別有效，因為：</p>
+<p>軟體開發領域展現了 LLM 驚人的潛力，能力從程式碼補全（code completion）一路演進到自主解決問題。代理在這裡特別有效，因為：</p>
 
 <ul>
-  <li>程式碼解法可透過自動化測試驗證；</li>
-  <li>代理能以測試結果作為回饋，反覆改進解法；</li>
-  <li>問題空間定義明確且有結構；以及</li>
-  <li>輸出品質能被客觀衡量。</li>
+  <li>程式碼解法可以用自動化測試驗證；</li>
+  <li>代理能把測試結果當回饋，反覆改進解法；</li>
+  <li>問題空間定義明確、有結構；以及</li>
+  <li>輸出品質可以客觀衡量。</li>
 </ul>
 
-<p>在我們自家的實作中，代理現在已能僅依據 pull request 的描述，解決 <a href="https://www.anthropic.com/research/swe-bench-sonnet">SWE-bench Verified</a> 基準測試中真實的 GitHub 議題。然而，雖然自動化測試有助於驗證功能，人為審查（human review）對於確保解法符合更廣泛的系統需求，仍然至關重要。</p>
+<p>在我們自家的實作中，代理現在只憑 pull request 的描述，就能解決 <a href="https://www.anthropic.com/research/swe-bench-sonnet">SWE-bench Verified</a> 基準測試裡真實的 GitHub 議題。不過，自動化測試雖然能驗證功能，人為審查（human review）仍然是關鍵，才能確保解法符合更上層的系統需求。</p>
 
 <h2>附錄 2：為你的工具做提示工程（Appendix 2: Prompt engineering your tools）</h2>
 
-<p>無論你正在建構哪一種代理系統（agentic system），工具很可能都是其中重要的一部分。<a href="https://www.anthropic.com/news/tool-use-ga">工具（Tools）</a>讓 Claude 能與外部服務及 API 互動，做法是在我們的 API 中指定其確切結構與定義。當 Claude 打算呼叫工具時，它會在 API 回應中包含一個 <a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use#example-api-response-with-a-tool-use-content-block">工具使用區塊（tool use block）</a>。工具定義與規格應獲得的提示工程（prompt engineering）關注，應與你的整體提示一樣多。在這段簡短的附錄中，我們說明如何為你的工具做提示工程。</p>
+<p>不管你建構的是哪一種代理系統（agentic system），工具大概都是重要的部分。<a href="https://www.anthropic.com/news/tool-use-ga">工具（Tools）</a>讓 Claude 能與外部服務及 API 互動，做法是在我們的 API 裡指定工具的完整結構與定義。Claude 打算呼叫工具時，會在 API 回應中夾帶一個 <a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use#example-api-response-with-a-tool-use-content-block">工具使用區塊（tool use block）</a>。工具定義與規格該得到的提示工程（prompt engineering）心力，跟你整體的提示一樣多。這段簡短的附錄說明怎麼為工具做提示工程。</p>
 
-<p>指定同一個動作往往有好幾種方式。例如，你可以透過撰寫 diff 來指定一次檔案編輯，也可以改寫整個檔案。對於結構化輸出（structured output），你可以用 markdown 或 JSON 來回傳程式碼。在軟體工程中，這類差異只是表面的，可以無損地從一種轉換為另一種。然而，有些格式對 LLM 而言，寫起來就是比其他格式困難得多。撰寫 diff 需要在新程式碼寫出之前，就知道區塊標頭（chunk header）中有多少行正在變更。用 JSON（相較於 markdown）撰寫程式碼，則需要對換行與引號做額外的跳脫處理（escaping）。</p>
+<p>同一個動作，往往有好幾種指定方式。例如一次檔案編輯，你可以寫 diff，也可以把整個檔案重寫一遍。結構化輸出（structured output）也一樣，程式碼可以放在 markdown 裡，也可以放在 JSON 裡。在軟體工程中，這類差別只是表面的，兩種可以無損互轉。但有些格式對 LLM 就是難寫得多。寫 diff，得在新程式碼寫出來之前，就先知道區塊標頭（chunk header）裡有幾行在變。把程式碼放進 JSON（相較於 markdown），則要對換行與引號多做一層跳脫處理（escaping）。</p>
 
-<p>我們對於決定工具格式的建議如下：</p>
-
-<ul>
-  <li>給模型足夠的 token 去「思考（think）」，以免它把自己逼進死角。</li>
-  <li>讓格式盡量貼近模型在網際網路文本中自然見過的形式。</li>
-  <li>確保沒有任何格式上的「額外負擔（overhead）」，例如必須準確計算數千行程式碼，或必須對它撰寫的任何程式碼做字串跳脫（string-escaping）。</li>
-</ul>
-
-<p>一個經驗法則是：想想人機介面（HCI, human-computer interfaces）投注了多少心力，並計畫在打造良好的<em>代理</em>－電腦介面（ACI, agent-computer interfaces）上投入同樣多的心力。以下是一些實作上的想法：</p>
+<p>決定工具格式時，我們的建議是：</p>
 
 <ul>
-  <li>站在模型的立場想。根據描述與參數，這個工具的使用方式是否顯而易見，還是你得仔細思考一番？如果是後者，那麼對模型而言很可能也是如此。一個好的工具定義通常會包含使用範例、邊界情況（edge cases）、輸入格式要求，以及與其他工具之間的清楚界線。</li>
-  <li>你能如何調整參數名稱或描述，讓事情更顯而易見？把它想成是在為團隊中的初階開發者寫一份很棒的 docstring。當使用許多相似的工具時，這一點尤其重要。</li>
-  <li>測試模型如何使用你的工具：在我們的 <a href="https://console.anthropic.com/workbench">workbench</a> 中執行許多範例輸入，觀察模型犯了哪些錯，並反覆改進。</li>
-  <li>為你的工具做 <a href="https://en.wikipedia.org/wiki/Poka-yoke">防呆（Poka-yoke）</a>。調整引數（arguments），讓錯誤更難發生。</li>
+  <li>給模型足夠的 token 去「思考（think）」，免得它把自己逼進死角。</li>
+  <li>格式盡量貼近模型在網路上自然看過的樣子。</li>
+  <li>不要有格式上的「額外負擔（overhead）」，例如得準確數出幾千行程式碼，或得為它寫的每一段程式碼做字串跳脫（string-escaping）。</li>
 </ul>
 
-<p>在打造我們用於 <a href="https://www.anthropic.com/research/swe-bench-sonnet">SWE-bench</a> 的代理時，我們實際上花在最佳化工具上的時間，比花在整體提示上的還多。例如，我們發現當代理離開根目錄後，模型會對使用相對檔案路徑（relative filepaths）的工具出錯。為了修正這點，我們把工具改成一律要求絕對檔案路徑（absolute filepaths）——結果模型完美無誤地使用了這個方法。</p>
+<p>有個經驗法則：想想人機介面（HCI, human-computer interfaces）投注了多少心力，就該在打造良好的<em>代理</em>－電腦介面（ACI, agent-computer interfaces）上投入同樣多。幾個實作上的想法：</p>
+
+<ul>
+  <li>站在模型的立場想。看描述和參數，這個工具怎麼用是顯而易見，還是得想一下？如果是後者，對模型大概也是。好的工具定義通常會附上使用範例、邊界情況（edge cases）、輸入格式要求，以及跟其他工具之間清楚的界線。</li>
+  <li>參數名稱或描述怎麼改，能讓事情更一目了然？把它想成是在為團隊裡的初階開發者寫一份好 docstring。工具一多、又彼此相似時，這點尤其重要。</li>
+  <li>測試模型怎麼用你的工具：在我們的 <a href="https://console.anthropic.com/workbench">workbench</a> 裡跑大量範例輸入，看模型在哪裡出錯，再反覆修。</li>
+  <li>幫你的工具做 <a href="https://en.wikipedia.org/wiki/Poka-yoke">防呆（Poka-yoke）</a>。調整引數（arguments），讓錯誤更難發生。</li>
+</ul>
+
+<p>打造 <a href="https://www.anthropic.com/research/swe-bench-sonnet">SWE-bench</a> 用的代理時，我們花在調工具上的時間，其實比花在整體提示上的還多。例如我們發現，代理離開根目錄之後，模型用相對檔案路徑（relative filepaths）的工具就會出錯。我們把工具改成一律要求絕對檔案路徑（absolute filepaths），結果模型用得毫無問題。</p>
 
 </main>
 
