@@ -20,8 +20,15 @@ plus locally downloaded images, then have a subagent review the translation.
 - **Optional:** output directory, output filename, translation style notes
   (e.g. 台灣用語, 精簡, 保留更多原文), scope restriction (only one section).
 
-If output location is unspecified, write into the current working directory as
-`<slug>.zh-Hant.html` with images in `assets/`.
+If output location is unspecified, write into the current working directory in
+a folder named after the source slug, as
+`<slug>/<slug>.zh-Hant.html` with images in `<slug>/assets/`.
+
+Every newly produced page MUST live in its own `<slug>/` folder — never a bare
+`.zh-Hant.html` at the working-directory root. The folder keeps the page and
+its downloaded images together and lets multiple translations sit side by side.
+Example: `claude-code-best-practices/claude-code-best-practices.zh-Hant.html`
+with `claude-code-best-practices/assets/`.
 
 ## Procedure
 
@@ -120,10 +127,10 @@ Keep the template's inline `<style>` untouched — that CSS is the approved them
 
 ### 5. Localize images and go offline
 
-Download every source image into `assets/` beside the output HTML, then rewrite
-the `<img src>` to the relative `assets/<filename>` path. The page MUST render
-fully with the network disconnected; a CDN hotlink is a defect. Skip this only
-if the user explicitly asks for remote images.
+Download every source image into `<slug>/assets/`, beside the output HTML, then
+rewrite the `<img src>` to the relative `assets/<filename>` path. The page MUST
+render fully with the network disconnected; a CDN hotlink is a defect. Skip this
+only if the user explicitly asks for remote images.
 
 ### 6. Verify the render
 

@@ -70,6 +70,35 @@ they are frequently mistranslated.
 | managed agent | 託管代理 |
 | Claude Managed Agents | Claude 託管代理 |
 
+## Claude Code product surface
+
+| English | 繁中 |
+|---|---|
+| session | 工作階段 |
+| context window | 脈絡視窗 |
+| context | 脈絡 |
+| compaction (user-facing /compact) | 壓縮 |
+| plan mode | 規劃模式 |
+| permission mode | 權限模式 |
+| permission allowlist | 權限允許清單 |
+| sandboxing | 沙箱 |
+| subagent | 子代理 |
+| checkpoint | 檢查點 |
+| rewind | 回溯 |
+| non-interactive mode | 非互動模式 |
+| fan-out | 扇出 |
+| worktree | worktree（保留原文） |
+| hook | hook（保留原文） |
+| skill | skill（保留原文） |
+| plugin | 外掛 |
+| slash command | 斜線指令 |
+| prompt | 提示 |
+| spec | 規格 |
+| agentic loop | 代理迴路 |
+| verification loop | 驗證迴路 |
+| adversarial review | 對抗式審查 |
+| status line | 狀態列 |
+
 ## Kept in English
 
 Acronyms and product or project names: LLM, API, SDK, CLI, JSON, HTML, CSS,

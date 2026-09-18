@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code 最佳實務（Best practices）</title>
+<meta name="description" content="充分發揮 Claude Code 的技巧與模式，從環境設定到跨平行工作階段的規模化。">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">Claude Code 文件</p>
+  <h1>Claude Code 最佳實務（Best practices for Claude Code）</h1>
+  <p class="pubdate">最後更新：2026-09-15</p>
+</header>
+
+<main id="main-content">
+
+<p class="lede">充分發揮 Claude Code 的技巧與模式，從設定你的環境，到在多個平行工作階段之間擴展規模。</p>
+
+<p>Claude Code 是一個代理式的程式開發環境（agentic coding environment）。聊天機器人回答問題，然後等著你問下一句；Claude Code 不一樣。它能讀你的檔案、執行指令、改動程式碼，自己一路把問題解完。你可以盯著看、隨時把它拉回正軌，也可以整個走開。</p>
+
+<p>這改變了你的工作方式。以前是你自己寫程式碼，再請 Claude 審查；現在你描述想要的結果，Claude 自己找出怎麼做。它會探索、規劃、實作。</p>
+
+<p>不過這種自主性還是有學習曲線。Claude 在某些限制下運作，你得先搞懂這些限制。</p>
+
+<p>這份指南收錄的模式，在 Anthropic 內部團隊，以及各種程式碼庫、語言與環境的工程師身上都驗證過。代理迴路（agentic loop）怎麼運作，請見 <a href="https://code.claude.com/docs/en/how-claude-code-works">Claude Code 的運作方式</a>。</p>
+
+<hr>
+
+<p>大多數最佳實務都繞著同一個限制轉：Claude 的脈絡視窗（context window）滿得很快，而它越滿，表現越差。</p>
+
+<p>脈絡視窗裝的是整段對話，包括每一則訊息、Claude 讀過的每個檔案、每條指令的輸出。這東西滿得很快。光是一次除錯，或一次程式碼庫探索，就可能產生並吃掉幾萬個 token。</p>
+
+<p>這點很重要，因為脈絡一滿，LLM 的表現就會下滑。視窗快滿時，Claude 可能開始「忘記」先前的指示，或犯更多錯。脈絡視窗是最該管好的資源。想看實際上一次工作階段是怎麼滿的，可以看<a href="https://code.claude.com/docs/en/context-window">這份互動導覽</a>，了解啟動時載入什麼、每讀一個檔案要付多少成本。用<a href="https://code.claude.com/docs/en/statusline">自訂狀態列</a>持續追蹤脈絡用量；減少用量的做法見<a href="https://code.claude.com/docs/en/costs#reduce-token-usage">減少 token 用量</a>。</p>
+
+<hr>
+
+<h2>讓 Claude 有辦法驗證自己的成果（Give Claude a way to verify its work）</h2>
+
+<blockquote>
+  <p>給 Claude 一個它能自己跑的檢查：測試、建置、拿來比對的截圖。差別在於你得盯著這次工作，還是可以整個走開。</p>
+</blockquote>
+
+<p>Claude 覺得做完了就會停。沒有它能跑的檢查，「看起來做完了」就是唯一的訊號，於是你成了驗證迴路：每個錯誤都得等你發現。給它一個會回傳通過或失敗的東西，這個迴路就會自己閉合。Claude 做事、跑檢查、讀結果，不對就再改，直到檢查通過。</p>
+
+<p>所謂檢查，就是任何能回傳訊號、讓 Claude 在對話裡讀到的東西：測試套件、建置的結束碼、linter、把輸出與 fixture 比對的腳本，或拿設計稿比對的<a href="https://code.claude.com/docs/en/chrome">瀏覽器截圖</a>。Claude 的檢查通過後，自己再跑一次 <a href="https://code.claude.com/docs/en/skills#run-and-verify-your-app"><code>/verify</code></a>，對照正在執行的應用程式確認這次修改。</p>
+
+<table>
+  <thead>
+    <tr><th>策略</th><th>之前</th><th>之後</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>提供驗證標準</strong></td>
+      <td><em>「寫一個驗證 email 位址的函式」</em></td>
+      <td><em>「寫一個 validateEmail 函式。測試案例：<a href="mailto:user@example.com">user@example.com</a> 為 true，invalid 為 false，<a href="mailto:user@.com">user@.com</a> 為 false。實作完跑測試」</em></td>
+    </tr>
+    <tr>
+      <td><strong>用視覺驗證 UI 變更</strong></td>
+      <td><em>「把儀表板弄得好看一點」</em></td>
+      <td><em>「[貼上截圖] 照這個設計實作。把結果截圖並與原設計比對，列出差異然後修掉」</em></td>
+    </tr>
+    <tr>
+      <td><strong>處理根本原因，而非症狀</strong></td>
+      <td><em>「建置失敗了」</em></td>
+      <td><em>「建置出現這個錯誤：[貼上錯誤]。修好並確認建置成功。處理根本原因，不要壓掉錯誤」</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>檢查有了之後，再決定它把關關得多嚴：</p>
+
+<ul>
+  <li><strong>在同一個提示裡</strong>：要 Claude 在同則訊息裡跑檢查並反覆修正，如上表。</li>
+  <li><strong>跨整個工作階段</strong>：把檢查設成 <a href="https://code.claude.com/docs/en/goal"><code>/goal</code> 條件</a>。會有另一個評估者每輪重新檢查，Claude 會一直做到目標解決為止。Claude 若卡住不動，Claude Code 最後會帶著仍設定的目標停下這次執行，詳見<a href="https://code.claude.com/docs/en/goal#how-evaluation-works">/goal 的評估方式</a>。</li>
+  <li><strong>當成確定性的關卡</strong>：<a href="https://code.claude.com/docs/en/hooks#stop">Stop hook</a> 把檢查當腳本執行，通過之前不讓這一輪結束。連續擋下 8 次後，Claude Code 會覆寫這個 hook 並結束該輪。</li>
+  <li><strong>靠第二意見</strong>：<a href="https://code.claude.com/docs/en/sub-agents">驗證子代理（verification subagent）</a>或<a href="https://code.claude.com/docs/en/workflows">動態工作流（dynamic workflow）</a>會檢查自己的發現，讓一個全新的模型試著推翻結果，這樣做事的代理就不是替自己打分的那一個。</li>
+</ul>
+
+<p>每一步都是用前置設定換取注意力。提示版本現在就能用在任何任務上。<code>/goal</code> 與 Stop hook 版本，則是讓無人看顧的執行也能正確收尾的關鍵。</p>
+
+<p>要 Claude 拿出證據，而不是口頭說成功：測試輸出、它跑了什麼指令與回傳什麼，或結果的截圖。看證據比自己重跑一次驗證快，而且對你沒盯著的工作階段也管用。</p>
+
+<hr>
+
+<h2>先探索，再規劃，然後才寫程式（Explore first, then plan, then code）</h2>
+
+<blockquote>
+  <p>把研究和規劃跟實作分開，免得解錯問題。</p>
+</blockquote>
+
+<p>讓 Claude 直接跳去寫程式，可能產出解決錯問題的程式碼。用<a href="https://code.claude.com/docs/en/permission-modes#analyze-before-you-edit-with-plan-mode">規劃模式（plan mode）</a>把探索和執行分開。</p>
+
+<p>建議的工作流（workflow）有四個階段：</p>
+
+<ol>
+  <li>
+    <p><strong>探索</strong>：按 <code>Shift+Tab</code> 直到狀態列顯示 <code>⏸ plan mode on</code> 進入規劃模式，或用 <code>claude --permission-mode plan</code> 開啟工作階段。Claude 會讀檔案、回答問題，但不做任何修改。</p>
+<pre><code>read /src/auth and understand how we handle sessions and login.
+also look at how we manage environment variables for secrets.</code></pre>
+  </li>
+  <li>
+    <p><strong>規劃</strong>：要 Claude 做一份詳細的實作計畫。</p>
+<pre><code>I want to add Google OAuth. What files need to change?
+What's the session flow? Create a plan.</code></pre>
+    <p>按 <code>Ctrl+G</code> 把計畫開進你的文字編輯器，直接改過再讓 Claude 繼續。</p>
+  </li>
+  <li>
+    <p><strong>實作</strong>：核准計畫或按 <code>Shift+Tab</code> 離開規劃模式，然後讓 Claude 寫程式，並對照自己的計畫驗證。</p>
+<pre><code>implement the OAuth flow from your plan. write tests for the
+callback handler, run the test suite and fix any failures.</code></pre>
+  </li>
+  <li>
+    <p><strong>提交</strong>：要 Claude 用說明性的訊息提交，並開一個 PR。</p>
+<pre><code>commit with a descriptive message and open a PR</code></pre>
+  </li>
+</ol>
+
+<blockquote>
+  <p>規劃模式很有用，但也多了額外負擔（overhead）。</p>
+  <p>範圍明確、修正又小的任務（改錯字、加一行 log、重新命名變數），直接叫 Claude 做就好。</p>
+  <p>不確定做法、變更牽涉多個檔案，或你對要改的程式碼不熟時，規劃最有價值。如果一句話就能描述完這個 diff，那就跳過規劃。</p>
+</blockquote>
+
+<hr>
+
+<h2>在提示裡提供具體脈絡（Provide specific context in your prompts）</h2>
+
+<blockquote>
+  <p>指示越精確，需要修正的地方就越少。</p>
+</blockquote>
+
+<p>Claude 能推敲意圖，但不會讀心。把具體檔案指出來、講明限制、指向可以照抄的模式。</p>
+
+<table>
+  <thead>
+    <tr><th>策略</th><th>之前</th><th>之後</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>界定任務範圍。</strong>講明是哪個檔案、什麼情境、測試偏好。</td>
+      <td><em>「幫 foo.py 加測試」</em></td>
+      <td><em>「替 foo.py 寫一個測試，涵蓋使用者已登出這個邊界情況。不要用 mock。」</em></td>
+    </tr>
+    <tr>
+      <td><strong>指向來源。</strong>直接要 Claude 去看能回答問題的來源。</td>
+      <td><em>「ExecutionFactory 的 api 為什麼這麼怪？」</em></td>
+      <td><em>「翻一翻 ExecutionFactory 的 git 歷史，整理一下 api 怎麼變成現在這樣」</em></td>
+    </tr>
+    <tr>
+      <td><strong>參照既有模式。</strong>把 Claude 指向你程式碼庫裡的做法。</td>
+      <td><em>「加一個行事曆元件」</em></td>
+      <td><em>「看看首頁現有的元件是怎麼實作的，理解一下模式。HotDogWidget.php 是很好的例子。照這個模式做一個新的行事曆元件，讓使用者選月份、前後翻頁挑年份。除了程式碼庫裡已經在用的函式庫，其他都不要引入。」</em></td>
+    </tr>
+    <tr>
+      <td><strong>描述症狀。</strong>提供症狀、可能的位置，以及「修好」是什麼樣子。</td>
+      <td><em>「修一下登入的 bug」</em></td>
+      <td><em>「使用者回報工作階段逾時後登入會失敗。檢查 src/auth/ 的驗證流程，特別是 token 更新。先寫一個能重現問題的失敗測試，再修」</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>探索階段、又容得下走錯再修正時，模糊的提示反而有用。像 <code>"what would you improve in this file?"</code> 這種提示，會挖出你原本沒想過要問的東西。</p>
+
+<h3>提供豐富的內容（Provide rich content）</h3>
+
+<blockquote>
+  <p>用 <code>@</code> 參照檔案、貼上截圖或圖片，或直接把資料導進來。</p>
+</blockquote>
+
+<p>有幾種方式可以把豐富的資料交給 Claude：</p>
+
+<ul>
+  <li><strong>用 <code>@</code> 參照檔案</strong>，不必描述程式碼在哪。Claude 回應前會先讀那個檔案。</li>
+  <li><strong>直接貼上圖片</strong>。複製貼上，或把圖片拖進提示裡。</li>
+  <li><strong>給 URL</strong>，指向文件與 API 參考。用 <code>/permissions</code> 把常用的網域加進允許清單。</li>
+  <li><strong>用管線導入資料</strong>，執行 <code>cat error.log | claude</code> 就能把檔案內容直接送進去。</li>
+  <li><strong>讓 Claude 自己去拿需要的東西</strong>。要它用 Bash 指令、MCP 工具或讀檔自行取得脈絡。</li>
+</ul>
+
+<hr>
+
+<h2>設定你的環境（Configure your environment）</h2>
+
+<p>幾個設定步驟，就能讓 Claude Code 在你所有工作階段裡明顯更有效。擴充功能的完整總覽，以及各種功能適合在什麼時候用，請見 <a href="https://code.claude.com/docs/en/features-overview">擴充 Claude Code</a>。</p>
+
+<h3>寫一份有效的 CLAUDE.md（Write an effective CLAUDE.md）</h3>
+
+<blockquote>
+  <p>執行 <code>/init</code>，依你目前的專案結構產生一份起始 CLAUDE.md，之後再慢慢修。</p>
+</blockquote>
+
+<p>CLAUDE.md 是一個特殊檔案，Claude 在每段對話開頭都會讀。裡面放 Bash 指令、程式碼風格與工作流規則。這給了 Claude 光看程式碼推不出來的長期脈絡。</p>
+
+<p>CLAUDE.md 沒有規定格式，但請保持簡短、好讀。例如：</p>
+
+<pre><code># Code style
+- Use ES modules (import/export) syntax, not CommonJS (require)
+- Destructure imports when possible (eg. import { foo } from 'bar')
+
+# Workflow
+- Be sure to typecheck when you're done making a series of code changes
+- Prefer running single tests, and not the whole test suite, for performance</code></pre>
+
+<p>執行 <code>/context</code> 確認 Claude 載入了這個檔案。CLAUDE.md 每個工作階段都會載入，所以只放廣泛適用的內容。只偶爾用得上的領域知識或工作流，改用 <a href="https://code.claude.com/docs/en/skills">skills</a>。Claude 會視需要載入，不會讓每段對話都變肥。</p>
+
+<p>內容要精簡。每一行都問自己：<em>「拿掉這行，Claude 會犯錯嗎？」</em> 不會就刪掉。CLAUDE.md 一旦臃腫，Claude 就會無視你真正的指示。</p>
+
+<table>
+  <thead>
+    <tr><th>✅ 該放</th><th>❌ 不該放</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Claude 猜不到的 Bash 指令</td><td>Claude 讀程式碼就能知道的事</td></tr>
+    <tr><td>與預設不同的程式碼風格規則</td><td>Claude 早就知道的語言慣例</td></tr>
+    <tr><td>測試指示與偏好的測試執行器</td><td>詳細的 API 文件（改成附連結）</td></tr>
+    <tr><td>儲存庫禮儀（分支命名、PR 慣例）</td><td>經常變動的資訊</td></tr>
+    <tr><td>專案專屬的架構決策</td><td>冗長的說明或教學</td></tr>
+    <tr><td>開發環境的怪癖（必要的環境變數）</td><td>逐一描述程式碼庫每個檔案</td></tr>
+    <tr><td>常見陷阱或不直覺的行為</td><td>「寫乾淨的程式碼」這類廢話</td></tr>
+  </tbody>
+</table>
+
+<p>如果明明有規則，Claude 還是照做你不想要的事，那大概是檔案太長，規則被淹沒了。如果 Claude 問你 CLAUDE.md 裡已經寫答案的問題，那可能是措辭不夠清楚。把 CLAUDE.md 當程式碼看待：出問題時回頭審、定期修剪、改動後觀察 Claude 的行為是否真的改變。CLAUDE.md 若已提交進版控，可以跑 <a href="https://code.claude.com/docs/en/commands#all-commands"><code>/doctor</code></a>，Claude 會提議刪掉那些能從程式碼庫推導出來的內容。</p>
+
+<p>若 Claude 一直漏掉某一條指示，就在那一行加上「IMPORTANT」之類的強調。強調太多行，就沒有一行突出。把 CLAUDE.md 納入 git，讓團隊一起貢獻。這個檔案的價值會隨時間累積。</p>
+
+<p>CLAUDE.md 可以用 <code>@path/to/import</code> 語法匯入其他檔案。匯入規則與 CLAUDE.md 可以放的位置，請見 <a href="https://code.claude.com/docs/en/memory#claude-md-files">CLAUDE.md 檔案</a>。</p>
+
+<h3>設定權限（Configure permissions）</h3>
+
+<blockquote>
+  <p>想少一點確認又不想放棄控制權，就用 <code>/permissions</code> 事先核准你信賴的工具，並用 <code>/sandbox</code> 讓沙箱（sandboxing）內的指令不必詢問就執行。想自己核准每次修改與指令，就切到 Manual 模式。</p>
+</blockquote>
+
+<p>在 Pro、Max 與 Team 方案上，auto 模式是互動式終端與 VS Code 工作階段的<a href="https://code.claude.com/docs/en/permission-modes#eliminate-prompts-with-auto-mode">內建起始權限模式</a>：改由另一個分類器模型替你審查大部分動作，只擋下看起來有風險的，例如權限範圍擴張、不明的基礎設施，或由惡意內容驅使的動作。</p>
+
+<p>其他方案的內建起始權限模式是 Manual，Claude Code 會在可能改動系統的動作前先問你：寫檔、Bash 指令、MCP 工具。這樣安全，但很煩。核准到第十次，你已經是在點確認，而不是在審查。在 Manual 模式下有兩個工具能減少這類中斷，auto 模式下也同樣適用：</p>
+
+<ul>
+  <li><strong>權限允許清單</strong>：核准你確知安全的特定工具，例如 <code>npm run lint</code> 或 <code>git commit</code></li>
+  <li><strong>沙箱</strong>：啟用作業系統層級的隔離，限制檔案系統與網路存取，讓 Claude 在界定的範圍內更自由地工作</li>
+</ul>
+
+<p>進一步了解<a href="https://code.claude.com/docs/en/permission-modes">權限模式</a>、<a href="https://code.claude.com/docs/en/permissions">權限規則</a>與<a href="https://code.claude.com/docs/en/sandboxing">沙箱</a>。</p>
+
+<h3>使用 CLI 工具（Use CLI tools）</h3>
+
+<blockquote>
+  <p>要 Claude Code 在操作外部服務時使用 <code>gh</code>、<code>aws</code>、<code>gcloud</code>、<code>sentry-cli</code> 這類 CLI 工具。</p>
+</blockquote>
+
+<p>CLI 工具是操作外部服務最省脈絡的方式。如果你用 GitHub，就裝 <code>gh</code> CLI。Claude 知道怎麼用它開 issue、發 PR、讀留言。沒有 <code>gh</code>，Claude 還是能用 GitHub API，但未經驗證的請求常常會撞到速率上限。</p>
+
+<p>Claude 也很擅長學它不熟的 CLI 工具。試試這樣的提示：<code>Use 'foo-cli-tool --help' to learn about foo tool, then use it to solve A, B, C.</code></p>
+
+<h3>連接 MCP 伺服器（Connect MCP servers）</h3>
+
+<blockquote>
+  <p>執行 <code>claude mcp add</code> 並附上伺服器名稱與 URL 或指令，就能連接 Notion、Figma 或你的資料庫這類外部工具。例如：<code>claude mcp add --transport http notion https://mcp.notion.com/mcp</code>。</p>
+</blockquote>
+
+<p>有了 <a href="https://code.claude.com/docs/en/mcp">MCP 伺服器</a>，你可以要 Claude 依照 issue 追蹤系統實作功能、查詢資料庫、分析監控資料、整合 Figma 的設計，或自動化工作流。</p>
+
+<h3>設定 hooks（Set up hooks）</h3>
+
+<blockquote>
+  <p>每次都必須發生、不容例外的動作，就用 hooks。</p>
+</blockquote>
+
+<p><a href="https://code.claude.com/docs/en/hooks-guide">Hooks</a> 會在 Claude 工作流的特定時點自動執行腳本。CLAUDE.md 的指示只是建議，hooks 則是確定性的，保證動作一定會發生。</p>
+
+<p>Claude 可以幫你寫 hooks。試試這樣的提示：<em>「寫一個 hook，每次編輯檔案後執行 eslint」</em>或<em>「寫一個 hook，阻止寫入 migrations 資料夾」</em>。直接編輯 <code>.claude/settings.json</code> 可手動設定 hooks，執行 <code>/hooks</code> 則可瀏覽目前設定了什麼。</p>
+
+<h3>建立 skills（Create skills）</h3>
+
+<blockquote>
+  <p>在 <code>.claude/skills/</code> 建立 <code>SKILL.md</code>，把領域知識與可重複使用的工作流交給 Claude。</p>
+</blockquote>
+
+<p><a href="https://code.claude.com/docs/en/skills">Skills</a> 用專案、團隊或領域專屬的資訊擴充 Claude 的知識。Claude 會在相關時自動套用，你也可以用 <code>/skill-name</code> 直接叫用。</p>
+
+<p>建立 skill 的方式，是在 <code>.claude/skills/</code> 底下新增一個含 <code>SKILL.md</code> 的目錄：</p>
+
+<pre><code>---
+name: api-conventions
+description: REST API design conventions for our services
+---
+# API Conventions
+- Use kebab-case for URL paths
+- Use camelCase for JSON properties
+- Always include pagination for list endpoints
+- Version APIs in the URL path (/v1/, /v2/)</code></pre>
+
+<p>Skills 也能定義你直接叫用的可重複工作流：</p>
+
+<pre><code>---
+name: fix-issue
+description: Fix a GitHub issue
+disable-model-invocation: true
+---
+Analyze and fix the GitHub issue: $ARGUMENTS.
+
+1. Use `gh issue view` to get the issue details
+2. Understand the problem described in the issue
+3. Search the codebase for relevant files
+4. Implement the necessary changes to fix the issue
+5. Write and run tests to verify the fix
+6. Ensure code passes linting and type checking
+7. Create a descriptive commit message
+8. Push and create a PR</code></pre>
+
+<p>執行 <code>/fix-issue 1234</code> 叫用它。有副作用、想手動觸發的工作流，就設 <code>disable-model-invocation: true</code>。</p>
+
+<h3>建立自訂子代理（Create custom subagents）</h3>
+
+<blockquote>
+  <p>在 <code>.claude/agents/</code> 定義專門的助手，讓 Claude 把獨立任務委派出去。</p>
+</blockquote>
+
+<p><a href="https://code.claude.com/docs/en/sub-agents">子代理（subagent）</a>有自己的脈絡和自己的工具權限，需要讀大量檔案，或需要專門關注又不想弄亂主要對話時很好用。</p>
+
+<pre><code>---
+name: security-reviewer
+description: Reviews code for security vulnerabilities
+tools: Read, Grep, Glob, Bash
+model: opus
+---
+You are a senior security engineer. Review code for:
+- Injection vulnerabilities (SQL, XSS, command injection)
+- Authentication and authorization flaws
+- Secrets or credentials in code
+- Insecure data handling
+
+Provide specific line references and suggested fixes.</code></pre>
+
+<p>明確要 Claude 使用子代理：<em>「用子代理審查這段程式碼的安全性問題。」</em></p>
+
+<h3>安裝外掛（Install plugins）</h3>
+
+<blockquote>
+  <p>執行 <code>/plugin</code> 瀏覽市集。外掛不用設定，就能加上 skills、工具與整合。</p>
+</blockquote>
+
+<p><a href="https://code.claude.com/docs/en/plugins">外掛</a>把 skills、hooks、子代理與 MCP 伺服器打包成單一可安裝的單位，來自社群與 Anthropic。如果你用的語言有型別，裝一個<a href="https://code.claude.com/docs/en/discover-plugins#code-intelligence">程式碼智慧外掛</a>，Claude 就能精確導覽符號，並在編輯後自動偵測錯誤。</p>
+
+<p>要在 skills、子代理、hooks 與 MCP 之間做選擇，請見<a href="https://code.claude.com/docs/en/features-overview#match-features-to-your-goal">擴充 Claude Code</a>。</p>
+
+<hr>
+
+<h2>有效溝通（Communicate effectively）</h2>
+
+<p>把 Claude 當另一位工程師，問你本來會問他的問題。功能比較大時，讓 Claude 先訪談你、寫出一份規格，再開始實作。</p>
+
+<h3>問程式碼庫的問題（Ask codebase questions）</h3>
+
+<blockquote>
+  <p>把 Claude 當資深工程師，問你本來會問他的問題。</p>
+</blockquote>
+
+<p>剛加入一個新程式碼庫時，可以用 Claude Code 學習與探索。你問 Claude 的問題，跟問另一位工程師的一模一樣：</p>
+
+<ul>
+  <li>日誌是怎麼運作的？</li>
+  <li>我要怎麼新增一個 API 端點？</li>
+  <li><code>foo.rs</code> 第 134 行的 <code>async move { ... }</code> 在做什麼？</li>
+  <li><code>CustomerOnboardingFlowImpl</code> 處理哪些邊界情況？</li>
+  <li>第 333 行為什麼呼叫 <code>foo()</code> 而不是 <code>bar()</code>？</li>
+</ul>
+
+<p>這樣用 Claude Code 是很有效的上手方式，能縮短適應期，也減少其他工程師的負擔。不需要什麼特別的提示技巧，直接問就好。</p>
+
+<h3>讓 Claude 訪談你（Let Claude interview you）</h3>
+
+<blockquote>
+  <p>功能比較大時，讓 Claude 先訪談你。用最精簡的提示開頭，要它用 <code>AskUserQuestion</code> 工具訪談你。</p>
+</blockquote>
+
+<p>Claude 會問到你還沒想過的地方，包括技術實作、UI/UX、邊界情況（edge case）與取捨（tradeoff）。送出提示前，把 <code>[brief description]</code> 換成你的功能。</p>
+
+<pre><code>I want to build [brief description]. Interview me in detail using the AskUserQuestion tool.
+
+Ask about technical implementation, UI/UX, edge cases, concerns, and tradeoffs. Don't ask obvious questions, dig into the hard parts I might not have considered.
+
+Keep interviewing until we've covered everything, then write a complete spec to SPEC.md.</code></pre>
+
+<p>規格完成後，開一個全新的工作階段來執行。新工作階段的脈絡乾淨，完全聚焦在實作上，而且你有一份寫好的規格可以對照。</p>
+
+<p>最有用的規格是自成一體的：寫出涉及的檔案與介面、說明什麼不在範圍內，最後附上一個端到端的驗證步驟，證明功能確實可行。把規格寫精確所花的時間，比盯著實作看更值得。</p>
+
+<hr>
+
+<h2>管理工作階段（Manage your session）</h2>
+
+<p>對話是持續保存、可以回溯的。好好利用這一點。</p>
+
+<h3>及早、頻繁地修正方向（Course-correct early and often）</h3>
+
+<blockquote>
+  <p>一發現 Claude 偏離正軌，馬上修正。</p>
+</blockquote>
+
+<p>最好的結果來自緊密的回饋迴路。Claude 偶爾會一次就把問題解對，但通常快速修正能更快得到更好的解法。</p>
+
+<ul>
+  <li><strong><code>Esc</code></strong>：按 <code>Esc</code> 在動作中途停下 Claude。脈絡會保留，你可以重新導向。</li>
+  <li><strong><code>Esc + Esc</code> 或 <code>/rewind</code></strong>：連按兩次 <code>Esc</code>，或執行 <code>/rewind</code> 打開回溯選單，還原先前的對話與程式碼狀態，或從選定的訊息開始摘要。</li>
+  <li><strong><code>"Undo that"</code></strong>：要 Claude 撤銷剛才的修改。</li>
+  <li><strong><code>/clear</code></strong>：不相關的任務之間重置脈絡。冗長又充斥無關脈絡的工作階段會拖慢表現。</li>
+</ul>
+
+<p>如果同一個問題在同一個工作階段裡修正超過兩次，失敗的做法塞爆了脈絡。執行 <code>/clear</code>，帶著你學到的東西、用更精確的提示重新開始。乾淨的工作階段配上更好的提示，幾乎總是勝過累積一堆修正的長工作階段。</p>
+
+<h3>積極管理脈絡（Manage context aggressively）</h3>
+
+<blockquote>
+  <p>不相關的任務之間執行 <code>/clear</code> 重置脈絡。</p>
+</blockquote>
+
+<p>接近脈絡上限時，Claude Code 會自動壓縮對話歷史，保留重要的程式碼與決策，同時騰出空間。</p>
+
+<p>長時間的工作階段裡，Claude 的脈絡視窗可能塞滿無關的對話、檔案內容與指令。這會拖慢表現，有時還會讓 Claude 分心。</p>
+
+<ul>
+  <li>任務之間常用 <code>/clear</code>，整個重置脈絡視窗</li>
+  <li>自動壓縮觸發時，Claude 會摘要最重要的部分，包括程式碼模式、檔案狀態與關鍵決策</li>
+  <li>想要更多控制權，執行 <code>/compact &lt;instructions&gt;</code>，例如 <code>/compact Focus on the API changes</code></li>
+  <li>只想壓縮對話的一部分，用 <code>Esc + Esc</code> 或 <code>/rewind</code> 選一個訊息檢查點（checkpoint），再選 <strong>Summarize from here</strong> 或 <strong>Summarize up to here</strong>。前者從該點往後濃縮訊息，保留較早的脈絡；後者濃縮較早的訊息，近期的完整保留。詳見<a href="https://code.claude.com/docs/en/checkpointing#rewind-and-summarize">回溯選單的摘要選項</a>。</li>
+  <li>在 CLAUDE.md 自訂壓縮行為，例如寫上 <code>"When compacting, always preserve the full list of modified files and any test commands"</code>，確保關鍵脈絡撐過摘要</li>
+  <li>不需要留在脈絡裡的問題，用 <a href="https://code.claude.com/docs/en/interactive-mode#side-questions-with-%2Fbtw"><code>/btw</code></a>。答案不會進入對話歷史，所以你查個細節不會讓脈絡變大。</li>
+</ul>
+
+<h3>用子代理做調查（Use subagents for investigation）</h3>
+
+<blockquote>
+  <p>用 <code>"use subagents to investigate X"</code> 把研究委派出去。它們在另一個脈絡裡探索，讓你的主要對話保持乾淨，專心實作。</p>
+</blockquote>
+
+<p>脈絡是根本的限制，所以用子代理把研究擋在脈絡之外。Claude 研究一個程式碼庫時會讀很多檔案，這些都會吃掉你的脈絡。子代理在各自的脈絡視窗裡執行，只回報摘要：</p>
+
+<pre><code>Use subagents to investigate how our authentication system handles token
+refresh, and whether we have any existing OAuth utilities I should reuse.</code></pre>
+
+<p>Claude 實作完之後，你也可以用子代理來驗證。見<a href="#add-an-adversarial-review-step">加上對抗式審查步驟</a>。</p>
+
+<h3>用檢查點回溯（Rewind with checkpoints）</h3>
+
+<blockquote>
+  <p>每一個開啟新一輪的提示都會建立一個檢查點。你可以把對話、程式碼或兩者都還原到任何先前的檢查點。</p>
+</blockquote>
+
+<p>每次修改前，Claude 會自動快照檔案，讓檢查點能還原它們。連按兩次 <code>Escape</code> 或執行 <code>/rewind</code> 打開回溯選單。你可以只還原對話、只還原程式碼、兩者都還原，或從選定的訊息開始摘要。詳見<a href="https://code.claude.com/docs/en/checkpointing">檢查點</a>。</p>
+
+<p>與其每一步都小心翼翼規劃，你可以叫 Claude 試個有風險的做法。不成，就回溯換一條路。檢查點跟對話一起保存，所以你可以關掉終端，之後再接續工作階段，一樣能回溯。</p>
+
+<blockquote>
+  <p>檢查點只追蹤透過 Claude 檔案編輯工具所做的變更。透過 Bash 指令或外部程序做的修改不會留下記錄。這不能取代 git。</p>
+</blockquote>
+
+<h3>接續對話（Resume conversations）</h3>
+
+<blockquote>
+  <p>用 <code>/rename</code> 為工作階段命名，把它們當成分支看待：每條工作線都有自己的長期脈絡。</p>
+</blockquote>
+
+<p>Claude Code 會把對話存在本機，所以一個任務要分好幾次做完時，你不必重新說明脈絡。執行 <a href="https://code.claude.com/docs/en/sessions#resume-a-session"><code>claude --continue</code></a> 接續上次的進度，或用 <code>claude --resume</code> 從清單挑一個。給工作階段取個好找的名字，像 <code>oauth-migration</code>。接續、分支與命名的完整控制方式，請見<a href="https://code.claude.com/docs/en/sessions">管理工作階段</a>。</p>
+
+<hr>
+
+<h2>自動化與規模化（Automate and scale）</h2>
+
+<p>用熟一個 Claude 之後，靠平行工作階段、非互動模式與扇出（fan-out）模式把產出放大。</p>
+
+<h3>執行非互動模式（Run non-interactive mode）</h3>
+
+<blockquote>
+  <p>在 CI、pre-commit hooks 或腳本裡用 <code>claude -p "prompt"</code>。加上 <code>--output-format stream-json --verbose</code> 可輸出串流 JSON。</p>
+</blockquote>
+
+<p>用 <code>claude -p "your prompt"</code> 可以非互動地執行 Claude，不需要互動提示。除非加上 <code>--no-session-persistence</code>，否則這次執行還是會產生一個可接續的工作階段。<a href="https://code.claude.com/docs/en/headless">非互動模式</a>是把 Claude 接進 CI 管線、pre-commit hooks 或任何自動化工作流的方式。輸出格式讓你能用程式解析結果：純文字、JSON 或串流 JSON。</p>
+
+<pre><code># One-off queries
+claude -p "Explain what this project does"
+
+# Structured output for scripts
+claude -p "List all API endpoints" --output-format json
+
+# Streaming for real-time processing
+claude -p "Analyze this log file" --output-format stream-json --verbose</code></pre>
+
+<p>第一條指令印出純文字。<code>json</code> 格式回傳單一 JSON 物件，裡面有 <code>result</code> 欄位。<code>stream-json</code> 格式每行印一個 JSON 物件，開頭是一個 init 事件。</p>
+
+<h3>執行多個 Claude 工作階段（Run multiple Claude sessions）</h3>
+
+<blockquote>
+  <p>平行執行多個 Claude 工作階段，加快開發、跑獨立實驗，或啟動複雜的工作流。</p>
+</blockquote>
+
+<p>看你自己願意花多少心力協調，再挑對應的平行方式；工作階段之間需要交換發現時，再加上訊息傳遞：</p>
+
+<ul>
+  <li><a href="https://code.claude.com/docs/en/worktrees">Worktrees</a>：在獨立的 git checkout 裡跑各自的 CLI 工作階段，修改不會互相撞到</li>
+  <li><a href="https://code.claude.com/docs/en/cross-session-messaging">跨工作階段訊息</a>：讓你自己跑的工作階段彼此傳遞發現</li>
+  <li><a href="https://code.claude.com/docs/en/desktop#work-in-parallel-with-sessions">桌面應用程式</a>：用圖形介面管理多個本機工作階段，也可以各自放在自己的 worktree</li>
+  <li><a href="https://code.claude.com/docs/en/claude-code-on-the-web">在雲端使用 Claude Code</a>：預設在 Anthropic 管理的基礎設施上執行工作階段</li>
+  <li><a href="https://code.claude.com/docs/en/agent-view">Agent view</a>：研究預覽。執行 <code>claude agents</code> 派送會在背景持續執行的工作階段，從同一個畫面監看</li>
+  <li><a href="https://code.claude.com/docs/en/agent-teams">Agent teams</a>：實驗性，預設關閉。自動協調多個工作階段，共用任務、訊息與一位團隊負責人</li>
+</ul>
+
+<p>除了把工作平行化，多個工作階段也讓以品質為重的流程變得可行。全新的脈絡能改善程式碼審查，Claude 不會偏袒自己剛寫的程式碼。</p>
+
+<p>例如，用 Writer/Reviewer 模式：</p>
+
+<table>
+  <thead>
+    <tr><th>工作階段 A（Writer）</th><th>工作階段 B（Reviewer）</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Implement a rate limiter for our API endpoints</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><code>Review the rate limiter implementation in @src/middleware/rateLimiter.ts. Look for edge cases, race conditions, and consistency with our existing middleware patterns.</code></td>
+    </tr>
+    <tr>
+      <td><code>Here's the review feedback: [Session B output]. Address these issues.</code></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>測試也能這樣做：讓一個 Claude 寫測試，另一個寫能通過測試的程式碼。</p>
+
+<h3>扇出到多個檔案（Fan out across files）</h3>
+
+<blockquote>
+  <p>用迴圈逐一呼叫 <code>claude -p</code> 處理任務。批次操作時用 <code>--allowedTools</code> 界定權限範圍。</p>
+</blockquote>
+
+<p>大型的遷移或分析，可以把工作分散到許多平行的 Claude 呼叫上。在 git 儲存庫裡執行 <a href="https://code.claude.com/docs/en/commands#all-commands"><code>/batch &lt;instruction&gt;</code></a>，Claude 會把變更拆給 5 到 30 個子代理。每個子代理在自己的 worktree 裡做事，並開一個 pull request。想用自己的腳本驅動扇出，就用迴圈跑 <code>claude -p</code>：</p>
+
+<ol>
+  <li>
+    <p><strong>產生任務清單</strong>：要 Claude 把需要遷移的檔案清單寫進一個檔案，讓下一步的迴圈讀取，提示像 <code>list all 2,000 Python files that need migrating and save the list to files.txt</code></p>
+  </li>
+  <li>
+    <p><strong>寫一個迴圈走過清單的腳本</strong>：</p>
+<pre><code>for file in $(cat files.txt); do
+  claude -p "Migrate $file from Python 2 to Python 3. Return OK or FAIL." \
+    --allowedTools "Edit,Bash(git commit *)"
+done</code></pre>
+  </li>
+  <li>
+    <p><strong>先在幾個檔案上試，再跑完整批</strong>：依前 2-3 個檔案出錯的情況調整提示，然後跑完整批。<code>--allowedTools</code> 參數限制 Claude 能做什麼，無人看顧時這點尤其重要。</p>
+  </li>
+</ol>
+
+<p>你也可以把 Claude 接進既有的資料或處理管線：</p>
+
+<pre><code>claude -p "&lt;your prompt&gt;" --output-format json | your_command</code></pre>
+
+<h3>用 auto 模式自主執行（Run autonomously with auto mode）</h3>
+
+<p>想要不中斷地執行，同時保有背景安全檢查，就用 <a href="https://code.claude.com/docs/en/permission-modes#eliminate-prompts-with-auto-mode">auto 模式</a>。分類器模型會在指令執行前審查，擋下權限範圍擴張、不明基礎設施與由惡意內容驅使的動作，同時讓例行工作不必確認就能繼續。</p>
+
+<pre><code>claude --permission-mode auto -p "fix all lint errors"</code></pre>
+
+<p>用 <code>-p</code> 參數的非互動執行中，分類器若一再擋下動作，Claude Code 不會停下這次執行。會發生什麼事以及相關門檻，請見 <a href="https://code.claude.com/docs/en/permission-modes#when-auto-mode-falls-back">auto 模式何時退回</a>。</p>
+
+<h3 id="add-an-adversarial-review-step">加上對抗式審查步驟（Add an adversarial review step）</h3>
+
+<blockquote>
+  <p>把任務視為完成之前，讓子代理在全新的脈絡裡審查 diff，回報缺口。</p>
+</blockquote>
+
+<p>Claude 無人看顧地工作越久，在你認定工作完成之前，獨立檢查就越重要。審查者在全新的<a href="https://code.claude.com/docs/en/sub-agents">子代理</a>脈絡裡執行，只看得到 diff 與你給的標準，看不到產生這些修改的推理過程，所以它會用自己的角度評估結果。</p>
+
+<p>要做正確性檢查，就執行內附的 <a href="https://code.claude.com/docs/en/commands"><code>/code-review</code> skill</a>，它會在全新的子代理裡審查目前的 diff 找 bug，並把發現回傳給工作階段。想改為對照你的計畫檢查 diff，就自己寫審查提示。寫明要檢查的工作、要對照的計畫，以及什麼算是一個發現：</p>
+
+<pre><code>Use a subagent to review the rate limiter diff against PLAN.md. Check that
+every requirement is implemented, the listed edge cases have tests, and
+nothing outside the task's scope changed. Report gaps, not style preferences.</code></pre>
+
+<p>因為審查者以子代理身分執行，實作中的工作階段會直接收到這些缺口，可以修好再重新審查，你不必在視窗之間複製發現。</p>
+
+<blockquote>
+  <p>你要求審查者找缺口，它通常就會回報一些，即使工作本身沒問題，因為那正是你叫它做的事。每個發現都追下去會導致過度工程：多餘的抽象層、防禦性程式碼，以及為不可能發生的情況寫測試。要審查者只標出影響正確性或既定需求的缺口，其餘的當作可選。</p>
+</blockquote>
+
+<hr>
+
+<h2>避開常見的失敗模式（Avoid common failure patterns）</h2>
+
+<p>這些都是常見錯誤。及早認出來能省下時間：</p>
+
+<ul>
+  <li><strong>什麼都塞進同一個工作階段。</strong>你先做一件事，接著問 Claude 一件不相關的事，又回頭做第一件事。脈絡裡塞滿無關資訊。
+    <blockquote><p><strong>解法</strong>：不相關的任務之間 <code>/clear</code>。</p></blockquote>
+  </li>
+  <li><strong>一修再修。</strong>Claude 做錯，你修正，它還是錯，你再修一次。脈絡裡混進了一堆失敗的做法。
+    <blockquote><p><strong>解法</strong>：兩次修正失敗後，<code>/clear</code>，並把學到的東西寫進更好的初始提示。</p></blockquote>
+  </li>
+  <li><strong>CLAUDE.md 寫得太滿。</strong>CLAUDE.md 太長，Claude 會忽略一半，因為重要規則淹沒在雜訊裡。
+    <blockquote><p><strong>解法</strong>：狠狠修剪。如果 Claude 沒這條指示也能做對，就刪掉或改成 hook。</p></blockquote>
+  </li>
+  <li><strong>先信任再驗證的落差。</strong>Claude 交出看起來合理、卻沒處理邊界情況的實作。
+    <blockquote><p><strong>解法</strong>：永遠提供驗證方式（測試、腳本、截圖）。無法驗證，就不要上線。</p></blockquote>
+  </li>
+  <li><strong>無止境的探索。</strong>你叫 Claude「調查」某件事卻沒界定範圍。Claude 讀了上百個檔案，把脈絡塞滿。
+    <blockquote><p><strong>解法</strong>：把調查範圍縮小，或用子代理，讓探索不占用你的主要脈絡。</p></blockquote>
+  </li>
+</ul>
+
+<hr>
+
+<h2>培養你的直覺（Develop your intuition）</h2>
+
+<p>這份指南裡的模式不是鐵律。它們是起點，一般情況下很管用，但未必適合每種情境。</p>
+
+<p>有時你<em>應該</em>讓脈絡累積，因為你正深陷一個複雜問題，那些歷史很有價值。有時你該跳過規劃，讓 Claude 自己想辦法，因為這是探索性任務。有時模糊的提示恰到好處，因為你想先看看 Claude 怎麼詮釋問題，再決定怎麼約束它。</p>
+
+<p>注意什麼行得通。Claude 產出好結果時，回頭看你做了什麼：提示的結構、你提供的脈絡、你當時的模式。Claude 卡住時，問為什麼。脈絡太吵？提示太模糊？任務大到一次做不完？</p>
+
+<p>久而久之，你會養出任何指南都寫不下的直覺。你會知道什麼時候該講清楚、什麼時候該開放，什麼時候該規劃、什麼時候該探索，什麼時候該清脈絡、什麼時候該讓它累積。</p>
+
+<h2>相關資源（Related resources）</h2>
+
+<ul>
+  <li><a href="https://code.claude.com/docs/en/how-claude-code-works">Claude Code 的運作方式</a>：代理迴路、工具與脈絡管理</li>
+  <li><a href="https://code.claude.com/docs/en/features-overview">擴充 Claude Code</a>：skills、hooks、MCP、子代理與外掛</li>
+  <li><a href="https://code.claude.com/docs/en/common-workflows">常見工作流</a>：除錯、測試、PR 等逐步做法</li>
+  <li><a href="https://code.claude.com/docs/en/memory">CLAUDE.md</a>：儲存專案慣例與長期脈絡</li>
+</ul>
+
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://code.claude.com/docs/en/best-practices">Best practices for Claude Code</a>（2026-09-15）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>
