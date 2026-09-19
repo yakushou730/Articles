@@ -290,7 +290,7 @@ done
 
 <p>還有一些<strong>以外掛為基礎的記憶擴充</strong>可以運用。</p>
 
-<p>例如 Claude Code 支援「skill」乃至市集外掛，你可以想像（或自己寫）一個 skill，自動保存每次編碼工作階段的摘要，下次載入。Amp 的自動交接（auto-handoff）功能實際上就是短期記憶：當<a href="/agentic-engineering/context-window/">脈絡視窗</a>快要溢出，它可以把對話交接給新的工作階段，附上至今的濃縮摘要。這能避免任務中途流失脈絡，對超大任務或複雜重構很有用。</p>
+<p>例如 Claude Code 支援「skill」乃至市集外掛，你可以想像（或自己寫）一個 skill，自動保存每次編碼工作階段的摘要，下次載入。Amp 的自動交接（auto-handoff）功能實際上就是短期記憶：當<a href="https://addyosmani.com/agentic-engineering/context-window/">脈絡視窗</a>快要溢出，它可以把對話交接給新的工作階段，附上至今的濃縮摘要。這能避免任務中途流失脈絡，對超大任務或複雜重構很有用。</p>
 
 <p>在更實驗性的做法裡，開發者用<strong>向量資料庫（vector databases）</strong>儲存與檢索記憶。例如每次迭代後，把 diff 或錯誤訊息做 embedding，連同描述存成向量。新一輪開始前，查資料庫找相似的過去案例，提供給代理。</p>
 
@@ -357,7 +357,7 @@ done
 
   <li><strong>檢查指令（Inspection Commands）：</strong>把一些除錯指令放進迴路，或讓它們容易執行。例如用腳本顯示所有任務狀態（jq ‘.tasks[] | {id, story, passes}’ prd.json）就能快速掌握進度。在 progress.txt 裡找「ERROR」或讀最後 N 行，可以知道某個任務為何失敗。</li>
 
-  <li><strong>代理內省（Agent Introspection）：</strong>有需要時可以叫代理解釋自己。例如它卡在某個任務，你可以改提示寫「如果測試重試 3 次仍失敗，輸出你的推理與計畫。」這能讓代理內部的<a href="/agentic-engineering/chain-of-thought/">思維鏈（chain-of-thought）</a>浮現（即所謂的「自我反思」），或許能提供線索。但要節制使用：太多內省也會弄亂迴路，不過它仍是除錯工具箱裡的工具。</li>
+  <li><strong>代理內省（Agent Introspection）：</strong>有需要時可以叫代理解釋自己。例如它卡在某個任務，你可以改提示寫「如果測試重試 3 次仍失敗，輸出你的推理與計畫。」這能讓代理內部的<a href="https://addyosmani.com/agentic-engineering/chain-of-thought/">思維鏈（chain-of-thought）</a>浮現（即所謂的「自我反思」），或許能提供線索。但要節制使用：太多內省也會弄亂迴路，不過它仍是除錯工具箱裡的工具。</li>
 
   <li><strong>效能指標（Performance Metrics）：</strong>記錄每次迭代花多久、用了多少成本（API token）很有用。你可以讓迴路記錄每個任務與整體的耗時。如果某個任務花的時間是其他的 10 倍，那代表它很複雜或卡住了。累積很多個晚上之後，你可以蒐集「每小時幾個功能」這類統計，用來判斷某次升級（換模型、調提示）有沒有差別。</li>
 
@@ -387,7 +387,7 @@ done
 <p>這些旗標要謹慎使用。比較安全的做法是<a href="https://ericmjl.github.io/blog/2025/11/8/safe-ways-to-let-your-coding-agent-work-autonomously/#:~:text=Auto"><strong>只自動核准唯讀指令</strong></a>，寫入一律人工核准。例如允許代理不用問就跑 grep、git log 或 npm test，但<em>不准</em>未經你明確同意就 git push 或 rm -rf。把安全操作列入白名單，代理就能自由蒐集資訊，副作用仍受控。</p>
 
 <ul>
-  <li><a href="/agentic-engineering/sandboxing/"><strong>沙箱（Sandboxing）</strong></a><strong>：</strong>最理想是在受控環境裡跑代理，例如 Docker 容器或 VM，尤其它又有能力執行程式碼（跑測試通常就需要）。</li>
+  <li><a href="https://addyosmani.com/agentic-engineering/sandboxing/"><strong>沙箱（Sandboxing）</strong></a><strong>：</strong>最理想是在受控環境裡跑代理，例如 Docker 容器或 VM，尤其它又有能力執行程式碼（跑測試通常就需要）。</li>
 </ul>
 
 <p>這能限制任何意外指令造成的損害。API key 也要用最小範圍：如果代理需要 API key 去發一則 GitHub 留言，就給它一個只能做這件事、其他都不能的 token。</p>
@@ -400,7 +400,7 @@ done
 
 <h3>處理幻覺與偏離</h3>
 
-<p>AI 模型有時會產出語法上說得通、語意上卻錯誤的輸出（<a href="/agentic-engineering/hallucination/"><strong>幻覺（hallucinations）</strong></a>）。在寫程式的情境裡，這可能是呼叫不存在的函式、用錯演算法，或寫出毫無意義的註解。還有<strong>任務偏離（task divergence）</strong>的風險：代理誤解需求，把東西做錯。</p>
+<p>AI 模型有時會產出語法上說得通、語意上卻錯誤的輸出（<a href="https://addyosmani.com/agentic-engineering/hallucination/"><strong>幻覺（hallucinations）</strong></a>）。在寫程式的情境裡，這可能是呼叫不存在的函式、用錯演算法，或寫出毫無意義的註解。還有<strong>任務偏離（task divergence）</strong>的風險：代理誤解需求，把東西做錯。</p>
 
 <p>應對方式：</p>
 

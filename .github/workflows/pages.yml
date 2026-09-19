@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Fail the deploy rather than publish a site with root-relative URLs,
+      # which 404 once GitHub Pages serves the files from a subpath.
+      - name: Audit site
+        run: python3 .claude/skills/maintain-article-index/scripts/audit_site.py --strict
+
+      - name: Confirm the index matches the articles on disk
+        run: python3 .claude/skills/maintain-article-index/scripts/build_index.py --check
+
+      # Publish only what the site needs: the index, every article folder,
+      # .nojekyll. Repo tooling under .claude/ stays out of the site.
+      - name: Stage site
+        run: |
+          mkdir -p _site
+          cp index.html .nojekyll _site/
+          for html in */*.zh-Hant.html; do
+            [ -e "$html" ] || continue
+            dir=${html%%/*}
+            mkdir -p "_site/$dir"
+            cp "$html" "_site/$dir/"
+          done
+          for assets in */assets; do
+            [ -d "$assets" ] || continue
+            cp -R "$assets" "_site/${assets%%/*}/"
+          done
+          echo "Staged files:"
+          find _site -type f | sort
+
+      # enablement: true turns Pages on if the repo has not enabled it yet.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

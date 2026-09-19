@@ -94,3 +94,38 @@ a pre-commit hook.
   deliberately generic.
 - Report the entry count, the new-tag decisions, and the browser checks — not a
   play-by-play.
+
+## Served as a website (GitHub Pages)
+
+The repo is published by `.github/workflows/pages.yml` on every push to `main`.
+Two constraints follow, and `scripts/audit_site.py --strict` enforces both as a
+deploy gate:
+
+1. **No root-relative URLs.** Pages serves the site under a subpath
+   (`https://<user>.github.io/Articles/`) unless a custom domain is configured.
+   A link like `href="/agentic-engineering/x/"` resolves to the domain root and
+   404s. Every relative `href`/`src` must resolve inside the repo, or be an
+   absolute `https://` URL.
+2. **No Liquid-looking syntax.** Without `.nojekyll`, Jekyll renders the files
+   and would try to interpret `{{ … }}` / `{% … %}`. `.nojekyll` is committed at
+   the repo root; keep it.
+
+Run the audit before committing site-facing changes:
+
+```bash
+python3 .claude/skills/maintain-article-index/scripts/audit_site.py --strict
+```
+
+### Custom domain
+
+To serve on a purchased domain instead of the `github.io` subpath, commit a
+`CNAME` file at the repo root containing the bare hostname (one line, no
+scheme), then point DNS at GitHub:
+
+- apex domain (`example.com`) → four `A` records to `185.199.108.153`,
+  `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+- `www` or any subdomain → one `CNAME` record to `<user>.github.io`
+
+Then set the domain in the repo's Pages settings and enable *Enforce HTTPS*.
+Root-relative URLs would resolve correctly once a custom domain is active, but
+they stay banned because the `github.io` fallback must keep working.
