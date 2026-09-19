@@ -47,10 +47,10 @@ jobs:
           echo "Staged files:"
           find _site -type f | sort
 
-      # enablement: true turns Pages on if the repo has not enabled it yet.
+      # Requires Pages to be enabled once in repo settings with the source set
+      # to "GitHub Actions". Creating the site needs repo-admin rights, which
+      # the workflow token does not have, so this cannot self-enable.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
