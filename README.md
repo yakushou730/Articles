@@ -11,28 +11,52 @@ project site，子路徑取自 repo 名稱。**repo 不能改名**，改了網�
 
 ## 需要重新部署嗎？
 
-**不用。** 推上 `main` 就自動部署，沒有手動步驟。
+**不用，而且 index 也不用自己更新。** 推上 `main` 就全部自動完成。
 
 ```
-push to main  →  GitHub Actions「Deploy to GitHub Pages」  →  網站更新
+push to main
+  ├─ Update article index   →  重建 index.html 並自動 commit
+  └─ Deploy to GitHub Pages →  稽核後發布網站
 ```
 
-通常 30～60 秒上線。想看進度或哪一步掛掉：
+兩件事都在 CI 做完，你只要負責寫文章。通常 30～60 秒上線。
+
+### 那 index 是怎麼被更新的
+
+`Update article index` 這個 workflow 會在你 push 動到任何文章時觸發，跑
+`build_index.py` 重建 `index.html`，如果內容有變就以 `github-actions[bot]`
+身分自動 commit 並 push（訊息是 `chore: rebuild article index`）。
+
+它不會無限迴圈：用 `GITHUB_TOKEN` 推的 commit 本來就不會再觸發 workflow，
+workflow 裡另外加了 `if: github.actor != 'github-actions[bot]'` 當第二層保險。
+
+### 你會遇到的唯一狀況：本機落後一個 commit
+
+bot 推了 index 之後，你本機會落後。下次要推之前先同步：
+
+```bash
+git pull --rebase
+```
+
+忘了的話 `git push` 會被你拒絕（non-fast-forward），照著做 `git pull --rebase`
+再推就好。
+
+### 看部署狀態
 
 ```bash
 gh run list --repo yakushou730/Articles --limit 5
 gh run watch --repo yakushou730/Articles
 ```
 
-也可以到 repo 的 **Actions** 頁籤，或手動觸發一次（`workflow_dispatch`）：
+也可以到 repo 的 **Actions** 頁籤，或手動觸發：
 
 ```bash
 gh workflow run pages.yml --repo yakushou730/Articles --ref main
 ```
 
-> 部署前會先跑兩道關卡：網站健檢（`audit_site.py --strict`）與 index 一致性
-> 檢查（`build_index.py --check`）。**任一失敗就不會發布**，網站維持在上一版，
-> 你不會因為忘記更新 index 而推出壞站。
+> 部署前有一道關卡：網站健檢（`audit_site.py --strict`）。它會擋掉在
+> `/Articles/` 子路徑下會 404 的 root-relative 連結，以及會被 Jekyll 吃掉的
+> `{{ … }}` 語法。**失敗就不發布**，網站維持在上一版。
 
 ---
 
@@ -47,65 +71,31 @@ gh workflow run pages.yml --repo yakushou730/Articles --ref main
 <slug>/assets/…                 # 圖片（若有）
 ```
 
-`<slug>` 是文章資料夾名稱，用英文短名，例如 `self-improving-agents`。
+`<slug>` 是資料夾名稱，用英文短名，例如 `self-improving-agents`。
 
-**這一步不用做任何設定。** 資料夾放對位置就好，index 會自己去讀。
+### 步驟 2：在文章裡宣告標籤
 
-### 步驟 2：更新 index
+在 `<head>` 加一行：
 
-```bash
-/update-index
+```html
+<meta name="tags" content="代理,工具鏈">
 ```
 
-或在終端機直接跑：
+**這一行就是標籤的唯一來源。** 之後要改標籤，改這裡、push，index 會跟著更新，
+不需要碰 `index.html`。（新版的翻譯模板已經有 `{{TAGS}}` 佔位符，產生時就填好。）
 
-```bash
-python3 .claude/skills/maintain-article-index/scripts/build_index.py
-```
+盡量沿用既有詞彙，別為同義詞另開新標籤：
 
-它會掃描所有 `<slug>/<slug>.zh-Hant.html`，從每篇自己的 `<h1>`、kicker、
-`meta description`、頁尾的原文來源行讀出標題與日期，重建 `index.html`。
-
-新文章會以 `+` 開頭印出來，並附上建議標籤（依關鍵字）。
-
-### 步驟 3：確認標籤
-
-標籤是唯一需要人判斷的地方。新文章拿到的是關鍵字猜測，讀一下、不對就改：
-
-```bash
-python3 .claude/skills/maintain-article-index/scripts/build_index.py \
-    --tag my-new-article=代理,工具鏈
-```
-
-**盡量沿用既有詞彙**，別為同義詞另開新標籤。目前使用的標籤：
-
-| 主題 | 來源 |
+| 主題標籤 | 來源標籤 |
 |---|---|
 | 代理、工作流、記憶與脈絡、工具鏈、提示工程、程式碼品質、架構模式、自動化迴路、程式碼檢索、實務技巧、人為監督 | Addy Osmani、Martin Fowler、Anthropic、Claude Code、aider |
 
-加了沒用過的新標籤也可以，chip 會自動長出來，不必改任何程式。
+加了沒用過的標籤也可以，chip 會自動長出來，不必改任何程式。
 
-### 步驟 4：確認上架時間（通常不用管）
+> 沒有宣告 `meta name="tags"` 也不會壞：index 會退回到關鍵字猜測，再不行就用
+> 來源站名當標籤。但那樣就得人工複查，**建議還是自己宣告。**
 
-預設抓資料夾的建立時間。如果那時間不對（例如資料夾是很久以前建的），
-就明確指定：
-
-```bash
-python3 .claude/skills/maintain-article-index/scripts/build_index.py \
-    --added my-new-article=2026-09-20T08:30:00
-```
-
-一旦寫進 `index.html` 就不會被之後的重建覆蓋掉。
-
-### 步驟 5：本機檢查
-
-用瀏覽器打開 `index.html`，確認：
-
-- 排序是新的在前
-- 新文章連得到、標籤點下去篩得到它
-- 沒有橫向滾動條
-
-### 步驟 6：推送
+### 步驟 3：推送
 
 ```bash
 git add -A
@@ -113,7 +103,22 @@ git commit -m "docs: add Traditional Chinese translation of <原文標題>"
 git push
 ```
 
-推完就自動部署，不用再做任何事。
+**沒了。** index 由 CI 重建並 commit，網站重新部署。不需要跑本機指令。
+
+### 想先在本機看結果（可選）
+
+```bash
+python3 .claude/skills/maintain-article-index/scripts/build_index.py --dry-run
+```
+
+只印出會有什麼改變，不寫檔。
+
+### 需要人工判斷的少數情況
+
+- **上架時間。** 預設抓資料夾建立時間。若那時間不對（例如資料夾很久以前就建好），
+  在 CI 自動 commit 之後手動改 `index.html` 的 `data-added` 即可，往後重建不會覆蓋它。
+  或本機指定：`build_index.py --added <slug>=2026-09-20T08:30:00`。
+- **關鍵字猜出來的標籤。** 只在你沒宣告 `meta name="tags"` 時才會發生。
 
 ---
 
@@ -121,16 +126,12 @@ git push
 
 ```bash
 # 1. 翻譯（用 skill 產生 <slug>/ 資料夾）
-# 2. 更新 index
-python3 .claude/skills/maintain-article-index/scripts/build_index.py
-
-# 3. 標籤不對就覆寫
-python3 .claude/skills/maintain-article-index/scripts/build_index.py \
-    --tag <slug>=標籤1,標籤2
-
-# 4. 推送（自動部署）
+# 2. 在文章 <head> 宣告 <meta name="tags" content="標籤1,標籤2">
+# 3. 推送（index 與部署都由 CI 自動完成）
 git add -A && git commit -m "docs: add <title>" && git push
 ```
+
+之後要同步本機：`git pull --rebase`
 
 ---
 
@@ -140,7 +141,8 @@ git add -A && git commit -m "docs: add <title>" && git push
 |---|---|
 | `index.html` | 文章目錄首頁，依上架時間排序，可依標籤篩選 |
 | `<slug>/<slug>.zh-Hant.html` | 單篇文章（一篇文章一個資料夾） |
-| `.github/workflows/pages.yml` | 部署流程 |
+| `.github/workflows/update-index.yml` | 自動重建 index 並 commit |
+| `.github/workflows/pages.yml` | 部署網站 |
 | `.claude/skills/maintain-article-index/` | index 維護 skill 與腳本 |
 | `.claude/skills/generate-traditional-chinese-web-content/` | 翻譯 skill |
 | `.claude/commands/update-index.md` | `/update-index` 指令 |

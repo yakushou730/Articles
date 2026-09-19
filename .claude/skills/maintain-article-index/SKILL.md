@@ -13,6 +13,14 @@ The filter chips are generated at runtime from each `<li data-tags="A|B|C">`,
 so adding an article never requires touching the page's CSS or JavaScript.
 Only the `<ol>` body changes.
 
+## Normally you do not run this by hand
+
+CI (`.github/workflows/update-index.yml`) rebuilds and commits `index.html` on
+every push that touches an article, so the routine add-an-article flow is:
+write the page, declare `<meta name="tags">`, push. Reach for the steps below
+when you need to preview locally, correct tags or add time, or diagnose a
+rebuild that produced the wrong result.
+
 ## Procedure
 
 ### 1. Run the builder
@@ -34,8 +42,10 @@ just omits the new article.
 Tags are the only judgement call. Precedence:
 
 1. `--tag slug=a,b` on the command line (explicit, always wins)
-2. tags already in `index.html` (hand edits survive every rebuild)
-3. keyword suggestions from `TAG_RULES` in the script (new articles only)
+2. `<meta name="tags" content="a,b">` in the article itself — the preferred
+   source, because editing the page updates the index with no further step
+3. tags already in `index.html` (hand edits survive every rebuild)
+4. keyword suggestions from `TAG_RULES`, then the source-site name
 
 New entries get suggested tags and are printed with a `+` prefix. Read them
 against the article and correct anything wrong:
