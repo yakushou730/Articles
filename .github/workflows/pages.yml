@@ -20,13 +20,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Belt and braces: update-index.yml normally commits the rebuilt index
+      # before this runs. If the two workflows ever race, rebuild here too so
+      # the published site is always consistent with the articles on disk.
+      - name: Rebuild the index
+        run: python3 .claude/skills/maintain-article-index/scripts/build_index.py
+
       # Fail the deploy rather than publish a site with root-relative URLs,
-      # which 404 once GitHub Pages serves the files from a subpath.
+      # which 404 once Pages serves the files from a subpath.
       - name: Audit site
         run: python3 .claude/skills/maintain-article-index/scripts/audit_site.py --strict
-
-      - name: Confirm the index matches the articles on disk
-        run: python3 .claude/skills/maintain-article-index/scripts/build_index.py --check
 
       # Publish only what the site needs: the index, every article folder,
       # .nojekyll. Repo tooling under .claude/ stays out of the site.

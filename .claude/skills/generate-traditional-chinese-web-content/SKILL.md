@@ -112,6 +112,7 @@ Copy `assets/template.html` from this skill and substitute the placeholders:
 | `{{SOURCE_URL}}` | source URL |
 | `{{SOURCE_TITLE}}` | original English title |
 | `{{SOURCE_DATE}}` | ISO date `YYYY-MM-DD` |
+| `{{TAGS}}` | comma-separated index tags, e.g. `代理,工具鏈` — reuse existing tags where one fits |
 
 Body markup inside `{{CONTENT}}`:
 

@@ -88,6 +88,16 @@ def added_time(f: Path) -> str:
     return datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%dT%H:%M:%S")
 
 
+def declared_tags(text: str) -> list[str]:
+    """Tags the article declares for itself, via <meta name="tags" content="a,b">.
+
+    This is the source of truth when present: editing the article updates the
+    index, instead of the index guessing from keywords.
+    """
+    raw = grab(r'<meta\s+name="tags"\s+content="([^"]*)"', text)
+    return [t.strip() for t in raw.split(",") if t.strip()]
+
+
 def suggest_tags(slug: str, title: str, desc: str, kicker: str) -> list[str]:
     hay = f"{slug} {title} {desc} {kicker}".lower()
     out = []
@@ -143,9 +153,15 @@ def collect(existing: dict, overrides: dict, added_overrides: dict) -> list[dict
             src_date = grab(r"(\d{4}-\d{2}-\d{2})", src_match.group(3))
 
         prev = existing.get(slug, {})
-        # Explicit and already-recorded tags keep their order verbatim; only
-        # freshly suggested ones get sorted, so rebuilds never churn the page.
-        chosen = overrides.get(slug) or prev.get("tags")
+        # Priority: --tag on the CLI > the article's own <meta name="tags"> >
+        # whatever index.html already records > keyword suggestions. Explicit
+        # and recorded tags keep their order verbatim; only freshly suggested
+        # ones get sorted, so rebuilds never churn the page.
+        chosen = (
+            overrides.get(slug)
+            or declared_tags(text)
+            or prev.get("tags")
+        )
         if chosen:
             tags = [t for t in chosen if t]
         else:
