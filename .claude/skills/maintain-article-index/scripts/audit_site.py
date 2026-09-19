@@ -42,25 +42,31 @@ def audit() -> list[tuple[str, str, str]]:
     for f in PAGES:
         rel = f.relative_to(ROOT)
         text = f.read_text(encoding="utf-8")
+        where = lambda m: f"{rel}:{text.count(chr(10), 0, m.start()) + 1}"
         for m in ROOT_RELATIVE.finditer(text):
             findings.append(
-                ("high", str(rel), f'root-relative URL {m.group(1)!r} — 404s under a Pages subpath')
+                ("high", where(m), f'root-relative URL {m.group(1)!r} — 404s under a Pages subpath')
             )
         for m in LIQUID.finditer(text):
             findings.append(
-                ("high", str(rel), f"Liquid syntax {m.group(0)!r} — Jekyll will try to render it")
+                ("high", where(m), f"Liquid syntax {m.group(0)!r} — Jekyll will try to render it")
             )
         for m in LOCAL_PATH.finditer(text):
-            findings.append(("medium", str(rel), f"local filesystem path {m.group(0)!r}"))
+            findings.append(("medium", where(m), f"local filesystem path {m.group(0)!r}"))
 
         # Every relative href/src must resolve on disk.
         for m in re.finditer(r'(?:href|src)\s*=\s*"([^"]+)"', text):
             url = m.group(1)
             if url.startswith(("http://", "https://", "mailto:", "#", "data:")):
                 continue
-            target = (f.parent / url.split("#")[0].split("?")[0]).resolve()
+            path = url.split("#")[0].split("?")[0]
+            if not path:
+                continue  # pure fragment (e.g. href="#section")
+            target = (f.parent / path).resolve()
             if not target.exists():
-                findings.append(("high", str(rel), f"broken relative link {url!r}"))
+                findings.append(
+                    ("high", where(m), f"broken relative link {url!r} — no such file")
+                )
 
         # A page that will be served must carry a charset and a viewport.
         if not re.search(r'<meta\s+charset=', text):
