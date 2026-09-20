@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>要素 5：統合執行狀態與業務狀態（Factor 5: Unify execution state and business state）</title>
+<meta name="description" content="能從脈絡視窗推斷出的執行狀態，就不必另外維護一套：單一真實來源帶來序列化、除錯、分岔等好處。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="HumanLayer,代理,架構模式,記憶與脈絡">
+<style>
+  h1,h2,h3,figcaption{overflow-wrap:break-word}
+  main{overflow-wrap:break-word}
+  p code,li code,td code,th code{overflow-wrap:anywhere}
+  .badges img{vertical-align:middle;margin:0 .35rem .35rem 0}
+  .contributors{line-height:1}
+  .contributors img{display:inline-block;width:80px;height:80px;border-radius:50%;margin:.15rem;border:1px solid var(--rule)}
+  .nav{color:var(--fg-soft);font-size:.92rem;margin-top:2.5rem}
+  details{margin:1.5rem 0;border:1px solid var(--rule);border-radius:8px;padding:.6rem 1rem;background:var(--code-bg)}
+  details summary{cursor:pointer;color:var(--fg-soft);font-size:.92rem}
+  details[open] summary{margin-bottom:.8rem}
+  table img{display:block;width:100%;height:auto}
+  figure a img{border:1px solid var(--rule)}
+</style>
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">HumanLayer · 12-Factor Agents</p>
+  <h1>要素 5：統合執行狀態與業務狀態（Factor 5: Unify execution state and business state）</h1>
+  <p class="pubdate">原文最後更新：2025 年 9 月 19 日</p>
+</header>
+
+<main id="main-content">
+<p class="lede"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/README.md">← 回到 README</a></p>
+
+<h2>5. 統合執行狀態與業務狀態（Unify execution state and business state）</h2>
+
+<p>即使不在 AI 領域，很多基礎設施系統也會試著把「執行狀態」與「業務狀態」分開。在 AI 應用裡，這可能牽涉到複雜的抽象，用來追蹤目前步驟、下一步、等待狀態、重試次數等等。這樣的分離帶來複雜度，也許值得，但對你的使用情境可能殺雞用牛刀。</p>
+
+<p>一如往常，什麼才適合你的應用程式由你決定。但別以為你<em>非得</em>分開管理它們。</p>
+
+<p>講清楚一點：</p>
+
+<ul>
+<li><strong>執行狀態</strong>：目前步驟、下一步、等待狀態、重試次數等等</li>
+<li><strong>業務狀態</strong>：代理工作流到目前為止發生了什麼（例如 OpenAI 訊息清單、工具呼叫與結果的清單等等）</li>
+</ul>
+
+<p>情況允許的話，簡化就對了：盡可能把兩者統合起來。</p>
+
+<figure>
+<a href="https://github.com/user-attachments/assets/e5a851db-f58f-43d8-8b0c-1926c99fc68d"><img src="assets/155-unify-state-animation.gif" alt="統合狀態動畫（unify state）"></a>
+</figure>
+
+<details>
+<summary><a href="https://github.com/humanlayer/12-factor-agents/blob/main/img/155-unify-state-animation.gif">GIF 版本</a></summary>
+
+<figure>
+<img src="assets/155-unify-state-animation.gif" alt="統合狀態動畫（unify state）">
+</figure>
+
+</details>
+
+<p>實際上，你可以把應用程式設計成能從脈絡視窗推斷出所有執行狀態。很多情況下，執行狀態（目前步驟、等待狀態等）就只是關於「目前為止發生過什麼」的中繼資料。</p>
+
+<p>有些東西可能沒辦法放進脈絡視窗，例如 session id、密碼相關資訊等等，但你的目標應該是讓這類東西越少越好。擁抱<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md">要素 3</a>，你就能控制真正進入 LLM 的內容。</p>
+
+<p>這個做法有幾個好處：</p>
+
+<ol>
+<li><strong>簡單</strong>：所有狀態只有單一真實來源</li>
+<li><strong>序列化</strong>：thread 可以輕鬆序列化／反序列化</li>
+<li><strong>除錯</strong>：完整歷史在同一個地方就能看到</li>
+<li><strong>彈性</strong>：新增事件型別就能輕鬆加入新狀態</li>
+<li><strong>恢復</strong>：載入 thread 就能從任何時間點繼續</li>
+<li><strong>分岔</strong>：把 thread 的某個子集複製到新的脈絡／狀態 ID，就能在任何時間點分岔</li>
+<li><strong>人機介面與可觀測性</strong>：把 thread 轉成人類可讀的 markdown 或豐富的網頁 UI，都很容易</li>
+</ol>
+
+<p class="nav"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-04-tools-are-structured-outputs.md">← 工具就是結構化輸出</a> | <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md">啟動／暫停／恢復 →</a></p>
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md">Factor 5: Unify execution state and business state</a>（2025-09-19）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

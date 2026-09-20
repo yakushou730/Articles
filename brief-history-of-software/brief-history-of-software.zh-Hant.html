@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我們怎麼走到這裡：軟體簡史（A Brief History of Software）</title>
+<meta name="description" content="從流程圖、DAG 編排器到代理迴圈：LLM 代理的技術脈絡，以及為什麼「迴圈到問題解決為止」行不通。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="HumanLayer,代理,工作流,自動化迴路,架構模式">
+<style>
+  h1,h2,h3,figcaption{overflow-wrap:break-word}
+  main{overflow-wrap:break-word}
+  p code,li code,td code,th code{overflow-wrap:anywhere}
+  .badges img{vertical-align:middle;margin:0 .35rem .35rem 0}
+  .contributors{line-height:1}
+  .contributors img{display:inline-block;width:80px;height:80px;border-radius:50%;margin:.15rem;border:1px solid var(--rule)}
+  .nav{color:var(--fg-soft);font-size:.92rem;margin-top:2.5rem}
+  details{margin:1.5rem 0;border:1px solid var(--rule);border-radius:8px;padding:.6rem 1rem;background:var(--code-bg)}
+  details summary{cursor:pointer;color:var(--fg-soft);font-size:.92rem}
+  details[open] summary{margin-bottom:.8rem}
+  table img{display:block;width:100%;height:auto}
+  figure a img{border:1px solid var(--rule)}
+</style>
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">HumanLayer · 12-Factor Agents</p>
+  <h1>我們怎麼走到這裡：軟體簡史（How We Got Here: A Brief History of Software）</h1>
+  <p class="pubdate">原文最後更新：2025 年 9 月 19 日</p>
+</header>
+
+<main id="main-content">
+<p class="lede"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/README.md">← 回到 README</a></p>
+
+<h2>長版：我們怎麼走到這裡</h2>
+
+<h3>你不一定要聽我的</h3>
+
+<p>不管你剛接觸代理，還是像我一樣又老又難搞的老鳥，我都想試著說服你：把你對 AI 代理的大部分想法先擱在一邊，退一步，從第一原理重新想一遍。（沒跟到 OpenAI responses 幾週前發布的話算暴雷，但把更多代理邏輯推到 API 後面，絕對不是答案。）</p>
+
+<h2>代理就是軟體，以及這段歷史</h2>
+
+<p>來談談我們怎麼走到這裡。</p>
+
+<h3>60 年前</h3>
+
+<p>接下來會一直提到有向圖（Directed Graphs，DGs），以及無環的那一類：DAG。先說一件事：軟體就是有向圖。以前我們用流程圖表示程式，不是沒道理。</p>
+
+<figure>
+<img src="assets/010-software-dag.png" alt="軟體即為有向圖（software is a directed graph）">
+</figure>
+
+<h3>20 年前</h3>
+
+<p>大約 20 年前，DAG 編排器開始流行。經典的像 <a href="https://airflow.apache.org/">Airflow</a>、<a href="https://www.prefect.io/">Prefect</a>，還有一些更早的前身，以及比較新的 <a href="https://dagster.io/">dagster</a>、<a href="https://www.inngest.com/">inngest</a>、<a href="https://www.windmill.dev/">windmill</a>。它們都遵循同一套圖形模式，另外帶來可觀測性、模組化、重試、管理等好處。</p>
+
+<figure>
+<img src="assets/015-dag-orchestrators.png" alt="DAG 編排器（DAG orchestrators）">
+</figure>
+
+<h3>10 到 15 年前</h3>
+
+<p>ML 模型開始好用到派得上用場之後，我們看到 DAG 裡開始串進 ML 模型。你可以想像那種步驟，例如「把這一欄的文字摘要成新的一欄」，或「把客服問題依嚴重程度或情緒分類」。</p>
+
+<figure>
+<img src="assets/020-dags-with-ml.png" alt="串進 ML 模型的 DAG（DAGs with ML models）">
+</figure>
+
+<p>但說到底，它主要還是那套熟悉的確定性軟體。</p>
+
+<h3>代理的承諾（The promise of agents）</h3>
+
+<p>我不是<a href="https://youtu.be/Dc99-zTMyMg?si=bcT0hIwWij2mR-40&amp;t=73">第一個這樣講的人</a>，但我剛開始學代理時最大的心得是：你可以把 DAG 丟掉。軟體工程師不必再逐一寫死每個步驟與邊界情況，改成給代理一個目標和一組轉移：</p>
+
+<figure>
+<img src="assets/025-agent-dag.png" alt="給代理一個目標與一組轉移（give the agent a goal and a set of transitions）">
+</figure>
+
+<p>讓 LLM 即時做決定，自己找出路徑。</p>
+
+<figure>
+<img src="assets/026-agent-dag-lines.png" alt="由 LLM 即時決定路徑（let the LLM figure out the path）">
+</figure>
+
+<p>這裡的承諾是：你寫的軟體更少，只要把圖的「邊」交給 LLM，讓它自己想出節點。你能從錯誤中恢復、能少寫很多程式，還可能發現 LLM 找到你沒想到的解法。</p>
+
+<h3>代理就是迴圈（Agents as loops）</h3>
+
+<p>換個說法：代理裡面有這樣一個迴圈，由 3 個步驟組成：</p>
+
+<ol>
+<li>LLM 決定工作流的下一步，輸出結構化 JSON（「工具呼叫」）</li>
+<li>確定性程式碼執行這個工具呼叫</li>
+<li>結果附加到脈絡視窗</li>
+<li>重複，直到下一步判定為「完成」</li>
+</ol>
+
+<pre><code>initial_event = {"message": "..."}
+context = [initial_event]
+while True:
+  next_step = await llm.determine_next_step(context)
+  context.append(next_step)
+
+  if (next_step.intent === "done"):
+    return next_step.final_answer
+
+  result = await execute_step(next_step)
+  context.append(result)</code></pre>
+
+<p>初始脈絡只有起始事件（可能是使用者訊息、可能是 cron 觸發、也可能是 webhook），我們請 LLM 選出下一步（工具），或判定已經完成。</p>
+
+<p>以下是多步驟範例：</p>
+
+<figure>
+<a href="https://github.com/user-attachments/assets/3beb0966-fdb1-4c12-a47f-ed4e8240f8fd"><img src="assets/027-agent-loop-animation.gif" alt="代理迴圈動畫（agent loop animation）"></a>
+</figure>
+
+<details>
+<summary><a href="https://github.com/humanlayer/12-factor-agents/blob/main/img/027-agent-loop-animation.gif">GIF 版本</a></summary>
+
+<figure>
+<img src="assets/027-agent-loop-animation.gif" alt="代理迴圈動畫（agent loop animation）">
+</figure>
+
+</details>
+
+<p>而最後「具現化」出來的 DAG，看起來會像這樣：</p>
+
+<figure>
+<img src="assets/027-agent-loop-dag.png" alt="代理迴圈產生的 DAG（the materialized DAG）">
+</figure>
+
+<h3>「迴圈到問題解決為止」這個模式的問題</h3>
+
+<p>這個模式最大的問題有兩個：</p>
+
+<ul>
+<li>脈絡視窗太長時，代理會迷失方向，一直重試同一套行不通的做法，轉不出來</li>
+<li>真的就這樣，但這已經足以讓整個做法癱瘓</li>
+</ul>
+
+<p>就算你沒自己手寫過代理，用代理化的寫程式工具時大概也遇過這種長脈絡問題：跑一陣子之後它就迷路了，你得重開一個對話。</p>
+
+<p>我還想提出一件我聽過不少次、而你自己大概也已經有一套直覺的事：</p>
+
+<blockquote>
+<h3><strong>就算模型支援的脈絡視窗越來越長，用小而聚焦的提示與脈絡，結果永遠更好</strong></h3>
+</blockquote>
+
+<p>多數跟我聊過的開發者，發現對話超過 10 到 20 輪就會變成一團亂、LLM 救不回來之後，<strong>就把「工具呼叫迴圈」這個想法擱到一邊了</strong>。就算代理有 90% 的時間做對，距離「夠格交到客戶手上」還是差得遠。你能想像一個網頁應用程式有 10% 的頁面載入會當掉嗎？</p>
+
+<p><strong>2025-06-09 更新</strong>：我很喜歡 <a href="https://x.com/swyx/status/1932125643384455237">@swyx</a> 的說法：</p>
+
+<figure>
+<a href="https://x.com/swyx/status/1932125643384455237"><img src="assets/swyx-tweet.png" alt="swyx 談脈絡視窗的推文截圖"></a>
+</figure>
+
+<h3>真正可行的做法：微型代理（micro agents）</h3>
+
+<p>我<strong>確實</strong>在真實世界看過不少次的做法，是把代理模式撒進一個更龐大、更確定性的 DAG 裡。</p>
+
+<figure>
+<img src="assets/028-micro-agent-dag.png" alt="微型代理的 DAG（micro agent DAG）">
+</figure>
+
+<p>你可能會問：「那這種情況下幹麼還用代理？」這問題我們稍後會談。簡單說，讓語言模型管理一組範圍明確的任務，就能輕鬆把即時的人為回饋接進來，轉成工作流步驟，又不會陷入脈絡錯誤的迴圈。（<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-01-natural-language-to-tool-calls.md">要素 1</a>、<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md">要素 3</a>、<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-07-contact-humans-with-tools.md">要素 7</a>）</p>
+
+<blockquote>
+<h4>讓語言模型管理一組範圍明確的任務，就能輕鬆把即時的人為回饋接進來……又不會陷入脈絡錯誤的迴圈</h4>
+</blockquote>
+
+<h3>一個真實的微型代理（A real life micro agent）</h3>
+
+<p>以下例子說明確定性程式碼如何跑一個微型代理，負責處理部署流程中需要人為介入的步驟。</p>
+
+<figure>
+<img src="assets/029-deploybot-high-level.png" alt="部署機器人的高階架構（deploybot high level）">
+</figure>
+
+<ul>
+<li><strong>真人</strong>把 PR 合併進 GitHub 的 main 分支</li>
+<li><strong>確定性程式碼</strong>部署到 staging 環境</li>
+<li><strong>確定性程式碼</strong>對 staging 跑端到端（e2e）測試</li>
+<li><strong>確定性程式碼</strong>交給代理做正式環境部署，初始脈絡是：「deploy SHA 4af9ec0 to production」</li>
+<li><strong>代理</strong>呼叫 <code>deploy_frontend_to_prod(4af9ec0)</code></li>
+<li><strong>確定性程式碼</strong>為這個動作請求人為核准</li>
+<li><strong>真人</strong>拒絕這個動作，並回饋「可以先部署後端嗎？」</li>
+<li><strong>代理</strong>呼叫 <code>deploy_backend_to_prod(4af9ec0)</code></li>
+<li><strong>確定性程式碼</strong>為這個動作請求人為核准</li>
+<li><strong>真人</strong>核准這個動作</li>
+<li><strong>確定性程式碼</strong>執行後端部署</li>
+<li><strong>代理</strong>呼叫 <code>deploy_frontend_to_prod(4af9ec0)</code></li>
+<li><strong>確定性程式碼</strong>為這個動作請求人為核准</li>
+<li><strong>真人</strong>核准這個動作</li>
+<li><strong>確定性程式碼</strong>執行前端部署</li>
+<li><strong>代理</strong>判定任務已成功完成，收工</li>
+<li><strong>確定性程式碼</strong>對正式環境跑端到端測試</li>
+<li><strong>確定性程式碼</strong>任務完成；或交給回復代理（rollback agent）檢視失敗並視情況回復</li>
+</ul>
+
+<figure>
+<a href="https://github.com/user-attachments/assets/deb356e9-0198-45c2-9767-231cb569ae13"><img src="assets/033-deploybot.gif" alt="部署機器人動畫（deploybot animation）"></a>
+</figure>
+
+<details>
+<summary><a href="https://github.com/humanlayer/12-factor-agents/blob/main/img/033-deploybot.gif">GIF 版本</a></summary>
+
+<figure>
+<img src="assets/033-deploybot.gif" alt="部署機器人動畫（deploybot animation）">
+</figure>
+
+</details>
+
+<p>這個例子取材自一個真實的<a href="https://github.com/got-agents/agents/tree/main/deploybot-ts">開源代理，我們用它管理 Humanlayer 的部署</a>。以下是我上週跟它的真實對話：</p>
+
+<figure>
+<img src="assets/035-deploybot-conversation.png" alt="與部署機器人的真實對話（deploybot conversation）">
+</figure>
+
+<p>我們沒給這個代理一大堆工具或任務。LLM 在這裡的主要價值，是解析真人的純文字回饋，並提出更新後的行動方案。我們盡可能隔離任務與脈絡，讓 LLM 專注在一個 5 到 10 步的小型工作流上。</p>
+
+<p>這裡還有另一個<a href="https://x.com/chainlit_io/status/1858613325921480922">比較傳統的客服／聊天機器人示範</a>。</p>
+
+<h3>所以代理到底是什麼？</h3>
+
+<ul>
+<li><strong>提示（prompt）</strong>：告訴 LLM 該怎麼表現、有哪些「工具」可用。提示的輸出是一個 JSON 物件，描述工作流的下一步（也就是「工具呼叫」或「函式呼叫」）。（<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-02-own-your-prompts.md">要素 2</a>）</li>
+<li><strong>switch 陳述式</strong>：根據 LLM 回傳的 JSON 決定怎麼處理。（<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-08-own-your-control-flow.md">要素 8</a> 的一部分）</li>
+<li><strong>累積的脈絡</strong>：儲存已經發生過的步驟與結果（<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md">要素 3</a>）</li>
+<li><strong>for 迴圈</strong>：直到 LLM 發出某種「終止」工具呼叫（或純文字回覆）為止，把 switch 陳述式的結果加進脈絡視窗，再請 LLM 選下一步。（<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-08-own-your-control-flow.md">要素 8</a>）</li>
+</ul>
+
+<figure>
+<img src="assets/040-4-components.png" alt="代理的四個組成元件（4 components）">
+</figure>
+
+<p>在「部署機器人」這個例子裡，自己掌握控制流與脈絡累積帶來幾個好處：</p>
+
+<ul>
+<li>在我們的 <strong>switch 陳述式</strong>與 <strong>for 迴圈</strong>裡，可以攔下控制流，暫停等待人為輸入，或等待長時間任務完成</li>
+<li>可以輕鬆把<strong>脈絡</strong>視窗序列化，方便暫停與恢復</li>
+<li>在<strong>提示</strong>裡，我們能盡情最佳化指令的傳遞方式，以及「目前為止發生了什麼」的呈現方式</li>
+</ul>
+
+<p><a href="https://github.com/humanlayer/12-factor-agents/blob/main/README.md#12-factor-agents">第二部分</a>會<strong>把這些模式形式化</strong>，讓它們能套用到任何軟體專案，加上亮眼的 AI 功能，而不必全盤接受傳統對「AI 代理」的實作與定義。</p>
+
+<p><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-01-natural-language-to-tool-calls.md">要素 1：從自然語言到工具呼叫 →</a></p>
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/brief-history-of-software.md">How We Got Here: A Brief History of Software</a>（2025-09-19）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

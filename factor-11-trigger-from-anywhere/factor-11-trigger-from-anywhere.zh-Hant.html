@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>要素 11：從任何地方觸發，在使用者所在之處與他碰面（Factor 11: Trigger from anywhere）</title>
+<meta name="description" content="讓使用者從 slack、email、sms 觸發代理，也讓代理從同樣管道回覆；外迴圈代理則由事件與 cron 啟動。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="HumanLayer,代理,工具鏈,人為監督">
+<style>
+  h1,h2,h3,figcaption{overflow-wrap:break-word}
+  main{overflow-wrap:break-word}
+  p code,li code,td code,th code{overflow-wrap:anywhere}
+  .badges img{vertical-align:middle;margin:0 .35rem .35rem 0}
+  .contributors{line-height:1}
+  .contributors img{display:inline-block;width:80px;height:80px;border-radius:50%;margin:.15rem;border:1px solid var(--rule)}
+  .nav{color:var(--fg-soft);font-size:.92rem;margin-top:2.5rem}
+  details{margin:1.5rem 0;border:1px solid var(--rule);border-radius:8px;padding:.6rem 1rem;background:var(--code-bg)}
+  details summary{cursor:pointer;color:var(--fg-soft);font-size:.92rem}
+  details[open] summary{margin-bottom:.8rem}
+  table img{display:block;width:100%;height:auto}
+  figure a img{border:1px solid var(--rule)}
+</style>
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">HumanLayer · 12-Factor Agents</p>
+  <h1>要素 11：從任何地方觸發，在使用者所在之處與他碰面（Factor 11: Trigger from anywhere, meet users where they are）</h1>
+  <p class="pubdate">原文最後更新：2025 年 5 月 10 日</p>
+</header>
+
+<main id="main-content">
+<p class="lede"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/README.md">← 回到 README</a></p>
+
+<h2>11. 從任何地方觸發，在使用者所在之處與他碰面（Trigger from anywhere, meet users where they are）</h2>
+
+<p>如果你在等 <a href="https://humanlayer.dev">humanlayer</a> 的推銷，你等到了。如果你已經做了<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md">要素 6：用簡單的 API 啟動、暫停、恢復</a>與<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-07-contact-humans-with-tools.md">要素 7：用工具呼叫聯絡真人</a>，就已經準備好採納這一條了。</p>
+
+<figure>
+<img src="assets/1b0-trigger-from-anywhere.png" alt="從任何地方觸發（trigger from anywhere）">
+</figure>
+
+<p>讓使用者能從 slack、email、sms 或任何他們想要的管道觸發代理。也讓代理能透過同樣的管道回覆。</p>
+
+<p>好處：</p>
+
+<ul>
+<li><strong>在使用者所在之處與他碰面</strong>：這能幫你打造像真人的 AI 應用程式，至少像數位同事</li>
+<li><strong>外迴圈代理（Outer Loop Agents）</strong>：讓代理能由非人類觸發，例如事件、cron、服務中斷等等。它們可能工作 5 分鐘、20 分鐘、90 分鐘，但走到關鍵節點時，能聯絡真人尋求協助、回饋或核准</li>
+<li><strong>高風險工具</strong>：如果能快速把各種真人拉進來，你就能讓代理執行風險更高的操作，例如寄送外部郵件、更新正式環境資料等等。維持清楚的標準，就能得到可稽核性與信心，讓代理<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-10-small-focused-agents.md#what-if-llms-get-smarter">去做更大、更好的事</a></li>
+</ul>
+
+<p class="nav"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-10-small-focused-agents.md">← 小而專注的代理</a> | <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-12-stateless-reducer.md">無狀態的 reducer →</a></p>
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-11-trigger-from-anywhere.md">Factor 11: Trigger from anywhere, meet users where they are</a>（2025-05-10）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

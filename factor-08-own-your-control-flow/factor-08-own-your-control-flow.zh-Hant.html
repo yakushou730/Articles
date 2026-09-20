@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>要素 8：自己掌握控制流（Factor 8: Own your control flow）</title>
+<meta name="description" content="自訂控制結構，讓代理能在工具「選定」與「實際執行」之間暫停，等待真人核准或長時間任務完成。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="HumanLayer,代理,架構模式,人為監督">
+<style>
+  h1,h2,h3,figcaption{overflow-wrap:break-word}
+  main{overflow-wrap:break-word}
+  p code,li code,td code,th code{overflow-wrap:anywhere}
+  .badges img{vertical-align:middle;margin:0 .35rem .35rem 0}
+  .contributors{line-height:1}
+  .contributors img{display:inline-block;width:80px;height:80px;border-radius:50%;margin:.15rem;border:1px solid var(--rule)}
+  .nav{color:var(--fg-soft);font-size:.92rem;margin-top:2.5rem}
+  details{margin:1.5rem 0;border:1px solid var(--rule);border-radius:8px;padding:.6rem 1rem;background:var(--code-bg)}
+  details summary{cursor:pointer;color:var(--fg-soft);font-size:.92rem}
+  details[open] summary{margin-bottom:.8rem}
+  table img{display:block;width:100%;height:auto}
+  figure a img{border:1px solid var(--rule)}
+</style>
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">HumanLayer · 12-Factor Agents</p>
+  <h1>要素 8：自己掌握控制流（Factor 8: Own your control flow）</h1>
+  <p class="pubdate">原文最後更新：2025 年 7 月 17 日</p>
+</header>
+
+<main id="main-content">
+<p class="lede"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/README.md">← 回到 README</a></p>
+
+<h2>8. 自己掌握控制流（Own your control flow）</h2>
+
+<p>控制流自己掌握，就能玩很多花樣。</p>
+
+<figure>
+<img src="assets/180-control-flow.png" alt="控制流（control flow）">
+</figure>
+
+<p>為你的特定使用情境，打造說得通的控制結構。具體來說，某些型別的工具呼叫，可能就是跳出迴圈、等待真人回覆或等待訓練 pipeline 這類長時間任務的理由。你可能也會想自己實作：</p>
+
+<ul>
+<li>工具呼叫結果的摘要或快取</li>
+<li>對結構化輸出做 LLM-as-judge</li>
+<li>脈絡視窗壓縮或其他<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md">記憶管理</a></li>
+<li>日誌、追蹤與量測指標</li>
+<li>客戶端限流</li>
+<li>持久化休眠／暫停／「等待事件」</li>
+</ul>
+
+<p>下面這個例子展示三種控制流模式：</p>
+
+<ul>
+<li>request_clarification：模型要求更多資訊，跳出迴圈等待真人回覆</li>
+<li>fetch_git_tags：模型要求一份 git 標籤清單，抓取標籤、附加到脈絡視窗，然後直接送回模型</li>
+<li>deploy_backend：模型要求部署後端，這是高風險動作，所以跳出迴圈等待人為核准</li>
+</ul>
+
+<pre><code>def handle_next_step(thread: Thread):
+
+  while True:
+    next_step = await determine_next_step(thread_to_prompt(thread))
+    
+    # inlined for clarity - in reality you could put 
+    # this in a method, use exceptions for control flow, or whatever you want
+    if next_step.intent == 'request_clarification':
+      thread.events.append({
+        type: 'request_clarification',
+          data: nextStep,
+        })
+
+      await send_message_to_human(next_step)
+      await db.save_thread(thread)
+      # async step - break the loop, we'll get a webhook later
+      break
+    elif next_step.intent == 'fetch_open_issues':
+      thread.events.append({
+        type: 'fetch_open_issues',
+        data: next_step,
+      })
+
+      issues = await linear_client.issues()
+
+      thread.events.append({
+        type: 'fetch_open_issues_result',
+        data: issues,
+      })
+      # sync step - pass the new context to the LLM to determine the NEXT next step
+      continue
+    elif next_step.intent == 'create_issue':
+      thread.events.append({
+        type: 'create_issue',
+        data: next_step,
+      })
+
+      await request_human_approval(next_step)
+      await db.save_thread(thread)
+      # async step - break the loop, we'll get a webhook later
+      break</code></pre>
+
+<p>這個模式讓你能視需要打斷並恢復代理的流程，讓對話與工作流更自然。</p>
+
+<p><strong>例子</strong>：我對市面上每個 AI 框架的頭號功能請求，就是希望能打斷正在工作的代理、稍後再恢復，尤其是在工具<strong>選定</strong>與工具<strong>實際執行</strong>之間的那個瞬間。</p>
+
+<p>沒有這種程度的可恢復性與細緻度，就沒辦法在工具呼叫執行前先審查／核准，於是你只能三選一：</p>
+
+<ol>
+<li>在記憶體裡暫停任務，等待長時間工作完成（也就是 <code>while...sleep</code>），而一旦行程中斷，就得從頭重來</li>
+<li>限制代理只能做低風險、低代價的呼叫，例如研究與摘要</li>
+<li>給代理更大的權限去做更有用的事，然後碰運氣祈禱它不要搞砸</li>
+</ol>
+
+<p>你可能注意到，這和<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md">要素 5：統合執行狀態與業務狀態</a>與<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md">要素 6：用簡單的 API 啟動、暫停、恢復</a>密切相關，但可以獨立實作。</p>
+
+<p class="nav"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-07-contact-humans-with-tools.md">← 用工具聯絡真人</a> | <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-09-compact-errors.md">壓縮錯誤 →</a></p>
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-08-own-your-control-flow.md">Factor 8: Own your control flow</a>（2025-07-17）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

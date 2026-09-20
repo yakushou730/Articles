@@ -168,12 +168,62 @@ they are frequently mistranslated.
 | drift | 偏離 |
 | tunnel vision | 隧道視野 |
 
+## 12-Factor Agents (HumanLayer, 2025-04)
+
+| English | 繁中 |
+|---|---|
+| factor | 要素 |
+| natural language to tool calls | 從自然語言到工具呼叫 |
+| own your prompts | 自己掌握提示 |
+| context window | 脈絡視窗 |
+| tools are just structured outputs | 工具就只是結構化輸出 |
+| execution state | 執行狀態 |
+| business state | 業務狀態 |
+| unify execution state and business state | 統合執行狀態與業務狀態 |
+| launch / pause / resume | 啟動／暫停／恢復 |
+| control flow | 控制流 |
+| compact errors into context window | 把錯誤壓縮進脈絡視窗 |
+| small, focused agents | 小而專注的代理 |
+| trigger from anywhere | 從任何地方觸發 |
+| stateless reducer | 無狀態的 reducer |
+| pre-fetch | 預先抓取 |
+| directed graph (DG) | 有向圖（Directed Graph，DG） |
+| DAG | DAG |
+| DAG orchestrator | DAG 編排器 |
+| context engineering | 脈絡工程 |
+| information density | 資訊密度 |
+| inner loop / outer loop | 內迴圈／外迴圈（inner/outer loop） |
+| micro agent | 微型代理（micro agent） |
+| deploybot | 部署機器人（deploybot） |
+| role hacking | 角色挪用（Role Hacking） |
+| model gaslighting | 模型煤氣燈效應（model gaslighting） |
+| self-healing | 自我修復 |
+| error spin-out | 錯誤空轉 |
+| token round trip | 來回的 token |
+| thread | thread（保留原文） |
+| event | 事件 |
+| human-in-the-loop | 人為介入 |
+| human approval | 人為核准 |
+| escalation | 升級處理 |
+| rollback agent | 回復代理（rollback agent） |
+| durable | 持久 |
+| serialization | 序列化 |
+| fork (thread) | 分岔 |
+| observability | 可觀測性 |
+| rate limiting | 限流 |
+| LLM-as-judge | LLM-as-judge |
+| high-stakes tool | 高風險工具 |
+| structured output | 結構化輸出 |
+| black box | 黑箱 |
+| greenfield rewrite | 幾乎從頭改寫 |
+
 ## Kept in English
 
 Acronyms and product or project names: LLM, API, SDK, CLI, JSON, HTML, CSS,
 URL, MCP, ACI, HCI, GUI, SWE-bench, Claude, Claude Haiku, Claude Sonnet,
 Anthropic, AWS, GitHub, Rivet, Vellum, Model Context Protocol, Strands Agents SDK,
-Claude Agent SDK.
+Claude Agent SDK, DAG, RAG, YAML, XML, TypeScript, Python, Airflow, Prefect,
+Dagster, Inngest, Windmill, BAML, Stripe, HumanLayer.
 
 ## Style rules
 

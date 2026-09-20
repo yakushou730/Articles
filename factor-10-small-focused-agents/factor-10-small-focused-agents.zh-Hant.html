@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>要素 10：小而專注的代理（Factor 10: Small, Focused Agents）</title>
+<meta name="description" content="別做什麼都想管的巨型代理：把範圍壓在 3 到 20 步，脈絡視窗才管得住，LLM 表現才穩。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="HumanLayer,代理,架構模式,實務技巧">
+<style>
+  h1,h2,h3,figcaption{overflow-wrap:break-word}
+  main{overflow-wrap:break-word}
+  p code,li code,td code,th code{overflow-wrap:anywhere}
+  .badges img{vertical-align:middle;margin:0 .35rem .35rem 0}
+  .contributors{line-height:1}
+  .contributors img{display:inline-block;width:80px;height:80px;border-radius:50%;margin:.15rem;border:1px solid var(--rule)}
+  .nav{color:var(--fg-soft);font-size:.92rem;margin-top:2.5rem}
+  details{margin:1.5rem 0;border:1px solid var(--rule);border-radius:8px;padding:.6rem 1rem;background:var(--code-bg)}
+  details summary{cursor:pointer;color:var(--fg-soft);font-size:.92rem}
+  details[open] summary{margin-bottom:.8rem}
+  table img{display:block;width:100%;height:auto}
+  figure a img{border:1px solid var(--rule)}
+</style>
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">HumanLayer · 12-Factor Agents</p>
+  <h1>要素 10：小而專注的代理（Factor 10: Small, Focused Agents）</h1>
+  <p class="pubdate">原文最後更新：2025 年 5 月 10 日</p>
+</header>
+
+<main id="main-content">
+<p class="lede"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/README.md">← 回到 README</a></p>
+
+<h2>10. 小而專注的代理（Small, Focused Agents）</h2>
+
+<p>不要打造什麼都想做的巨型代理，改成打造小而專注、只把一件事做好的代理。代理只是一個更大、以確定性程式碼為主的系統裡的其中一塊積木。</p>
+
+<figure>
+<img src="assets/1a0-small-focused-agents.png" alt="小而專注的代理（small focused agents）">
+</figure>
+
+<p>這裡的關鍵洞察和 LLM 的限制有關：任務越大越複雜，需要的步驟就越多，脈絡視窗也越長。脈絡（context）一長，LLM 就更容易迷失或失焦。把代理的範圍限制在特定領域、控制在 3 到 10 步，也許最多 20 步，就能讓脈絡視窗維持在可管理的範圍，LLM 的表現也維持在高檔。</p>
+
+<blockquote>
+<h4>脈絡一長，LLM 就更容易迷失或失焦</h4>
+</blockquote>
+
+<p>小而專注的代理有什麼好處：</p>
+
+<ol>
+<li><strong>脈絡可管理</strong>：脈絡視窗越小，LLM 表現越好</li>
+<li><strong>職責清楚</strong>：每個代理都有明確定義的範圍與目的</li>
+<li><strong>更可靠</strong>：比較不會在複雜工作流裡迷失</li>
+<li><strong>更好測試</strong>：測試與驗證特定功能更簡單</li>
+<li><strong>更好除錯</strong>：出問題時更容易定位與修復</li>
+</ol>
+
+<h3>如果 LLM 變得更聰明了呢？</h3>
+
+<p>如果 LLM 聰明到能處理 100 步以上的工作流，我們還需要這一條嗎？</p>
+
+<p>簡答：需要。隨著代理與 LLM 進步，它們<strong>也許</strong>會自然擴張到能處理更長的脈絡視窗，也就是能處理更大 DAG 裡的更多部分。這個小而專注的做法，能確保你<strong>今天</strong>就拿到成果，同時也替你做好準備，隨著 LLM 脈絡視窗變得更可靠，慢慢擴大代理的範圍。（如果你曾經重構過大型的確定性程式碼庫，讀到這裡可能會點頭。）</p>
+
+<figure>
+<a href="https://github.com/user-attachments/assets/0cd3f52c-046e-4d5e-bab4-57657157c82f"><img src="assets/1a5-agent-scope-grow.gif" alt="代理範圍逐步擴大（agent scope grows）"></a>
+</figure>
+
+<details>
+<summary><a href="https://github.com/humanlayer/12-factor-agents/blob/main/img/1a5-agent-scope-grow.gif">GIF 版本</a></summary>
+
+<figure>
+<img src="assets/1a5-agent-scope-grow.gif" alt="代理範圍逐步擴大（agent scope grows）">
+</figure>
+
+</details>
+
+<p>刻意拿捏代理的大小與範圍，只在能維持品質的前提下擴大，是這裡的關鍵。<a href="https://open.substack.com/pub/swyx/p/notebooklm?selection=08e1187c-cfee-4c63-93c9-71216640a5f8&amp;utm_campaign=post-share-selection&amp;utm_medium=web">打造 NotebookLM 的團隊</a>是這麼說的：</p>
+
+<blockquote>
+<p>我一直覺得，做 AI 最神奇的時刻，往往出現在我離模型能力邊界非常、非常、非常近的時候</p>
+</blockquote>
+
+<p>不管那條邊界在哪，只要能找到它、並且穩定地做對，你就能打造出神奇的體驗。這裡有很多護城河可以挖，但一如往常，這需要一些工程紀律。</p>
+
+<p class="nav"><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-09-compact-errors.md">← 壓縮錯誤</a> | <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-11-trigger-from-anywhere.md">從任何地方觸發 →</a></p>
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-10-small-focused-agents.md">Factor 10: Small, Focused Agents</a>（2025-05-10）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

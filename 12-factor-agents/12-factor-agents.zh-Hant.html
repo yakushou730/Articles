@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 要素代理（12-Factor Agents）</title>
+<meta name="description" content="12-Factor Agents 主文：為什麼多數代理框架不適合直接上生產，以及讓 LLM 軟體夠格交到客戶手上的 12 條工程原則。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="HumanLayer,代理,工作流,架構模式,實務技巧">
+<style>
+  h1,h2,h3,figcaption{overflow-wrap:break-word}
+  main{overflow-wrap:break-word}
+  p code,li code,td code,th code{overflow-wrap:anywhere}
+  .badges img{vertical-align:middle;margin:0 .35rem .35rem 0}
+  .contributors{line-height:1}
+  .contributors img{display:inline-block;width:80px;height:80px;border-radius:50%;margin:.15rem;border:1px solid var(--rule)}
+  .nav{color:var(--fg-soft);font-size:.92rem;margin-top:2.5rem}
+  details{margin:1.5rem 0;border:1px solid var(--rule);border-radius:8px;padding:.6rem 1rem;background:var(--code-bg)}
+  details summary{cursor:pointer;color:var(--fg-soft);font-size:.92rem}
+  details[open] summary{margin-bottom:.8rem}
+  table img{display:block;width:100%;height:auto}
+  figure a img{border:1px solid var(--rule)}
+</style>
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">HumanLayer · 12-Factor Agents</p>
+  <h1>12 要素代理：打造可靠 LLM 應用程式的原則（12-Factor Agents: Principles for building reliable LLM applications）</h1>
+  <p class="pubdate">原文發布於 2025 年 3 月，持續更新（最後更新：2025 年 9 月）</p>
+</header>
+
+<main id="main-content">
+<p class="lede"><em>本文仿照 <a href="https://12factor.net/">12 Factor Apps</a> 的精神寫成。專案原始碼公開在 <a href="https://github.com/humanlayer/12-factor-agents">github.com/humanlayer/12-factor-agents</a>，歡迎回饋與貢獻。一起把這件事弄懂。</em></p>
+
+<p class="badges"><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="assets/badge-code-apache.svg" alt="程式碼授權：Apache 2.0"></a> <a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="assets/badge-content-ccbysa.svg" alt="內容授權：CC BY-SA 4.0"></a> <a href="https://humanlayer.dev/discord"><img src="assets/badge-discord.svg" alt="Discord 伺服器"></a> <a href="https://www.youtube.com/watch?v=8kMaTybvDUw"><img src="assets/badge-conf-talk.svg" alt="AI Engineer 研討會演講（17 分鐘）"></a> <a href="https://www.youtube.com/watch?v=yxJDyQ8v6P0"><img src="assets/badge-deep-dive.svg" alt="YouTube 深入解析"></a></p>
+
+<blockquote>
+<p>錯過 AI Engineer World's Fair 了嗎？<a href="https://www.youtube.com/watch?v=8kMaTybvDUw">這裡有演講錄影</a>。</p>
+<p>在找脈絡工程（context engineering）的內容？<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md">直接跳到要素 3</a>。</p>
+<p>想參與 <code>npx/uvx create-12-factor-agent</code>？請看<a href="https://github.com/humanlayer/12-factor-agents/discussions/61">討論串</a>。</p>
+</blockquote>
+
+<p>嗨，我是 Dex。我<a href="https://youtu.be/8bIHcttkOTE">玩</a><a href="https://theouterloop.substack.com">AI 代理</a><a href="https://humanlayer.dev">已經好一陣子</a>。</p>
+
+<p><strong>市面上的代理框架我幾乎都試過</strong>，從隨插即用的 crew／langchain，到走極簡路線的 smolagents，再到號稱 production grade 的 langraph、griptape 等等。</p>
+
+<p><strong>我跟很多實力很強的創辦人聊過</strong>，有 YC 內也有 YC 外，他們都在用 AI 做很厲害的東西。多數人自己搭整套技術堆疊。真正上線、直接面對客戶的代理產品裡，我看不到多少框架的影子。</p>
+
+<p><strong>有件事讓我很意外</strong>：市面上多數自稱「AI 代理」的產品，其實沒那麼代理化（agentic）。很多主要是確定性程式碼，只在恰到好處的地方串進幾個 LLM 步驟，讓體驗變得神奇。</p>
+
+<p>好的代理並不照著<a href="https://www.anthropic.com/engineering/building-effective-agents#agents">「這是你的提示，這是一袋工具，迴圈直到達成目標」</a>那個模式走。它們大部分就只是軟體。</p>
+
+<p>於是我開始回答這個問題：</p>
+
+<blockquote>
+<h3><strong>有哪些原則，可以讓我們打造出真正夠格交到生產環境客戶手上的 LLM 軟體？</strong></h3>
+</blockquote>
+
+<p>歡迎來到 12-factor agents。芝加哥歷任市長從 Daley 開始就一直在各大機場貼滿那句話：我們很高興你來了。</p>
+
+<p><em>特別感謝 <a href="https://github.com/iantbutler01">@iantbutler01</a>、<a href="https://github.com/tnm">@tnm</a>、<a href="https://www.github.com/hellovai">@hellovai</a>、<a href="https://www.github.com/stantonk">@stantonk</a>、<a href="https://www.github.com/balanceiskey">@balanceiskey</a>、<a href="https://www.github.com/AdjectiveAllison">@AdjectiveAllison</a>、<a href="https://www.github.com/pfbyjy">@pfbyjy</a>、<a href="https://www.github.com/a-churchill">@a-churchill</a>，以及 SF MLOps 社群，對本指南提出早期回饋。</em></p>
+
+<h2>短版：12 個要素（The Short Version: The 12 Factors）</h2>
+
+<p>就算 LLM <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-10-small-focused-agents.md#what-if-llms-get-smarter">持續以指數速度變強</a>，仍然有一些核心工程技巧，能讓 LLM 軟體更可靠、更好擴充、也更好維護。</p>
+
+<ul>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/brief-history-of-software.md">我們怎麼走到這裡：軟體簡史（How We Got Here: A Brief History of Software）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-01-natural-language-to-tool-calls.md">要素 1：從自然語言到工具呼叫（Factor 1: Natural Language to Tool Calls）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-02-own-your-prompts.md">要素 2：自己掌握提示（Factor 2: Own your prompts）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md">要素 3：自己掌握脈絡視窗（Factor 3: Own your context window）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-04-tools-are-structured-outputs.md">要素 4：工具就只是結構化輸出（Factor 4: Tools are just structured outputs）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md">要素 5：統合執行狀態與業務狀態（Factor 5: Unify execution state and business state）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md">要素 6：用簡單的 API 啟動、暫停、恢復（Factor 6: Launch/Pause/Resume with simple APIs）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-07-contact-humans-with-tools.md">要素 7：用工具呼叫聯絡真人（Factor 7: Contact humans with tool calls）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-08-own-your-control-flow.md">要素 8：自己掌握控制流（Factor 8: Own your control flow）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-09-compact-errors.md">要素 9：把錯誤壓縮進脈絡視窗（Factor 9: Compact Errors into Context Window）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-10-small-focused-agents.md">要素 10：小而專注的代理（Factor 10: Small, Focused Agents）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-11-trigger-from-anywhere.md">要素 11：從任何地方觸發，在使用者所在之處與他碰面（Factor 11: Trigger from anywhere, meet users where they are）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-12-stateless-reducer.md">要素 12：把代理做成無狀態的 reducer（Factor 12: Make your agent a stateless reducer）</a></li>
+</ul>
+
+<h3 id="visual-nav">視覺導覽（Visual Nav）</h3>
+
+<figure>
+<a href="#visual-nav"><img src="assets/visual-nav.png" alt="12 個要素的視覺導覽總覽（Visual Nav）"></a>
+<figcaption>12 個要素的視覺導覽總覽（Visual Nav）</figcaption>
+</figure>
+
+<table>
+<tr>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-01-natural-language-to-tool-calls.md"><img src="assets/110-natural-language-tool-calls.png" alt="要素 1：從自然語言到工具呼叫（Factor 1: Natural Language to Tool Calls）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-02-own-your-prompts.md"><img src="assets/120-own-your-prompts.png" alt="要素 2：自己掌握提示（Factor 2: Own your prompts）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md"><img src="assets/130-own-your-context-building.png" alt="要素 3：自己掌握脈絡視窗（Factor 3: Own your context window）"></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-04-tools-are-structured-outputs.md"><img src="assets/140-tools-are-just-structured-outputs.png" alt="要素 4：工具就只是結構化輸出（Factor 4: Tools are just structured outputs）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md"><img src="assets/150-unify-state.png" alt="要素 5：統合執行狀態與業務狀態（Factor 5: Unify execution state and business state）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md"><img src="assets/160-pause-resume-with-simple-apis.png" alt="要素 6：用簡單的 API 啟動、暫停、恢復（Factor 6: Launch/Pause/Resume with simple APIs）"></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-07-contact-humans-with-tools.md"><img src="assets/170-contact-humans-with-tools.png" alt="要素 7：用工具呼叫聯絡真人（Factor 7: Contact humans with tool calls）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-08-own-your-control-flow.md"><img src="assets/180-control-flow.png" alt="要素 8：自己掌握控制流（Factor 8: Own your control flow）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-09-compact-errors.md"><img src="assets/190-factor-9-errors-static.png" alt="要素 9：把錯誤壓縮進脈絡視窗（Factor 9: Compact Errors into Context Window）"></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-10-small-focused-agents.md"><img src="assets/1a0-small-focused-agents.png" alt="要素 10：小而專注的代理（Factor 10: Small, Focused Agents）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-11-trigger-from-anywhere.md"><img src="assets/1b0-trigger-from-anywhere.png" alt="要素 11：從任何地方觸發（Factor 11: Trigger from anywhere）"></a></td>
+<td><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-12-stateless-reducer.md"><img src="assets/1c0-stateless-reducer.png" alt="要素 12：把代理做成無狀態的 reducer（Factor 12: Make your agent a stateless reducer）"></a></td>
+</tr>
+</table>
+
+<h2>我們怎麼走到這裡（How we got here）</h2>
+
+<p>想深入了解我的代理歷程、以及我們如何走到這一步，請看<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/brief-history-of-software.md">軟體簡史</a>。以下是速覽。</p>
+
+<h3>代理的承諾（The promise of agents）</h3>
+
+<p>接下來會一直提到有向圖（Directed Graphs，DGs），以及無環的那一類：DAG。先說一件事：軟體就是有向圖。以前我們用流程圖表示程式，不是沒道理。</p>
+
+<figure>
+<img src="assets/010-software-dag.png" alt="軟體即為有向圖（software is a directed graph）">
+<figcaption>軟體即為有向圖（software is a directed graph）</figcaption>
+</figure>
+
+<h3>從程式碼到 DAG（From code to DAGs）</h3>
+
+<p>大約 20 年前，DAG 編排器開始流行。經典的像 <a href="https://airflow.apache.org/">Airflow</a>、<a href="https://www.prefect.io/">Prefect</a>，還有一些更早的前身，以及比較新的 <a href="https://dagster.io/">dagster</a>、<a href="https://www.inngest.com/">inngest</a>、<a href="https://www.windmill.dev/">windmill</a>。它們都遵循同一套圖形模式，另外帶來可觀測性、模組化、重試、管理等好處。</p>
+
+<figure>
+<img src="assets/015-dag-orchestrators.png" alt="DAG 編排器（DAG orchestrators）">
+<figcaption>DAG 編排器（DAG orchestrators）</figcaption>
+</figure>
+
+<h3>代理的承諾（The promise of agents）</h3>
+
+<p>我不是<a href="https://youtu.be/Dc99-zTMyMg?si=bcT0hIwWij2mR-40&amp;t=73">第一個這樣講的人</a>，但我剛開始學代理時最大的心得是：你可以把 DAG 丟掉。軟體工程師不必再逐一寫死每個步驟與邊界情況，改成給代理一個目標和一組轉移：</p>
+
+<figure>
+<img src="assets/025-agent-dag.png" alt="給代理一個目標與一組轉移（give the agent a goal and a set of transitions）">
+<figcaption>給代理一個目標與一組轉移（give the agent a goal and a set of transitions）</figcaption>
+</figure>
+
+<p>讓 LLM 即時做決定，自己找出路徑。</p>
+
+<figure>
+<img src="assets/026-agent-dag-lines.png" alt="由 LLM 即時決定路徑（let the LLM figure out the path）">
+<figcaption>由 LLM 即時決定路徑（let the LLM figure out the path）</figcaption>
+</figure>
+
+<p>這裡的承諾是：你寫的軟體更少，只要把圖的「邊」交給 LLM，讓它自己想出節點。你能從錯誤中恢復、能少寫很多程式，還可能發現 LLM 找出新穎的解法。</p>
+
+<h3>代理就是迴圈（Agents as loops）</h3>
+
+<p>後面會看到，這招其實沒那麼管用。</p>
+
+<p>再往下一層看。代理裡面有這樣一個迴圈，由 3 個步驟組成：</p>
+
+<ol>
+<li>LLM 決定工作流的下一步，輸出結構化 JSON（「工具呼叫」）</li>
+<li>確定性程式碼執行這個工具呼叫</li>
+<li>結果附加到脈絡視窗</li>
+<li>重複，直到下一步判定為「完成」</li>
+</ol>
+
+<pre><code>initial_event = {"message": "..."}
+context = [initial_event]
+while True:
+  next_step = await llm.determine_next_step(context)
+  context.append(next_step)
+
+  if (next_step.intent === "done"):
+    return next_step.final_answer
+
+  result = await execute_step(next_step)
+  context.append(result)</code></pre>
+
+<p>初始脈絡只有起始事件（可能是使用者訊息、可能是 cron 觸發、也可能是 webhook），我們請 LLM 選出下一步（工具），或判定已經完成。</p>
+
+<p>以下是多步驟範例：</p>
+
+<figure>
+<a href="https://github.com/user-attachments/assets/3beb0966-fdb1-4c12-a47f-ed4e8240f8fd"><img src="assets/027-agent-loop-animation.gif" alt="代理迴圈動畫（agent loop animation）"></a>
+<figcaption>代理迴圈動畫（agent loop animation）</figcaption>
+</figure>
+
+<details>
+<summary><a href="https://github.com/humanlayer/12-factor-agents/blob/main/img/027-agent-loop-animation.gif">GIF 版本</a></summary>
+
+<figure>
+<img src="assets/027-agent-loop-animation.gif" alt="代理迴圈動畫（agent loop animation）">
+<figcaption>代理迴圈動畫（agent loop animation）</figcaption>
+</figure>
+
+</details>
+
+<h2>為什麼需要 12-factor agents？</h2>
+
+<p>說到底，這個做法就是沒有我們想的那麼好用。</p>
+
+<p>在打造 HumanLayer 的過程中，我跟至少 100 位 SaaS 開發者聊過（大多是技術背景的創辦人），他們都想讓現有產品更代理化。歷程通常長這樣：</p>
+
+<ol>
+<li>決定要做一個代理</li>
+<li>產品設計、UX 規劃、想清楚要解決什麼問題</li>
+<li>想快點動起來，於是抓來 $FRAMEWORK 就<em>開始做</em></li>
+<li>品質做到 70～80 分</li>
+<li>發現 80 分對大多數面對客戶的功能來說不夠</li>
+<li>發現要突破 80 分，得先逆向工程那個框架、提示、流程等等</li>
+<li>打掉重練</li>
+</ol>
+
+<details>
+<summary>一些免責聲明（Random Disclaimers）</summary>
+
+<p><strong>免責聲明</strong>：我不確定這段話放哪裡最合適，但這裡看起來不比其他地方差：<strong>這絕對不是在暗諷市面上眾多框架，也不是在暗諷那些寫框架的聰明人</strong>。它們實現了很了不起的事，也加速了整個 AI 生態系。</p>
+
+<p>希望這篇文章能帶來一個結果：讓做代理框架的人從我和其他人的歷程中學到東西，把框架做得更好。</p>
+
+<p>尤其是那些想快速推進、又需要深度控制權的開發者。</p>
+
+<p><strong>免責聲明 2</strong>：我不打算談 MCP。它的位置在哪裡，你應該看得出來。</p>
+
+<p><strong>免責聲明 3</strong>：我主要用 TypeScript，<a href="https://www.linkedin.com/posts/dexterihorthy_llms-typescript-aiagents-activity-7290858296679313408-Lh9e?utm_source=share&amp;utm_medium=member_desktop&amp;rcm=ACoAAA4oHTkByAiD-wZjnGsMBUL_JT6nyyhOh30">理由在此</a>，但這些東西在 Python 或任何你偏好的語言都能跑。</p>
+
+<p>總之回到正題。</p>
+
+</details>
+
+<h3>打造優秀 LLM 應用程式的設計模式（Design Patterns for great LLM applications）</h3>
+
+<p>翻過數百個 AI 函式庫、跟數十位創辦人合作之後，我的直覺是這樣：</p>
+
+<ol>
+<li>有些核心的東西讓代理變得優秀</li>
+<li>全力押注某個框架、然後幾乎從頭改寫成自己的版本，可能得不償失</li>
+<li>確實有些核心原則能讓代理變好，用了框架大概也能拿到其中大部分</li>
+<li>不過我看過最快的做法，是從代理實作裡挑出小而模組化的概念接進現有產品，讓開發者把高品質 AI 軟體交到客戶手上</li>
+<li>這些模組化概念，多數熟練的軟體工程師都能定義和套用，就算沒有 AI 背景也一樣</li>
+</ol>
+
+<blockquote>
+<h4>我看過讓開發者把好 AI 軟體交到客戶手上最快的方法，是從代理實作裡挑出小而模組化的概念，接進現有產品</h4>
+</blockquote>
+
+<h2>12 個要素（再列一次）</h2>
+
+<ul>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/brief-history-of-software.md">我們怎麼走到這裡：軟體簡史（How We Got Here: A Brief History of Software）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-01-natural-language-to-tool-calls.md">要素 1：從自然語言到工具呼叫（Factor 1: Natural Language to Tool Calls）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-02-own-your-prompts.md">要素 2：自己掌握提示（Factor 2: Own your prompts）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-03-own-your-context-window.md">要素 3：自己掌握脈絡視窗（Factor 3: Own your context window）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-04-tools-are-structured-outputs.md">要素 4：工具就只是結構化輸出（Factor 4: Tools are just structured outputs）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md">要素 5：統合執行狀態與業務狀態（Factor 5: Unify execution state and business state）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md">要素 6：用簡單的 API 啟動、暫停、恢復（Factor 6: Launch/Pause/Resume with simple APIs）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-07-contact-humans-with-tools.md">要素 7：用工具呼叫聯絡真人（Factor 7: Contact humans with tool calls）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-08-own-your-control-flow.md">要素 8：自己掌握控制流（Factor 8: Own your control flow）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-09-compact-errors.md">要素 9：把錯誤壓縮進脈絡視窗（Factor 9: Compact Errors into Context Window）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-10-small-focused-agents.md">要素 10：小而專注的代理（Factor 10: Small, Focused Agents）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-11-trigger-from-anywhere.md">要素 11：從任何地方觸發，在使用者所在之處與他碰面（Factor 11: Trigger from anywhere, meet users where they are）</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-12-stateless-reducer.md">要素 12：把代理做成無狀態的 reducer（Factor 12: Make your agent a stateless reducer）</a></li>
+</ul>
+
+<h2>榮譽提名與其他建議（Honorable Mentions / other advice）</h2>
+
+<ul>
+<li><a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/appendix-13-pre-fetch.md">要素 13：先把可能用到的脈絡一次抓齊（Factor 13: Pre-fetch all the context you might need）</a></li>
+</ul>
+
+<h2>相關資源（Related Resources）</h2>
+
+<ul>
+<li>想貢獻這份指南，<a href="https://github.com/humanlayer/12-factor-agents">從這裡開始</a></li>
+<li>2025 年 3 月，我在 Tool Use podcast <a href="https://youtu.be/8bIHcttkOTE">聊了很多這類內容</a></li>
+<li>我也在 <a href="https://theouterloop.substack.com">The Outer Loop</a> 寫這類主題</li>
+<li>我和 <a href="https://github.com/hellovai">@hellovai</a> 一起做<a href="https://github.com/hellovai/ai-that-works/tree/main">「最大化 LLM 效能」的線上研討會</a></li>
+<li>我們用這套方法在 <a href="https://github.com/got-agents/agents">got-agents/agents</a> 打造開源代理</li>
+<li>我們無視自己所有的建議，做了一套<a href="https://github.com/humanlayer/kubechain">在 Kubernetes 上跑分散式代理的框架</a></li>
+<li>本指南提到的其他連結：
+<ul>
+<li><a href="https://12factor.net">12 Factor Apps</a></li>
+<li><a href="https://www.anthropic.com/engineering/building-effective-agents#agents">打造高效的代理（Anthropic）</a></li>
+<li><a href="https://thedataexchange.media/baml-revolution-in-ai-engineering/">提示就是函式（Prompts are Functions）</a></li>
+<li><a href="https://tomasp.net/blog/2015/library-frameworks/">函式庫模式：為什麼框架是邪惡的（Library patterns: Why frameworks are evil）</a></li>
+<li><a href="https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction">錯誤的抽象（The Wrong Abstraction）</a></li>
+<li><a href="https://github.com/dexhorthy/mailcrew">Mailcrew 代理</a></li>
+<li><a href="https://www.youtube.com/watch?v=f_cKnoPC_Oo">Mailcrew 示範影片</a></li>
+<li><a href="https://x.com/chainlit_io/status/1858613325921480922">Chainlit 示範</a></li>
+<li><a href="https://www.linkedin.com/posts/dexterihorthy_llms-typescript-aiagents-activity-7290858296679313408-Lh9e">LLM 與 TypeScript</a></li>
+<li><a href="https://www.boundaryml.com/blog/schema-aligned-parsing">結構描述對齊解析（Schema Aligned Parsing）</a></li>
+<li><a href="https://www.vellum.ai/blog/when-should-i-use-function-calling-structured-outputs-or-json-mode">函式呼叫 vs. 結構化輸出 vs. JSON 模式</a></li>
+<li><a href="https://github.com/boundaryml/baml">GitHub 上的 BAML</a></li>
+<li><a href="https://docs.llamaindex.ai/en/stable/examples/llm/openai_json_vs_function_calling/">OpenAI JSON 與函式呼叫的比較</a></li>
+<li><a href="https://theouterloop.substack.com/p/openais-realtime-api-is-a-step-towards">外迴圈代理（Outer Loop Agents）</a></li>
+<li><a href="https://airflow.apache.org/">Airflow</a></li>
+<li><a href="https://www.prefect.io/">Prefect</a></li>
+<li><a href="https://dagster.io/">Dagster</a></li>
+<li><a href="https://www.inngest.com/">Inngest</a></li>
+<li><a href="https://www.windmill.dev/">Windmill</a></li>
+<li><a href="https://aiagentindex.mit.edu/">AI Agent Index（MIT）</a></li>
+<li><a href="https://open.substack.com/pub/swyx/p/notebooklm?selection=08e1187c-cfee-4c63-93c9-71216640a5f8">NotebookLM 談如何找出模型能力邊界</a></li>
+</ul>
+</li>
+</ul>
+
+<h2>貢獻者（Contributors）</h2>
+
+<p>感謝每一位貢獻 12-factor agents 的人。</p>
+
+<p class="contributors"><a href="https://github.com/dexhorthy"><img src="assets/avatar-dexhorthy.png" alt="dexhorthy" width="80"></a> <a href="https://github.com/Sypherd"><img src="assets/avatar-Sypherd.png" alt="Sypherd" width="80"></a> <a href="https://github.com/tofaramususa"><img src="assets/avatar-tofaramususa.png" alt="tofaramususa" width="80"></a> <a href="https://github.com/a-churchill"><img src="assets/avatar-a-churchill.png" alt="a-churchill" width="80"></a> <a href="https://github.com/Elijas"><img src="assets/avatar-Elijas.png" alt="Elijas" width="80"></a> <a href="https://github.com/hugolmn"><img src="assets/avatar-hugolmn.png" alt="hugolmn" width="80"></a> <a href="https://github.com/jeremypeters"><img src="assets/avatar-jeremypeters.png" alt="jeremypeters" width="80"></a> <a href="https://github.com/kndl"><img src="assets/avatar-kndl.png" alt="kndl" width="80"></a> <a href="https://github.com/maciejkos"><img src="assets/avatar-maciejkos.png" alt="maciejkos" width="80"></a> <a href="https://github.com/pfbyjy"><img src="assets/avatar-pfbyjy.png" alt="pfbyjy" width="80"></a> <a href="https://github.com/0xRaduan"><img src="assets/avatar-0xRaduan.png" alt="0xRaduan" width="80"></a> <a href="https://github.com/zyuanlim"><img src="assets/avatar-zyuanlim.png" alt="zyuanlim" width="80"></a> <a href="https://github.com/lombardo-chcg"><img src="assets/avatar-lombardo-chcg.png" alt="lombardo-chcg" width="80"></a> <a href="https://github.com/sahanatvessel"><img src="assets/avatar-sahanatvessel.png" alt="sahanatvessel" width="80"></a></p>
+
+<h2>授權（License）</h2>
+
+<p>所有內容與圖片採用 <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0 授權</a>。</p>
+
+<p>程式碼採用 <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 授權</a>。</p>
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://github.com/humanlayer/12-factor-agents">12-Factor Agents - Principles for building reliable LLM applications</a>（2025-09-21）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>
