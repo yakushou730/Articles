@@ -164,6 +164,201 @@
 
 <ol class="entries" id="entries">
 
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|工作流|架構模式|實務技巧">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="12-factor-agents/12-factor-agents.zh-Hant.html">12 要素代理：打造可靠 LLM 應用程式的原則（12-Factor Agents: Principles for building reliable LLM applications）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">12-Factor Agents 主文：為什麼多數代理框架不適合直接上生產，以及讓 LLM 軟體夠格交到客戶手上的 12 條工程原則。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-09-21</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">工作流</span><span class="tag">架構模式</span><span class="tag">實務技巧</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|記憶與脈絡|提示工程">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="appendix-13-pre-fetch/appendix-13-pre-fetch.zh-Hant.html">要素 13：先把可能用到的脈絡一次抓齊（Factor 13: Pre-fetch all the context you might need）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">如果早就知道模型會呼叫哪個工具，就確定性地先呼叫它、把結果放進脈絡，別浪費來回的 token。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-05-10</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">記憶與脈絡</span><span class="tag">提示工程</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|工作流|自動化迴路|架構模式">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="brief-history-of-software/brief-history-of-software.zh-Hant.html">我們怎麼走到這裡：軟體簡史（How We Got Here: A Brief History of Software）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">從流程圖、DAG 編排器到代理迴圈：LLM 代理的技術脈絡，以及為什麼「迴圈到問題解決為止」行不通。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-09-19</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">工作流</span><span class="tag">自動化迴路</span><span class="tag">架構模式</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|工具鏈|架構模式">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-01-natural-language-to-tool-calls/factor-01-natural-language-to-tool-calls.zh-Hant.html">要素 1：從自然語言到工具呼叫（Factor 1: Natural Language to Tool Calls）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">把一句自然語言轉成描述 API 呼叫的結構化物件，交給確定性程式碼執行。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-05-10</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">工具鏈</span><span class="tag">架構模式</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|提示工程|實務技巧">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-02-own-your-prompts/factor-02-own-your-prompts.zh-Hant.html">要素 2：自己掌握提示（Factor 2: Own your prompts）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">不要把提示工程外包給框架：把提示當成一等公民的程式碼，才能測試、迭代與逆向工程。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-06-06</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">提示工程</span><span class="tag">實務技巧</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|記憶與脈絡|提示工程">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-03-own-your-context-window/factor-03-own-your-context-window.zh-Hant.html">要素 3：自己掌握脈絡視窗（Factor 3: Own your context window）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">一切都是脈絡工程：自訂脈絡格式、提高資訊密度、用更少 token 換到更好的 LLM 表現。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-07-15</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">記憶與脈絡</span><span class="tag">提示工程</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|工具鏈|架構模式">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-04-tools-are-structured-outputs/factor-04-tools-are-structured-outputs.zh-Hant.html">要素 4：工具就只是結構化輸出（Factor 4: Tools are just structured outputs）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">工具本質上只是 LLM 的結構化輸出：LLM 決定做什麼，你的程式碼控制怎麼做。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-05-10</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">工具鏈</span><span class="tag">架構模式</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|架構模式|記憶與脈絡">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-05-unify-execution-state/factor-05-unify-execution-state.zh-Hant.html">要素 5：統合執行狀態與業務狀態（Factor 5: Unify execution state and business state）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">能從脈絡視窗推斷出的執行狀態，就不必另外維護一套：單一真實來源帶來序列化、除錯、分岔等好處。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-09-19</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">架構模式</span><span class="tag">記憶與脈絡</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|架構模式|自動化迴路">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-06-launch-pause-resume/factor-06-launch-pause-resume.zh-Hant.html">要素 6：用簡單的 API 啟動、暫停、恢復（Factor 6: Launch/Pause/Resume with simple APIs）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">代理就是程式：使用者、應用程式與其他代理都該能用簡單的 API 啟動它，並在長時間操作時暫停、再從中斷處恢復。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-09-19</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">架構模式</span><span class="tag">自動化迴路</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|人為監督|工具鏈">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-07-contact-humans-with-tools/factor-07-contact-humans-with-tools.zh-Hant.html">要素 7：用工具呼叫聯絡真人（Factor 7: Contact humans with tool calls）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">把「聯絡真人」變成另一種工具呼叫：讓代理走出聊天介面，做出持久、可內省的多方工作流。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-05-10</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">人為監督</span><span class="tag">工具鏈</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|架構模式|人為監督">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-08-own-your-control-flow/factor-08-own-your-control-flow.zh-Hant.html">要素 8：自己掌握控制流（Factor 8: Own your control flow）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">自訂控制結構，讓代理能在工具「選定」與「實際執行」之間暫停，等待真人核准或長時間任務完成。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-07-17</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">架構模式</span><span class="tag">人為監督</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|記憶與脈絡|實務技巧">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-09-compact-errors/factor-09-compact-errors.zh-Hant.html">要素 9：把錯誤壓縮進脈絡視窗（Factor 9: Compact Errors into Context Window）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">把錯誤訊息加回脈絡視窗，讓 LLM 自我修復；再用連續錯誤門檻避免它空轉。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-05-10</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">記憶與脈絡</span><span class="tag">實務技巧</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|架構模式|實務技巧">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-10-small-focused-agents/factor-10-small-focused-agents.zh-Hant.html">要素 10：小而專注的代理（Factor 10: Small, Focused Agents）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">別做什麼都想管的巨型代理：把範圍壓在 3 到 20 步，脈絡視窗才管得住，LLM 表現才穩。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-05-10</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">架構模式</span><span class="tag">實務技巧</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|工具鏈|人為監督">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-11-trigger-from-anywhere/factor-11-trigger-from-anywhere.zh-Hant.html">要素 11：從任何地方觸發，在使用者所在之處與他碰面（Factor 11: Trigger from anywhere, meet users where they are）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">讓使用者從 slack、email、sms 觸發代理，也讓代理從同樣管道回覆；外迴圈代理則由事件與 cron 啟動。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-05-10</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">工具鏈</span><span class="tag">人為監督</span></span>
+    </div>
+  </li>
+
+  <li data-added="2026-09-20T01:29:52" data-tags="HumanLayer|代理|架構模式">
+    <div class="entry-head">
+      <h2 class="entry-title"><a href="factor-12-stateless-reducer/factor-12-stateless-reducer.zh-Hant.html">要素 12：把代理做成無狀態的 reducer（Factor 12: Make your agent a stateless reducer）</a></h2>
+      <span class="entry-date">2026-09-20 上架</span>
+    </div>
+    <p class="entry-desc">把代理想成無狀態的 reducer，對照 foldl 的摺疊運算。這一條純粹為了好玩。</p>
+    <div class="entry-meta">
+      <span>HumanLayer · 12-Factor Agents</span>
+      <span>原文 2025-04-28</span>
+      <span class="entry-tags"><span class="tag">HumanLayer</span><span class="tag">代理</span><span class="tag">架構模式</span></span>
+    </div>
+  </li>
+
   <li data-added="2026-09-18T16:51:27" data-tags="Martin Fowler|代理|程式碼品質|人為監督">
     <div class="entry-head">
       <h2 class="entry-title"><a href="mf-role-developer-skills/mf-role-developer-skills.zh-Hant.html">代理式編碼中開發者技能的角色（The role of developer skills in agentic coding）</a></h2>
