@@ -62,9 +62,24 @@ gh workflow run pages.yml --repo yakushou730/Articles --ref main
 
 ## 新增一篇文章
 
+### 步驟 0：先檢查原文連結
+
+翻譯前先確認這個來源尚未製作過文章：
+
+```bash
+python3 .claude/skills/generate-traditional-chinese-web-content/scripts/check_source_url.py '<原文網址>'
+```
+
+如果連結已存在，指令會以失敗結束，列出既有文章的路徑與標題；此時停止流程，
+不要抓取原文、建立新資料夾或覆蓋既有文章。檢查會忽略網址片段（`#...`）、
+移除結尾斜線，並保留 query string，避免把不同文件誤判成同一篇。
+
 ### 步驟 1：產生翻譯
 
-用 `/generate-traditional-chinese-web-content` skill，給它原文網址，它會產出：
+用 `/generate-traditional-chinese-web-content` skill，給它原文網址。skill 會在
+抓取原文前自動執行上述檢查；遇到重複連結會直接擋下流程。
+
+它會產出：
 
 ```
 <slug>/<slug>.zh-Hant.html      # 文章本體

@@ -32,15 +32,39 @@ with `claude-code-best-practices/assets/`.
 
 ## Procedure
 
+### 0. Reject duplicate source URLs
+
+Before fetching or translating anything, run the repository check with the exact
+source URL:
+
+```bash
+python3 .claude/skills/generate-traditional-chinese-web-content/scripts/check_source_url.py '<SOURCE_URL>'
+```
+
+If it exits non-zero, stop the workflow. Report that the source URL already has
+a translated article and include the existing article path and title from the
+command output. Do not fetch the page, create a folder, or overwrite an
+existing article. The check treats host names as case-insensitive, removes a
+trailing slash, ignores URL fragments, and preserves query strings because a
+query can identify a different source document.
+
+To audit the repository itself for duplicate source URLs, run:
+
+```bash
+python3 .claude/skills/generate-traditional-chinese-web-content/scripts/check_source_url.py --all
+```
+
 ### 1. Fetch the source
 
-Read the URL with the `read` tool. Do not use the browser for reading — `read`
-returns clean text. Open a browser tab only if `read` returns navigation
-chrome, a paywall stub, or missing body content.
+Only after the duplicate check succeeds, read the URL with the `read` tool. Do
+not use the browser for reading — `read` returns clean text. Open a browser tab
+only if `read` returns navigation chrome, a paywall stub, or missing body
+content.
 
 Capture the full source text. The translation MUST cover the whole document,
 including appendices, notes, captions, and acknowledgements. Never summarize,
-truncate, or "skip the boring parts" — the deliverable is a complete translation.
+truncate, or "skip the boring parts" — the deliverable is a complete
+translation.
 
 Record from the source: exact title, publisher/section kicker (e.g.
 `Engineering at Anthropic`), publication date, meta description, and every
