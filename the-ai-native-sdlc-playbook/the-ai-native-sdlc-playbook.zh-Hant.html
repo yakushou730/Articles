@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 原生的 SDLC 實戰手冊（The AI-Native SDLC playbook）</title>
+<meta name="description" content="Anthropic 的階段式 AI 原生 SDLC 實戰手冊：團隊如何用 Claude 規劃、設計、建置、測試、部署與維護軟體。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="工作流,記憶與脈絡,工具鏈,人為監督,自動化迴路">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">Claude · Enterprise AI / Claude Code</p>
+  <h1>AI 原生的 SDLC 實戰手冊（The AI-Native SDLC playbook）</h1>
+  <p class="pubdate">原文發布：2026-08-21</p>
+</header>
+
+<main id="main-content">
+<figure>
+  <img src="assets/423062049d4676b41d52b16068cbb5e21603190e-1000x1000.svg" alt="AI 原生的 SDLC 實戰手冊（The AI-Native SDLC playbook）封面插圖">
+</figure>
+
+<p class="lede">如何一個階段一個階段地用 AI 改造你的軟體開發生命週期。</p>
+
+<h2 id="sd-c1">程式碼不再是瓶頸（Code is no longer the bottleneck）</h2>
+
+<p>組織已經開始用 AI 寫程式，速度是一年前無法想像的，但圍繞程式碼的流程並沒有以同樣的步調改變。</p>
+
+<p>許多工程團隊仍保留同一套核准關卡、審查、交接與政策，這讓 <a href="https://claude.com/product/claude-code">Claude Code</a> 這類代理式寫程式方案帶來的生產力提升停滯下來。</p>
+
+<p>軟體開發生命週期（SDLC）是把軟體從想法帶到生產環境的流程。多數組織跑的都是同一套六階段流程的某個版本，涵蓋規劃、設計、建置、測試、部署與維護。傳統上，每個階段都是各自獨立的環節，由不同角色負責。產品經理寫需求，技術架構師把需求轉成設計，工程師依設計建置，受監管企業的 QA 團隊負責驗證，發布團隊負責上線，維運團隊監看正在運行的東西。工作在階段之間靠文件、票（ticket）與簽核移動。</p>
+
+<p>傳統的軟體開發生命週期（SDLC）流程繁重，為的是確保每一步都有問責與控制。然而，傳統 SDLC 設計的年代，最耗時也最花錢的階段是寫程式與實作，如今已經不是。PRD、估算儀式、產品安全審查之所以存在，是為了在可能長達數週、數月甚至數季的開發工作期間強制對齊。</p>
+
+<p>傳統 SDLC 的控制措施也預設每一步都由人執行。創造最多價值的組織，已經圍繞代理式 AI 現在能做的事重建流程，同時確保人仍在迴路中。這份指南會走過我們 Applied AI 團隊的幾項最佳實務，說明如何在 SDLC 的每個階段把 Claude 整合進組織內部，加快開發、讓流程跑得更快；這些做法來自與客戶合作的經驗。</p>
+
+<p>當程式碼不再是瓶頸，而建置階段跑得比傳統 SDLC 允許的還快，三件事會成立：</p>
+
+<ul>
+  <li>瓶頸移到建置階段左邊與右邊的步驟。主要是規劃、審查與測試、部署，這些仍以人的速度在跑。</li>
+  <li>控制措施開始與現實脫節，變得難以運作。逐行人工審查在人寫程式時說得通，一旦大部分 diff 由代理寫出來，就再也跟不上。</li>
+  <li>治理成本升高，因為例外狀況仍要走每週或每月開一次的會議與委員會。</li>
+</ul>
+
+<figure>
+  <img src="assets/44592f18.png" alt="圖示：傳統 SDLC 各階段長度不變，建置階段則壓縮成幾小時">
+  <figcaption><em>建置不再是限制條件，卡住的是它周圍那些以人的速度推進的步驟。人的速度階段維持原本長度，建置則壓縮到幾小時。</em></figcaption>
+</figure>
+
+<p>用安全瓶頸當例子。安全團隊的人力是依照人的產出配置的，當代理把程式碼產出放大好幾倍，審查佇列就會堆積，或者程式碼在審查不足的情況下上線。受監管的組織兩種結果都不能接受，因此安全與政策檢查必須跟上代理的腳步。</p>
+
+<p>要真正拿到代理式 AI 的生產力提升、同時確保安全，傳統 SDLC 生命週期需要的改造程度，跟實作階段已經經歷的一樣大。</p>
+
+<h3>目錄（Table of contents）</h3>
+
+<ol>
+  <li><a href="#sd-c1">程式碼不再是瓶頸</a></li>
+  <li><a href="#sd-c2">手法</a></li>
+  <li><a href="#sd-s1">階段 1：規劃</a></li>
+  <li><a href="#sd-s2">階段 2：設計</a></li>
+  <li><a href="#sd-s3">階段 3：建置</a></li>
+  <li><a href="#sd-s4">階段 4：測試</a></li>
+  <li><a href="#sd-s5">階段 5：部署</a></li>
+  <li><a href="#sd-s6">階段 6：維護</a></li>
+  <li><a href="#sd-c9">結語</a></li>
+</ol>
+
+<h2>什麼是 AI 原生的 SDLC？（What is an AI-native SDLC?）</h2>
+
+<p>AI 原生的 SDLC 是一套重新設計的流程，把舊有的控制目標與新的執行方式結合起來。流程不再是線性流動，而是一個迴路，AI 嵌入每個節點。AI 原生的 SDLC 推動自動交接、自動觸發後續手法，幫忙解決傳統 SDLC 各階段之間人工作業、笨重卡頓的交接問題。</p>
+
+<p>這個轉變你也會聽到別人叫它代理式 SDLC（agentic SDLC）、AI SDLC，或直接叫代理式軟體開發（agentic software development）。名稱不同，講的是同一件事。</p>
+
+<figure>
+  <img src="assets/53b010df.png" alt="圖示：AI 原生 SDLC 六個階段的轉變">
+</figure>
+
+<h3>AI 原生 SDLC 六個階段的轉變（The shifts across the six stages of an AI-native SDLC）</h3>
+
+<p>下表整理傳統 SDLC 與 AI 原生 SDLC 在 Claude 支援下的光譜兩端。多數組織落在兩欄之間。</p>
+
+<table>
+  <thead>
+    <tr><th>階段</th><th>傳統 SDLC</th><th>AI 原生 SDLC</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>規劃</td>
+      <td>需求由委員會蒐集，經過工作坊與簽核逐步收斂，再以人工撰寫</td>
+      <td>Claude 直接從來源綜整痛點，寫進 <code>intent.md</code>；這份文件人看得懂，機器也能據以行動</td>
+    </tr>
+    <tr>
+      <td>設計</td>
+      <td>規格由分析師撰寫，再由設計師解讀</td>
+      <td>需求與設計壓縮進同一場與代理的工作階段，標準以 skill 編碼、存在 git 裡，負責引導</td>
+    </tr>
+    <tr>
+      <td>建置</td>
+      <td>測試與程式碼以人工撰寫，文件在主開發完成後才補</td>
+      <td>測試與程式碼由 AI 產生，組織知識以版本控管、機器可讀的 <code>CLAUDE.md</code> 檔案與 skill 維護</td>
+    </tr>
+    <tr>
+      <td>測試</td>
+      <td>在階段邊界設 QA 關卡</td>
+      <td>持續評估（evals）貫穿實作過程</td>
+    </tr>
+    <tr>
+      <td>部署</td>
+      <td>人審查每一行程式碼，治理發生在審查週期裡，常常不一致</td>
+      <td>多層代理審查，人為審查保留給受監管與關鍵程式碼。治理在 AI 行動的當下執行，hook 就是核准關卡</td>
+    </tr>
+    <tr>
+      <td>維護</td>
+      <td>人盯著生產環境找 bug</td>
+      <td>代理監看線上部署。任何控制帶（control band）被突破，都會被診斷並寫回迴路，成為新的 <code>intent.md</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>右欄貫串的線索是「提交下來的產出物」（artifact）。每個階段結束時，都有一份產出物寫進版本控制（包括 <code>intent.md</code>、<code>spec.md</code>、<code>plan.md</code>、diff 與測試、帶著審查發現的 PR，以及事故紀錄），下一個階段從讀取它開始。早期階段的產出物以 .md 檔為主，因為產品負責人與代理可以讀同一份檔案、據以行動。從建置階段開始，產出物是程式碼與相關紀錄。這條提交鏈同時也是稽核軌跡：誰要了什麼、代理產出了什麼、誰核准了它。</p>
+
+<p>每個需要判斷的決策，責任仍在人身上。在代理式 SDLC 的世界裡，人的注意力跟著必須審查的產出物一起移動。</p>
+
+<blockquote>
+  <p>每個階段都提交一份下個階段讀得到的產出物。意圖、規格、計畫、diff 與審查發現合起來，就是稽核軌跡（audit trail）。</p>
+</blockquote>
+
+<h2 id="sd-c2">手法（Plays）</h2>
+
+<p>手法是這本實戰手冊的核心，分成六個非線性階段（規劃、設計、建置、測試、部署、維護），合起來涵蓋完整的生命週期。</p>
+
+<p>每個手法涵蓋：</p>
+
+<ul>
+  <li>改變了什麼；</li>
+  <li>怎麼開始；</li>
+  <li>實作的具體步驟；</li>
+  <li>治理考量；以及</li>
+  <li>怎麼衡量它有沒有用。</li>
+</ul>
+
+<p>這些步驟是模組化的，組織可以依自身需求，選擇在不同時間優先改造不同階段。每個手法都在「前置條件」下寫出依賴，依賴圖則進一步呈現。</p>
+
+<p>一個階段結束時提交一份產出物，這次提交啟動下一階段。一份被接受的 <code>intent.md</code> 觸發需求與設計那一輪，一份被核准的 <code>spec.md</code> 觸發規劃模式，一個合併的 PR 觸發管線，生產環境裡被突破的控制帶則寫出下一份 <code>intent.md</code>，迴路就這樣繼續。</p>
+
+<p>一開始，每一步都由你手動提示，終點狀態是一個迴路：每一份被接受的產出物都會觸發下一個關卡。人的注意力集中在關卡上，審查代理標記出來的東西，而不是每個階段都從零開始。</p>
+
+<figure>
+  <img src="assets/5d5a3c05.png" alt="依賴圖：各手法依階段排列，箭頭指出採用的先後順序">
+  <figcaption><em>手法依階段列出，箭頭給出採用的順序，兩者不是同一回事。先從任何沒有箭頭指向它的手法開始，它不需要任何前置。其他手法則要先把指向它的那些手法採用起來。</em></figcaption>
+</figure>
+
+<h2 id="sd-s1">01 規劃（Plan）</h2>
+
+<p>想法不再等人把它寫成文件。意圖（intent）在源頭用提出者自己的話記下，一次就成，成為版本控管的產出物，下一個階段可以直接據以行動。</p>
+
+<h3>以 intent.md 捕捉意圖（Capture as intent.md）</h3>
+
+<p><code>intent.md</code> 是軟體開發流程的起點，它可以從不同路徑進來。某個人有個想法、開了一張票，或是一則告警把事故帶到檯面上（見階段 6：維護）。</p>
+
+<p>當某個人有個想法，他和 Claude 一起腦力激盪，產出一份 markdown 原型規格（proto-spec）。在傳統 SDLC 裡，同一個人接下來必須說服產品團隊的成員，跟他一起或替他把它寫成正式文件。</p>
+
+<p>Claude 產生的原型規格人看得懂、受版本控管，下一個階段可以直接取用。這份原型規格存成 <code>intent.md</code>。</p>
+
+<p>不管意圖來自事件觸發還是代理，步驟都一樣：產品負責人在提交前審查並修正代理寫的 <code>intent.md</code>。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+想法要先經過待辦清單項目、使用者故事、故事點與精煉會議，才有人能據以行動。每次交接都轉移一次擁有權，所以送到工程團隊手上的東西，已經離提出者原本的意思好幾步。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+提出者與 Claude 腦力激盪，把結果寫成 <code>intent.md</code>，一份用提出者自己語言寫的原型規格。這份產出物記載想要什麼、為什麼要，以及在什麼限制之下。重複出現的流程則以 skill 編碼。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+無。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+給非工程背景同仁使用的 Claude 存取權（claude.ai 或 <a href="https://claude.com/product/cowork">Cowork</a>）；一份談定的 <code>intent.md</code> 模板；一個受版本控管、產品負責人會盯著的共用意圖存放處。單一產品最簡單的存放處，是產品 repo 裡的 <code>intent/</code> 資料夾。這樣安排能讓產出物鏈緊鄰由它衍生的程式碼。意圖只有橫跨多個儲存庫，另開一個專門的意圖 repo 才划算；在 monorepo 裡，它就是一個目錄。階段 3：建置的側欄會說明這個存放處，與已經在保管紀錄的 Jira 或需求工具之間是什麼關係。</p>
+
+<p>這些設定對平台或工程團隊來說是一次性的工作。需要一位技術團隊成員建立意圖存放處，並決定誰能寫入，因為貢獻者會來自組織各處。</p>
+
+<p>儲存庫建好之後，沒有 git 經驗的貢獻者不需要直接操作 git。接到版本控制系統（例如 GitHub）的連接器，就能讓他們從 claude.ai 或 Cowork 請 Claude 代為提交 markdown 檔案。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>提出者用自己的話向 Claude 描述問題。他可以描述今天做不到什麼、誰會受這個想法影響、更好的狀況長什麼樣，或什麼不在範圍內。不需要正式措辭。</li>
+  <li>腦力激盪到想法具體為止。Claude 會問分析師會問的問題：範圍、使用者、限制，以及成功是什麼樣子。</li>
+  <li>請 Claude 用組織的模板把結果寫成 <code>intent.md</code>。模板可以由技術團隊成員做成 skill，並經主管簽核。內容可以涵蓋問題、預期結果、受影響的使用者與系統、限制與待解問題。</li>
+  <li>提出者修正 Claude 理解錯的地方。</li>
+  <li>把 <code>intent.md</code> 提交到共用存放處。作者與時間戳一併進入紀錄，產品負責人從這裡接手這個想法。</li>
+</ol>
+
+<pre><code># Intent: claims status self-service
+Author: J. Ortiz (claims operations). Status: draft.
+
+## Problem
+Customers phone the contact center to ask where their claim is.
+Handlers spend roughly a third of call time on status-only queries.
+
+## Proposed outcome
+Customers see claim status, next step and expected date in the portal.
+
+## Affected users and systems
+Claims handlers, portal team, claims-core API.
+
+## Constraints
+No new PII in the portal session. Existing authentication only.
+
+## Open questions
+Do third-party loss adjusters need access too?</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>證據是那份被提交的 <code>intent.md</code>，裡面列出作者、時間戳與完整修訂歷史，並記錄在意圖存放處的 git 歷史裡。產品負責人負責核准，把意圖送進階段 2：設計的接受或拒絕決定，以合併或關閉審查的形式記錄下來。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+從第一次對話到 <code>intent.md</code> 提交完成的時間，從意圖存放處的 git 歷史讀取，那裡記錄了作者與時間戳。預期會從長達數週的引導與精煉循環，縮短到幾小時。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+存活率，也就是產品負責人接受進階段 2：設計、而非關閉的 <code>intent.md</code> 佔比。接受或拒絕的決定，以產出物合併或審查關閉的形式記錄下來。另外也看同一個變更在第一個 <code>spec.md</code> 提交之後，才對 <code>intent.md</code> 做的修改次數。</p>
+
+<h2 id="sd-s2">02 設計（Design）</h2>
+
+<p>需求與設計壓縮成一場工作階段。政策在規格寫出來的當下就被套用，而不是幾週後在審查裡才被發現。</p>
+
+<h3>需求與設計（Requirements and design）</h3>
+
+<p><code>intent.md</code> 經產品負責人核准後，Claude 接手這份被接受的 <code>intent.md</code>，產出需求與設計規格。這個過程由組織在品牌、安全、合規與 UX 方面的 <a href="https://code.claude.com/docs/en/skills">skill</a> 引導。</p>
+
+<p>產品負責人審查這份規格，但不負責寫它。這個流程的目標，是產出一份工程團隊能據以規劃的規格，並把需要留意的區域標記出來。</p>
+
+<p>前端工作是最清楚的例子。<code>intent.md</code> 被接受後，產品負責人依 <code>intent.md</code> 在 <a href="https://claude.com/product/design">Claude Design</a>（beta）裡畫出設計稿，來回調整，再匯出到 Claude Code 建置。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+需求與設計是兩個分開的階段，由不同團隊執行。分析師把想法形式化成需求，設計師再把需求解讀回設計。分開是為了問責，但速度慢，而且資訊會流失。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+兩個階段在同一場提示工作階段裡完成。Claude 接手 <code>intent.md</code>，產出需求與設計規格，以組織的 skill 為限制條件，並標記出需要留意的區域。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+寫一份 <code>intent.md</code>，並把品牌、安全、合規與 UX 政策寫成 skill。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一位有 Claude 存取權的產品負責人。不需要工程背景。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>產品負責人開一場工作階段，環境裡要有組織的 skill，並附上 <code>intent.md</code>。</li>
+  <li>產品負責人的提示指向 <code>intent.md</code>，點出限制條件，並要求標記出需要留意的區域。一開始先手動跑，接著把它寫成組織層級的斜線指令（slash command）。再往前一步，把意圖存放處接受 <code>intent.md</code> 設為觸發條件，用一個在合併時啟動的非互動式工作，載入組織的 skill 跑完這一輪，並以 pull request 的形式提交 <code>spec.md</code>（階段 5：部署的 CI/CD 手法涵蓋這部分的線路）。到了這個階段，產品負責人第一次參與的地方就是審查。</li>
+  <li>同一位產品負責人對照想法審查規格。這份規格有沒有解決當初說的問題？<code>intent.md</code> 裡的待解問題是被回答了，還是被往下帶？</li>
+  <li>先處理被標記出來的疑慮，因為那些是分析師原本會往上呈報的點。產品負責人在工程團隊看到規格之前，與對應的政策負責人一起解決每一項。</li>
+  <li>把 <code>spec.md</code> 與 <code>intent.md</code> 一起提交。這對檔案記錄了當初要什麼、以及決定了什麼。</li>
+  <li>產品負責人決定規格與意圖是否推進到建置，遇到組織歸類為較高風險的項目就諮詢技術主管。這個判斷永遠由一位人類同事下，而接受規格，就是啟動階段 3：建置裡規劃模式手法的動作。</li>
+</ol>
+
+<h4>範例：提示（What it looks like (the prompt)）</h4>
+
+<pre><code>Read the attached intent.md and produce a requirements and design spec for integrating it into our existing codebase. Apply the skills available to you so the plan conforms to our brand guidelines, security policies and UX standards. Document the spec fully as spec.md, ready to hand to the engineering team. Describe clearly any areas of concern, especially where you cannot satisfy contradicting policies.</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>現行政策在規格寫出來的當下就被讀取與套用，而不是幾週後在審查裡才被發現。組織的 skill 以限制條件的形式套用在規格上。規格本身、產出規格的提示，以及當下生效的 skill 版本，全都記錄在版本控制裡。產品負責人簽核規格，並把標記出的疑慮轉給具名的政策負責人。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+同一個變更從 <code>intent.md</code> 提交到 <code>spec.md</code> 提交之間經過的時間（兩個 git 時間戳），與過去需求加設計的循環相比。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+建置開始後的需求重工。計算日期落在同一個變更第一個 <code>plan.md</code> 提交之後的 <code>spec.md</code> 提交數。git log 會直接給你這個數字。</p>
+
+<h2 id="sd-s3">03 建置（Build）</h2>
+
+<p>沒有被接受的計畫，就不會有任何實作。組織知識變成代理讀得到的檔案，護欄（guardrails）以程式碼的形式運行，而不是靠習慣。</p>
+
+<h3>把 Claude Code 規劃模式當成預設起點（Claude Code plan mode as the default starting point）</h3>
+
+<p>工程師用<a href="https://code.claude.com/docs/en/permission-modes">規劃模式（plan mode）</a>開啟 Claude Code 工作階段，把階段 2：設計核准的 <code>spec.md</code> 交給 Claude，讓它訪談工程師，反覆調整計畫，直到工程師滿意為止。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+工程師讀完設計就開始寫程式。這個變更會怎麼做、動到哪些檔案與哪些測試，都留在工程師腦子裡，頂多寫在票的留言裡。其他人無從審查。審查者第一眼看到的就是完成後的 diff，到那時重工已經很慢。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+工作從一份書面計畫開始，由 Claude 在規劃模式裡產出，在那裡它可以讀程式碼庫而不改動任何東西。工程師在寫程式之前修正計畫，被核准的版本提交為 <code>plan.md</code>，供後續階段核對。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+意圖產出物（<code>intent.md</code> 或 <code>spec.md</code>）如果存在的話，另外 <code>CLAUDE.md</code> 也有幫助。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+能存取該儲存庫的 Claude Code。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>工程師與 Claude 以規劃模式開啟工作階段。</li>
+  <li>工程師把 <code>intent.md</code> 與 <code>spec.md</code> 交給 Claude，要求一份實作計畫，點名會改動的檔案、工作的順序，以及能證明它站得住腳的測試。</li>
+  <li>追問這份計畫：這個變更可能弄壞什麼、哪一步風險最高、Claude 還考慮過哪些最後沒選的做法。</li>
+  <li>反覆調整，直到一位完全沒看過這段對話的工程師，光憑計畫就能實作這個變更。</li>
+  <li>把核准的計畫提交為 <code>plan.md</code>。計畫加入稽核軌跡，而 PR 審查手法（階段 5：部署）會拿最終的 diff 與它核對。</li>
+  <li>接受計畫，讓 Claude 實作。計畫夠扎實的話，實作往往一次就過。</li>
+  <li>實作偏離計畫時，在同一次提交裡更新 <code>plan.md</code>。可以考慮用 hook 強制兩者保持同步。</li>
+</ol>
+
+<h4>範例：plan.md（What it looks like (plan.md)）</h4>
+
+<pre><code># Plan: claims status self-service (from intent.md 2026-06-02)
+
+## Files that change
+portal/src/claims/StatusPanel.tsx (new), claims-api/routes/status.py,
+claims-api/tests/test_status.py
+
+## Order of work
+1. Add the status endpoint behind existing auth.
+2. Panel against the endpoint.
+3. Wire into the portal nav.
+
+## Risks
+The claims-core API rate-limits at 50 rps; the panel must cache.
+
+## Proof
+test_status.py covers the four claim states; screenshot matches the
+approved mock.</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>設計審查發生在任何程式碼產生之前，那時改變方向還只是編輯一份文件。規劃模式本身就強制了這件事，因為在工程師接受計畫之前，Claude 不能編輯檔案。計畫與修訂紀錄，連同誰接受了它，都留下紀錄。例行變更由工程師核准，組織歸類為較高風險的項目則送交技術主管或架構師。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+第一次實作就合併的變更佔比，以及從計畫核准到 PR 合併的時間，所需資料都在 PR 的中繼資料裡。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+每個變更的重工循環次數，同樣取自 PR 的中繼資料，以及合併的 diff 與已提交的 <code>plan.md</code> 還對得上的比例。</p>
+
+<h3>Claude Code 自動模式（Claude Code on auto mode）</h3>
+
+<p>Claude Code 也能以自動模式運行：工程師核准計畫，來回調整到滿意之後，Claude 套用每一項變更時不再逐次跳出提示。隨著後續手法的護欄成熟（調校過的 <code>CLAUDE.md</code>、把政策編碼進去的 skill、擋掉不安全動作的 hook，以及 Claude 跑得動的測試套件），自動接受會成為例行工作的預設值：<code>spec.md</code> 寫得精準、影響半徑小，而且測試已經覆蓋到那段程式碼。</p>
+
+<p>轉變的方向，已經從使用者盯著代理做修改、審查每一個動作，轉向在更長的自主工作階段之後審查產出物。搭配 worktree 使用時，自動接受模式進一步讓個人與團隊層級的平行作業成為可能，也是讓 SDLC 自主運行、把迴路閉合起來的基礎，階段 6：維護會說明這件事。</p>
+
+<blockquote>
+  <h3>側欄：遺留系統與真實來源（Sidebar: Legacy systems and the source of truth）</h3>
+  <p><em>適用於流程產出的每一份產出物。</em></p>
+  <p>既有的 SDLC 流程大概已經在追蹤產出物，只是不是存在 markdown 檔案裡。工作項目可能在 Jira，需求可能在某個內建法規可追溯性的工具裡，設計在 Figma，變更核准則在變更審查委員會（change board）。這些系統很難被取代，因為稽核人員與監管機關已經接受它們，其他團隊也依賴它們，所以 AI 原生的 SDLC 必須繞著既有的東西長出來。</p>
+  <p>轉換到 AI 原生 SDLC 時，流程產出的每一份產出物都要指定一個系統當作真實來源（source of truth），其餘系統只保留副本或連回原件的連結。底下的幾種配置都能做到只有一個真實來源，選擇則依產出物而不同：</p>
+  <p><strong>以 repo 為真實來源。</strong>markdown 產出物是權威紀錄，遺留系統則引用提交裡的檔案。對工程驅動的組織來說，這可能是最乾淨的配置之一，因為所有紀錄都在同一個工具裡，只有一個時間戳權威。</p>
+  <p><strong>以遺留系統為真實來源。</strong>Jira、ServiceNow 或需求工具保管權威紀錄，markdown 產出物是工作副本。Claude 在工作階段開始時讀取紀錄，並在產出規格或計畫的同一場工作階段裡，透過 <a href="https://code.claude.com/docs/en/mcp">MCP</a> 連接器把結果寫回去。</p>
+  <p><strong>以連結為最低標準。</strong>所有產出物都註明紀錄 ID，所有遺留紀錄都包含 markdown 檔案的提交 SHA。轉換到 AI 原生 SDLC 時，從連結開始是不錯的起點，代價是接受有兩個真實來源。</p>
+  <p>遺留系統與 markdown 優先的系統可以並存，只要兩者之間有連結，或是指定其中一個為真實來源。</p>
+</blockquote>
+
+<h3>CLAUDE.md</h3>
+
+<p><a href="https://code.claude.com/docs/en/memory"><code>CLAUDE.md</code></a> 把一位新進同仁需要的脈絡交給 Claude，涵蓋慣例、指令、架構，以及團隊最常看到的錯誤。過去放在人腦與 wiki 上的知識，變成代理每次工作階段開始時都會讀的檔案，由整個團隊維護，每次出錯就迭代一次。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+無。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一個 repo、裝好的 Claude Code，以及一位熟悉這個程式碼庫的工程師。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>在 repo 裡執行 <code>/init</code>。Claude 依它找到的東西產生一份起頭的 <code>CLAUDE.md</code>。</li>
+  <li>把產生的檔案刪到只剩新進同仁第一天需要的內容。保留建置、測試與 lint 指令，保留真正重要的慣例，以及 Claude 一再弄錯的事。</li>
+  <li>把 <code>CLAUDE.md</code> 提交進 repo 根目錄的 git，讓整個團隊共用同一個版本，改動也像程式碼一樣送審。</li>
+  <li>這裡有一條好用的工作規則：Claude 同一個錯誤犯第二次，就把修正寫進 <code>CLAUDE.md</code>。</li>
+  <li>控制在一頁以內，因為 Claude 每次工作階段開始都會整份讀完，任何過時的內容都在白白佔用脈絡。</li>
+</ol>
+
+<h4>範例：CLAUDE.md（What it looks like (CLAUDE.md)）</h4>
+
+<pre><code># Payments service
+
+## Commands
+- Build: make build
+- Test: make test (unit), make itest (integration, needs docker)
+- Lint: make lint (runs in CI; fix before pushing)
+
+## Conventions
+- Java 21, Spring Boot 3. No new Lombok.
+- Money is always BigDecimal, never double.
+- Every endpoint needs an integration test in src/itest.
+
+## Architecture
+- api/ holds REST controllers, core/ holds domain logic,
+  adapters/ talks to external systems.
+- Kafka events are defined in schemas/; never edit generated classes.
+
+## Things Claude gets wrong
+- Do not bump dependency versions; the platform team owns them.
+- The legacy v1/ package is frozen; changes go in v2/.</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p><code>CLAUDE.md</code> 受版本控管，所以代理據以工作的指令可供審查與稽核。團隊慣例透過這個檔案套用，對檔案的改動記錄在 git 歷史裡，程式碼擁有者（code owner）在 PR 審查中核准這些改動。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+Claude 重複犯下 <code>CLAUDE.md</code> 本該攔下的錯誤的頻率。修正內容或對 <code>CLAUDE.md</code> 的改動，應該能在 git 歷史裡追蹤到。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+從 PR 歷史看團隊新成員第一個 PR 合併所花的時間。</p>
+
+<h3>用 skill 承載組織知識（Skills as institutional knowledge）</h3>
+
+<p>skill 是組織把內部知識變得可運作的方式。指令明確、受版本控管、大範圍套用，政策變動時集中更新。經驗法則是：必須一致套用的組織知識才寫成 skill；屬於 <code>CLAUDE.md</code> 或提示的內容，不要寫成 skill。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+不需要。有一份 <code>CLAUDE.md</code> 會有幫助，因為它把代理的工作知識留在 repo 裡，但 skill 並不依賴它。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一項有具名負責人、且已寫下真實來源的政策。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>挑一項目前執行不一致的知識。可能是安全標準、API 設計慣例，或品牌規則。</li>
+  <li>把它寫成 skill：一個資料夾，裡面放 <code>SKILL.md</code>，frontmatter 說明它什麼時候觸發，本文說明要做什麼。由工程師從政策負責人的真實來源寫出來，可以請 Claude 幫忙。</li>
+  <li>把 skill 放在 repo 的 <code>.claude/skills/&lt;name&gt;/</code>，讓它跟著程式碼一起出貨；或透過<a href="https://code.claude.com/docs/en/plugin-marketplaces">外掛（plugin）</a>在組織內散布。</li>
+  <li>測試 skill 會不會觸發。請 Claude 用不同方式做相關任務，確認每一次 skill 都有載入。</li>
+  <li>政策變動時，改 skill，並讓政策負責人簽核這次改動。</li>
+  <li>工程師在下一次工作階段就會自動拿到新版本。</li>
+</ol>
+
+<h4>範例：.claude/skills/secure-api-review/SKILL.md（What it looks like）</h4>
+
+<pre><code>---
+name: secure-api-review
+description: Apply the API security standard. Use whenever creating or
+  modifying an external-facing endpoint, reviewing API code, or
+  generating an OpenAPI spec.
+---
+# Secure API review
+
+When you create or change an API endpoint:
+1. Authentication: every endpoint requires the gateway JWT;
+   no anonymous routes outside /health.
+2. Input validation: validate request bodies against the OpenAPI
+   schema and reject unknown fields.
+3. Audit: every state-changing endpoint emits an audit event with
+   actor, action, entity and timestamp.
+4. Data classification: fields tagged pii in the schema must never
+   appear in logs or error messages.
+
+Run scripts/check-endpoints.sh and include its output in your summary.</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>skill 是一種控制，屬於建議性質的控制。它讓 Claude 在寫程式碼的當下比較可能套用政策，但沒有任何機制強制一場工作階段必須遵守。必須永遠成立的政策，需要在 skill 後面加上確定性的東西，例如擋掉動作的 hook，或在 PR 階段重新檢查政策的審查輪。skill 讓違規變少，hook 讓違規幾乎不可能發生。skill 的每次叫用都記錄在工作階段追蹤裡，政策負責人像審查程式碼一樣審查 skill 的改動。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+從政策負責人核准政策變更，到更新後的 skill 合併所花的時間，取自 skill 資料夾上的 PR。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+PR 審查中引用該政策的發現數，一旦 skill 在寫程式碼時就套用政策，這個數字應該往零下降。如果沒有往零走，可能是 skill 沒有觸發，或文字已經偏離官方政策。</p>
+
+<h3>用 hook 當建置期護欄（Hooks as build-time guardrails）</h3>
+
+<p>skill 是建議性質的控制，<a href="https://code.claude.com/docs/en/hooks">hook</a> 則是它後面那一層確定性的機制。Claude 在實作期間的動作大多是檔案編輯與 shell 指令，所以建置階段是 hook 最常被觸發的地方。</p>
+
+<p>建置期的 hook 可以：</p>
+
+<ul>
+  <li>擋掉對受保護路徑的編輯，例如生成的類別或凍結的套件；</li>
+  <li>在檔案編輯後執行 formatter 與 linter，讓偏離不會累積；</li>
+  <li>把憑證擋在 diff 之外。</li>
+</ul>
+
+<p>政策必須無例外成立的那些 skill，背後都要有 hook。hook 會在每一個符合條件的動作上執行，所以建置期的 hook 應該快，而且只針對改動的檔案。像是完整測試套件這種較重的檢查，屬於提交或 PR 階段。</p>
+
+<p>需要向人要核准的 hook，屬於階段 5：部署的關卡，因為建置期間跳出核准提示，會把人重新放回所有平行工作階段的關鍵路徑上。</p>
+
+<h3>平行工作階段與子代理（Parallel sessions and subagents）</h3>
+
+<p>一位工程師可以同時推進好幾條工作流。</p>
+
+<p>平行工作階段是另一個完整的 Claude Code 實例，在自己的 <a href="https://code.claude.com/docs/en/worktrees">git worktree</a> 裡做另一項任務。每個獨立的工作階段對其他工作階段一無所知，唯一的共用點就是操作它們的工程師。</p>
+
+<p><a href="https://code.claude.com/docs/en/sub-agents">子代理（subagent）</a>在單一工作階段內運行，是一個有自己脈絡視窗與工具限制的範圍化助手，適合在多項任務中重複出現的工作，例如驗證應用程式是否照預期運行。</p>
+
+<p>平行工作階段提高一位工程師同時在跑的任務數，子代理則讓每個工作階段專注在自己的任務上。工程師的工作是操作與審查全部。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+一位工程師一次做一項任務，一天或一週裡有相當比例的時間花在建置、測試與審查上。等待時切換到別的任務是可行的，但脈絡切換夠累，很少人會這樣選。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+一位工程師同時跑好幾個 Claude 工作階段，各自在自己的 worktree 裡做自己的任務。重複性的工作變成有自己脈絡與工具限制的子代理。工程師的工作轉向編排，最終轉向打造並監看迴路。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+<code>CLAUDE.md</code>，因為所有工作階段都會讀這個檔案。回饋迴路（階段 4：測試）在這裡也有幫助，因為工作階段能驗證自己的工作，工程師需要投入的監督就少了。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一個 git 儲存庫，因為隔離來自 worktree；以及調校過的權限設定，讓工作階段不會卡在核准提示上，等待組織認為安全的指令。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>工程師把工作切成會動到不同檔案的任務，用規劃模式手法（階段 3：建置）產出的計畫看出哪裡彼此獨立。共用檔案的任務放在同一個工作階段裡，依序執行。</li>
+  <li>每個平行任務有自己的 worktree，例如一個終端機跑 <code>claude --worktree feature-auth</code>，另一個跑 <code>claude --worktree fix-rate-limit</code>。worktree 是在自己分支上的獨立檢出，能避免工作階段在檔案上互相碰撞。</li>
+  <li>兩到三個工作階段是合理的起點。實際的上限取決於一個人能好好審查幾條工作流，所以只在審查還跟得上的時候增加工作階段。</li>
+  <li>把重複性的工作變成子代理，定義在 <code>.claude/agents/</code> 的 markdown 檔案裡，每個都有名稱、說明什麼時候使用，以及它能動到的工具。例子包括：在主要代理完成後清掉不必要複雜度的程式碼簡化者、負責跑起應用程式並檢查行為的驗證者，以及探索程式碼庫後回報、不把主要脈絡灌爆的研究者。把這些定義提交進 git，讓整個團隊共用。</li>
+</ol>
+
+<h4>範例：.claude/agents/verifier.md（What it looks like）</h4>
+
+<pre><code>---
+name: verifier
+description: Runs the app and checks the change works before the session
+  reports done
+tools: Bash, Read
+---
+Start the app with make run. Exercise the changed behavior and the two
+nearest neighboring flows. Report what you ran, what you saw, and any
+behavior that does not match plan.md. Do not fix anything; report only.</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>工作階段越多，產出越多，所以控制必須來自 repo 裡的設定。那裡的 hook 與權限設定套用到所有工作階段，而一個工作階段做了什麼會留下紀錄，歸屬到執行的工作階段由哪位工程師啟動。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+在審查品質維持的前提下，每位工程師的並行工作階段數，從 OpenTelemetry 匯出資料計算；以及一天中花在操作而非等待的比例。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+每位工程師每週合併的變更數，與依 PR 歷史算出的重工率一起看。</p>
+
+<h2 id="sd-s4">04 測試（Test）</h2>
+
+<p>每個工作階段在人看到之前先檢查自己的工作，而引導代理的設定，也要像它寫出來的程式碼一樣接受回歸測試。</p>
+
+<h3>給 Claude 一條回饋迴路（Give Claude a feedback loop）</h3>
+
+<p>永遠給 Claude 一個驗證自己工作的方式，不管是測試、建置，還是截圖比對。工作階段會在工程師看到之前先檢查自己的工作、修掉自己的錯誤。</p>
+
+<p>回饋迴路不該與驗證者子代理（階段 3：建置）混為一談。回饋迴路會在整個任務中跟著工作跑很多次。驗證者子代理則是包裝最後一次檢查的其中一種方式：在工作階段認為做完了之後，用一個全新的脈絡視窗跑一遍。這樣一來，判決就不會被產出程式碼的那些假設影響。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+程式碼能用的訊號來得很晚。CI 幾分鐘後、測試人員幾天後、生產環境幾週後。當代理在產出程式碼，遲來的訊號意味著得有人檢查代理的全部產出，而那個人就成了瓶頸。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+工作階段在有人看到之前，先拿到一個檢查自己工作的方式。跑測試、跑建置、截圖。Claude 會迭代到檢查通過為止，所以送到工程師手上的東西已經通過了。設定這條迴路由執行該工作階段的工程師負責，底下的步驟就是為他寫的。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+無。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一套測試與一個建置，各自用一行指令就能在本機跑起來。UI 工作還需要讓 Claude 看得到結果，這很關鍵：一個瀏覽器工具，或透過 MCP 接進來的截圖工具。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>如果今天檢查工作要跑一串指令、還要知道一些環境細節，就把它包成單一目標，例如 <code>make test</code> 或 <code>npm test</code>，失敗時回傳非零值。</li>
+  <li>在 <code>CLAUDE.md</code> 的 Commands 區段，逐條列出每個指令，並附上正常輸出長什麼樣子的範例。</li>
+  <li>把目標講清楚、講成可以量化的，讓 Claude 不必問你就能檢查工作，例如「test_status.py 裡的測試全部通過」、「截圖與附上的設計稿相符」，或「端點回傳 200，並帶有新欄位」。</li>
+  <li>修 bug 時，先寫失敗的測試。請 Claude 把 bug 重現成一個測試，跑它，確認它因為你預期的原因失敗。提交那個測試。接著才請 Claude 在不改測試的前提下讓它通過，並用最後一步提到的測試檔 hook 強制這項限制。一個在修復之前就存在、而代理無法改寫的測試，就是 bug 已經消失的證明。</li>
+  <li>UI 工作要用視覺檢查把迴路閉合起來。給 Claude 一個瀏覽器或截圖工具，給它設計稿，讓它迭代。實作、截圖、比對、調整。兩三輪很正常，而且每一輪結果都應該比上一輪好。</li>
+  <li>把驗證納入「完成」的定義。指令放在 <code>CLAUDE.md</code> 裡。回報任務完成前先跑測試，並把輸出貼出來。</li>
+  <li>最後，迴路本身也需要保護，因為正在修程式的代理，不能有辦法削弱對那段程式的檢查。一個在修復任務期間擋掉測試檔編輯的 hook 可以做到這件事。替代方案是在審查時檢查 diff，拒絕任何動到測試的改動。</li>
+</ol>
+
+<h4>範例：CLAUDE.md 的驗證區塊（What it looks like）</h4>
+
+<pre><code>## Verifying your work
+
+- Build: make build (must finish with "Build succeeded")
+- Test: make test (all green; never skip or delete a failing test)
+- Lint: make lint (zero warnings)
+
+Run all three before reporting any task complete, and paste the output.
+If a test fails, fix the code, not the test.</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p><strong>強制執行了什麼</strong><br>
+任務回報完成前必須先驗證，以及在修復期間擋掉代理編輯測試檔；組織要求這些必須有保證的地方，就以 hook 實作。</p>
+
+<p><strong>證據是什麼</strong><br>
+Claude 執行並貼上的 <code>make test</code> 實際輸出、建置紀錄，或截圖比對，所以證據來自工具鏈本身。</p>
+
+<p><strong>記錄在哪裡</strong><br>
+工作階段逐字稿，由 OpenTelemetry 匯出資料轉送到組織的可觀測性堆疊；以及 PR 的檢查執行結果，審查者與後續任何稽核者都看得到。</p>
+
+<p><strong>誰核准</strong><br>
+審查 PR 的程式碼擁有者。機械性的證據已經附上，所以他能專注在意圖與風險上。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+代理撰寫變更的 CI 首次通過率，CI 系統本身就支援這個數字。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+每個 PR 的審查時間（取自 PR 中繼資料），當測試攔下以往由審查者攔下的問題，這個數字應該下降；以及從事故追蹤系統取得的變更失敗率。</p>
+
+<h3>CI 裡的持續評估（Continuous evals in CI）</h3>
+
+<p>評估（evals）是 AI 原生版的階段關卡 QA。實務上，這是一套在代理設定有變動時就跑的套件。換上新模型或重寫提示時，評估套件會說明代理是否仍以相同標準完成工作。</p>
+
+<p>評估應該當成一套活的套件。模型變強之後，原本有鑑別力的案例會失去作用，必須加入來自持續監控的新案例。</p>
+
+<p>依使用情境不同，有些團隊可能偏好離線、以固定節奏跑這些評估，而不是每次變更都跑。底下的步驟講的是持續評估。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+<code>CLAUDE.md</code> 與回饋迴路（階段 4：測試）。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+能以非互動方式執行 Claude Code 的 CI，以及一把有評估執行預算的 API key。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>平台工程師從近期工作中收集 20 到 50 項真實任務，連同預期或已被接受的結果。</li>
+  <li>把每項任務寫成一個評估，也就是提示加上定義何謂可接受的檢查（測試通過、lint 乾淨、行為不變、遵守政策）。</li>
+  <li>套件以非互動方式在 CI 裡跑，依排程執行，也在 <code>CLAUDE.md</code>、skill 或 hook 有任何變動時執行，因為這些設定會引導代理，值得像程式碼一樣接受回歸測試。</li>
+  <li>用結果來管制設定變更。讓通過率下降的 skill 改動，要先經過審查才能合併。</li>
+  <li>每一則生產事故都變成一個評估，由擁有該事故的團隊撰寫，並留在套件裡當作回歸測試。</li>
+</ol>
+
+<h4>範例：.github/workflows/agent-evals.yml（What it looks like）</h4>
+
+<pre><code>name: Agent evals
+on:
+  pull_request:
+    paths: ['CLAUDE.md', '.claude/**']
+  schedule:
+    - cron: '0 2 * * *'
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install -g @anthropic-ai/claude-code
+      - name: Run eval suite
+        env:
+          ANTHROPIC_API_KEY: $&#123;&#123; secrets.ANTHROPIC_API_KEY &#125;&#125;
+        run: |
+          for eval in evals/*.json; do
+            claude -p "$(jq -r '.prompt' $eval)" \
+              --allowedTools "Read,Edit,Bash(make test)" \
+              --output-format json > result.json
+            ./evals/check.sh "$eval" result.json
+          done</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>評估給 QA 一個跟得上代理產出的關卡。通過率門檻以合併檢查的形式強制執行，每次執行都有紀錄，方便跨時間比較結果，而設定變更由負責該設定的團隊核准。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+每一次執行由套件回報的評估通過率趨勢，以及一則生產事故變成永久評估所花的時間。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+CI 攔下的回歸，對比從事故追蹤系統取得的、在生產環境才發現的回歸。</p>
+
+<h2 id="sd-s5">05 部署（Deploy）</h2>
+
+<p>審查雙向跑，治理在代理行動的當下執行。代理做得到生產關卡之前的所有事，關卡之後一件都不做。</p>
+
+<h3>PR 審查迴路裡的 AI（AI in the PR review loop）</h3>
+
+<p>Claude 既給審查，也收到審查。它依組織政策審查進來的 PR，也處理自己 PR 上的審查留言。這讓工程師能在 PR 審查中專注於行為，也就是判斷意圖與風險。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+審查量能是依人的產出規劃的。一個 PR 要等審查者把它整份讀完，審查品質隨審查者的負載起伏，作者在後面追，待辦卻一直長。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+所有 PR 都拿到同一組審查輪，發現依嚴重程度排序。人的注意力往上移一層，變成看這個變更有沒有做到計畫的意圖，以及風險是否可接受。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+更新過的 <code>CLAUDE.md</code>（來自階段 3：建置）；如果審查輪要強制執行成文政策，則需要 skill；以及定義好的子代理。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一個裝好 Claude 整合的 repo，可以是管理員啟用的託管 <a href="https://code.claude.com/docs/en/code-review">Code Review</a>（研究預覽）服務，或是在自家 CI 裡跑的 <a href="https://code.claude.com/docs/en/github-actions">claude-code-action</a>；需要時模型呼叫走 AWS Bedrock、Google Vertex 或 Microsoft Foundry（CI/CD 手法涵蓋部署選項）。要求程式碼擁有者核准的分支保護政策也值得設定。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>託管的 Code Review 服務是最快的起點。管理員啟用它並選擇儲存庫。需要控制管線，或想讓 API 呼叫走自家雲端合約時，就用 claude-code-action 在自己的 CI 裡跑審查（CI/CD 手法涵蓋這部分的線路）。</li>
+  <li>技術主管把審查政策寫成 repo 根目錄的 <code>REVIEW.md</code>，依組織在意的面向分成幾輪：bug 與邏輯錯誤；安全與弱點；對照規格（來自需求手法的 <code>spec.md</code>）、實作計畫（來自規劃模式手法的 <code>plan.md</code>）與設計原則的合規性。<code>REVIEW.md</code> 也定義什麼算 Important、什麼算 Nit，以及什麼要略過。</li>
+  <li>技術主管設定人為門檻。發現本身不會核准或擋下 PR，分支保護仍要求程式碼擁有者核准。想用發現來管制合併的平台工程師，可以讀取檢查執行發布的嚴重程度計數，那是一份機器可讀的統計。</li>
+  <li>當審查者或作者在審查留言裡標記 <code>@claude</code>，Claude 會處理該留言並推上修正。PR 討論串同時記錄了要求與改動。這個修正迴路透過 claude-code-action 運行。在託管服務裡，留言 <code>@claude review</code> 則是要求一次新的審查。對於 Claude 開的 PR，可以再進一步，讓 Claude 一路照顧到合併。團隊會把這個迴路包成自訂斜線指令，掃過 PR 上未解決的審查留言與失敗的檢查，處理它們並推上修正，直到 PR 全綠、只等程式碼擁有者核准。</li>
+  <li>審查發現會回饋進 <code>CLAUDE.md</code>。當審查第二次標出同一個錯誤，修正就在那次審查中寫進 <code>CLAUDE.md</code>；因為審查會讀 <code>CLAUDE.md</code>，從下一個 PR 開始就會攔下這個錯誤。審查也會標出某個變更已經讓 <code>CLAUDE.md</code> 過時。</li>
+  <li>每個月一次，技術主管透過為發現評分來調校設定，讓審查者進步，並在 <code>REVIEW.md</code> 裡限制 Nit 的數量。生成的路徑，以及 CI 已經在強制執行的項目，都排除在外。</li>
+</ol>
+
+<h4>範例：REVIEW.md（What it looks like）</h4>
+
+<pre><code># Review instructions
+
+## Passes
+Run three passes and tag each finding with its pass:
+- Bugs: logic errors, broken edge cases, subtle regressions
+- Security: injection risks, authentication gaps, PII in logs
+- Compliance: the change matches spec.md, plan.md and our design principles
+
+## What Important means here
+Reserve Important for findings that would break behavior, leak data
+or breach a policy. Style and naming are nits.
+
+## Cap the nits
+Report at most five nits per review; summarize the rest as a count.
+
+## Do not report
+Generated files under src/gen/ and anything CI already enforces.</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>職責分離（separation of duties）得以保留，因為寫出程式碼的代理沒有辦法核准它。<code>REVIEW.md</code> 裡的審查政策套用到所有 PR，而發現、修正、評分與核准都記錄在 PR 歷史裡，所以 PR 本身就是稽核紀錄。核准來自人，透過分支保護執行，並以發現為參考。</p>
+
+<p>想了解這些控制在生產規模下如何組合，見<a href="https://claude.com/blog/how-anthropic-secures-its-ai-native-software-development-lifecycle">Anthropic 如何保護自家的 AI 原生 SDLC</a>。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+首次審查的時間，應該降到幾分鐘；以及審查留言不必有人碰觸分支就解決的佔比，資料直接存在 Git 上。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+合併前攔下的缺陷與弱點，對比流到生產環境的那些，取自 PR 歷史與事故追蹤系統。</p>
+
+<h3>用 hook 當核准關卡（Hooks as approval gates）</h3>
+
+<p>建置階段用 hook 當護欄，在沒有人參與的情況下放行或擋下動作（階段 3：建置）。hook 也可以發問，讓動作暫停到特定的人核准為止，這正是發布關卡需要的。</p>
+
+<p>這個手法放在階段 5：部署，是因為發布關卡是最清楚的案例，但 hook 並不是部署專屬：Claude 在哪裡行動，它就在哪裡運行。例如在階段 3：建置，hook 可以在沒有變更票的情況下擋掉對 migration 與基礎設施的編輯；在階段 4：測試，可以阻止代理在修復任務中編輯測試檔。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+無。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一份成文的清單，列出變更流程要求哪些核准。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>工程主管會同變更管理與合規團隊，列出必須保留下來的人為核准關卡，例如變更管理簽核、發布授權，以及對受保護路徑的編輯。</li>
+  <li>平台工程師把每個關卡表達成 hook，也就是在 Claude 行動前執行的腳本，可以放行、發問或擋下。</li>
+  <li>團隊層級的 hook 放進 git 裡的 <code>.claude/settings.json</code>，不可協商的 hook 放進由平台或 IT 管理員擁有的受管理設定（managed settings），個別工程師無法關掉它們。</li>
+  <li>擋下時應該說明理由，所以當 hook 中止一個動作，原因與取得核准的路徑會出現在 Claude 的輸出裡。</li>
+</ol>
+
+<h4>範例：.claude/settings.json（What it looks like）</h4>
+
+<pre><code>{
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": "Bash",
+          "hooks": [
+            { "type": "command",
+              "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/production-gate.sh" }
+          ]
+        }
+      ]
+    }
+}</code></pre>
+
+<h4>以及關卡本身（.claude/hooks/production-gate.sh）</h4>
+
+<pre><code>#!/bin/bash
+# Production deploys require a named release authorization
+cmd=$(jq -r '.tool_input.command' < /dev/stdin)
+if [[ "$cmd" == *"deploy"* && "$cmd" == *"production"* ]]; then
+   if [ -z "$RELEASE_APPROVAL" ]; then
+     echo "Production deploys need a release authorization." >&2
+     exit 2 # exit 2 blocks the action; the message goes to Claude
+   fi
+fi
+exit 0</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>hook 就是核准關卡。關卡的條件每一次、對每個人都執行。放行與擋下的決定連同時間戳記錄下來。關卡也定義了什麼算核准，是已核准的變更票，還是發布經理的簽核。</p>
+
+<blockquote>
+  <h3>實作範例：受監管企業的受管理設定（Worked example: Managed settings for a regulated enterprise）</h3>
+  <p><em>由平台團隊透過 MDM 或管理主控台部署；工程師無法編輯或覆寫其中任何一項。</em></p>
+<pre><code>{
+  "permissions": {
+    "deny": [
+      "Read(.env*)", "Read(./secrets/**)",
+      "WebFetch", "Bash(curl *)", "Bash(wget *)"
+    ],
+    "allow": [
+      "Bash(git *)", "Bash(make build)",
+      "Bash(make test)", "Bash(make lint)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  },
+  "allowManagedPermissionRulesOnly": true,
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "network": { "allowedDomains": ["git.internal.example.com",
+                                    "registry.npmjs.org"] },
+    "credentials": {
+      "files": [
+        { "path": "~/.ssh", "mode": "deny" },
+        { "path": "~/.aws/credentials", "mode": "deny" }
+      ],
+      "envVars": [ { "name": "GITHUB_TOKEN", "mode": "deny" } ]
+    }
+  },
+  "allowManagedHooksOnly": true,
+  "disableSideloadFlags": true,
+  "allowManagedMcpServersOnly": true,
+  "strictKnownMarketplaces": [
+    { "source": "github", "repo": "example-corp/approved-plugins" }
+  ],
+  "requiredMinimumVersion": "2.1.193"
+}</code></pre>
+  <p><strong>每一行在控制上換到什麼</strong></p>
+  <p><code>permissions.deny</code> 把機密擋在代理的脈絡之外，並透過工具封鎖任意網路連外；<code>permissions.allow</code> 預先核准安全的內迴圈，讓拒絕清單不會變成提示疲勞。</p>
+  <p><code>disableBypassPermissionsMode</code> 加上 <code>allowManagedPermissionRulesOnly</code>，意思是沒有任何工程師、專案檔案或命令列旗標能放寬這些規則。</p>
+  <p><code>sandbox</code> 補上權限管不到的缺口。工具層級拒絕 WebFetch，擋不住 shell 指令連上網路；OS 層級的網域允許清單則直接封鎖連外。</p>
+  <p><code>failIfUnavailable</code> 與 <code>allowUnsandboxedCommands</code> 讓沙箱變成一道關卡：沙箱無法初始化時 Claude Code 拒絕啟動，而在沙箱內失敗的指令不能拿到沙箱外重試。</p>
+  <p><code>credentials</code> 補上拒絕規則留下的缺口。<code>permissions.deny</code> 管的是 Claude 的檔案工具，但沙箱中的 shell 指令預設仍可能讀到 <code>~/.ssh</code> 或 <code>~/.aws/credentials</code>；這個區塊拒絕那些讀取，並從每一個沙箱指令的環境中移除指定的機密。</p>
+  <p><code>allowManagedHooksOnly</code> 意思是這個手法裡的核准關卡是唯一會執行的 hook；本機沒有任何東西能加入或取代它們。</p>
+  <p><code>disableSideloadFlags</code> 與 <code>strictKnownMarketplaces</code> 意思是工程師機器上的每一個 skill、代理、hook 與 MCP 伺服器，都是透過組織核准的外掛市集進來的，絕不是來自個人主目錄。</p>
+  <p><code>allowManagedMcpServersOnly</code> 讓代理的工具介面成為由平台團隊擁有的允許清單。</p>
+  <p><code>requiredMinimumVersion</code> 拒絕在低於已核准下限的版本上啟動，所以這些控制是由組織實際評估過的建置版本在強制執行。</p>
+  <p>把上面這些當成一個可以調整的起點，而不是照抄的建議。每一項拒絕都在跟能力做取捨，正確的平衡取決於該 repo 的資料分級。設定參考文件記載了每一個鍵，包括受管理專用的那些：<a href="https://code.claude.com/docs/en/settings">code.claude.com/docs/en/settings</a></p>
+</blockquote>
+
+<h4>怎麼衡量（針對 hook 本身）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+等待每個核准關卡所花的時間。每一次 hook 決定都會連同時間戳與放行或擋下的判定寫進 OpenTelemetry 匯出資料，所以每個關卡的等待時間都看得到。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+從事故追蹤系統看 hook 上線前後，到達生產環境的關卡違規次數。</p>
+
+<h3>CI/CD 整合與部署（CI/CD integration and deployment）</h3>
+
+<p>以非互動方式在 CI/CD 管線裡執行 Claude Code，把執行沙箱化讓長時間運行的代理安全地跑，透過 MCP 整合暴露部署能力，並在代理真正需要之前先演練過回復路徑。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+管線跑的是確定性的腳本，任何需要判斷的事都等人。例如分診（triage）不穩定的測試、寫 changelog（變更紀錄），或查出建置為什麼壞掉。部署與回復是人在壓力下照著走的 runbook（執行手冊）。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+Claude 在管線裡以非互動方式執行需要判斷的步驟，在帶有範圍化憑證的沙箱中運行。部署工具透過 MCP 暴露給代理，所以寫出並測試這個變更的工作流，也能把它部署出去、把它回復，在組織為每個環境定義的關卡之內。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+Claude 在 PR 審查迴路裡，以及用 hook 當核准關卡，因為自動化要把任何東西加速送過去之前，關卡必須先存在。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一個裝好 claude-code-action 的 CI 平台，或任何能呼叫 <code>claude -p</code> 的 runner；模型存取走 API，或在流量必須留在組織雲端合約內時走 Bedrock、Foundry 或 Vertex；給部署目標用的 MCP 伺服器；以及一個不帶常態生產憑證的代理工作沙箱設定檔。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>平台工程師從唯讀的判斷步驟開始。在管線工作中用 <code>claude -p</code> 分診失敗的建置、摘要不穩定的測試，或草擬 changelog（變更紀錄）。</li>
+  <li>在既有關卡後面加入寫入步驟，用於修 lint、更新生成的說明文件，或透過 <code>@claude</code> 提及來處理審查留言這類工作。代理寫的任何東西都以 PR 的形式、經由分支保護進來，而且代理沒有任何路徑能推上 main。</li>
+  <li>執行要沙箱化。代理工作在容器裡跑，受網路政策約束，使用短效的範圍化權杖，預設不持有生產憑證。</li>
+  <li>透過 MCP 暴露部署。部署、狀態與回復變成工具，依環境劃分範圍，所以代理的部署權限是一份允許清單，而不是一個帶著憑證的 shell 腳本。</li>
+  <li>依環境分級自主程度。在開發環境，代理自由部署。在生產環境，代理準備發布、由發布經理授權，並由 hook 強制執行生產關卡。預備環境落在中間。</li>
+  <li>回復應該是管線裡演練最多次的路徑，一條代理能執行、而且在預備環境定期演練的指令。閉合迴路手法（階段 6：維護）在控制帶被突破時就會呼叫這個回復動作，所以它必須事先被證明可行。</li>
+</ol>
+
+<h4>範例：管線步驟（What it looks like）</h4>
+
+<pre><code>- name: Triage failed build
+  if: failure()
+  run: >
+    claude -p "Read the build log at out/build.log. Identify the most
+    likely cause, say whether the failure looks flaky or real, and write a
+    three-line summary for the PR thread." >> triage.md</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>治理原則是：代理可以行動到生產關卡為止，但過不去。底下的控制強制執行這個原則。</p>
+
+<ul>
+  <li>分支保護讓代理寫的任何東西都變成 PR，沒有直達 main 的路徑。</li>
+  <li>生產部署 hook 擋下發布，直到具名的發布經理授權。每一次非互動執行都以代理自己的身分行動，所以管線紀錄能區分代理做了什麼、觸發該次執行的工程師做了什麼。</li>
+  <li>依環境劃分的權限分級，決定代理在通往關卡的路上可以做多少事。</li>
+</ul>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+不需要把值班人員叫起來就能分診完成的管線失敗佔比，取自 CI/CD 管線紀錄。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+DevOps 研究與評估協會（DORA）指標，CI 系統與部署工具本來就會輸出這些數據。</p>
+
+<h2 id="sd-s6">06 維護（Maintain）</h2>
+
+<p>迴路閉合起來。一個觸發條件叫用 Claude，叫用路徑上沒有人，而它找到的東西以 <code>intent.md</code> 的形式重新進入管線。</p>
+
+<h3>維護與閉合迴路（Maintenance and closing the loop）</h3>
+
+<p>到目前為止，我們談的是如何在 SDLC 流程的每個階段加入 Claude，每個階段都需要有人啟動最初的步驟。這個階段則把焦點轉向讓 Claude 自主運行，把迴路閉合起來。</p>
+
+<p>舉例來說，一個持續運行的監控代理，可以在 bug 票被開出來之後建立一份 <code>intent.md</code>，然後流經需求、規劃、建置、測試與審查各階段。階段 6：維護以無頭方式運行，階段之間有一道獨立的信心關卡（confidence gate），可以是一個確定性的檢查，或一個對抗式的審查代理，決定前一階段的產出是繼續往下走，還是升級給人。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+維護是被動的階段。所有票或事故都等人處理，才重新啟動流程。告警在凌晨三點響起，可能被漏掉；一張票可能在待辦清單裡躺到有人接手；如果下一場火先燒起來，事後檢討的行動項目可能根本沒有進到程式碼庫。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+一個觸發條件，例如控制帶被突破、一張票、一則頻道訊息或一個排程，叫用 Claude 而路徑上沒有人。Claude 診斷，只透過受管制的路徑行動，並把找到的東西寫成 <code>intent.md</code>，接著走上前面描述的各個階段。人負責分診與審查這些工作，不再需要啟動它。</p>
+
+<h3>閉合迴路（Closing the loop）</h3>
+
+<p>一個確定性的腳本監看生產環境，在控制帶被突破時叫用 Claude。用監控一次突破來說明迴路自主運行的模式很有幫助；至於透過不同管道進來的工作，則由本階段最後的 <a href="https://claude.com/product/tag">Claude Tag</a>（公開 beta）一節說明。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+<code>intent.md</code>，它給迴路一個結構化的輸出來重新啟動。Claude 加速過的 PR 審查、當作行動邊界的 hook，以及 CI/CD 的回復路徑（最高自主等級會呼叫它）。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+一個偵測腳本能查詢的指標儲存（Prometheus、CI 系統的 API，或同類系統）；對儲存庫的讀取權；一個在 CI 裡以非互動方式執行 Claude Code 的方式，或用於接收 webhook 的服務的 <a href="https://platform.claude.com/docs/en/agent-sdk/overview">Agent SDK</a>。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>服務負責人或平台工程師挑一個有穩定滾動基線的指標，例如 CI 測試失敗率、部署後 5xx 比率，或 PR 週期時間。</li>
+  <li>他們寫偵測腳本，通常是滾動視窗上的平均值與標準差，加上一些規則（Western Electric 或類似規則），讓控制帶既能抓到緩慢漂移，也能抓到突升。腳本受版本控管並有單元測試，偵測完全保持確定性，不涉及模型。</li>
+  <li>回應等級定義在受版本控管的設定裡（底下的 <code>bands.yaml</code>）。1σ 時腳本只記日誌，2σ 時以唯讀方式叫用 Claude 診斷，3σ 時 Claude 可以行動，但只能開一個 PR 進到審查關卡，或觸發一個事先核准的 runbook（執行手冊）。</li>
+  <li>觸發層可以是 GitHub 或 GitLab 的排程工作流、既有監控堆疊送出的 webhook，或網路內部的 Cron Job。Claude 以無狀態方式運行，可以是在 CI runner 上的非互動步驟，也可以是沙箱容器裡的 Agent SDK 服務；CI/CD 手法涵蓋部署與模型存取的選項。因為這次執行是無狀態且非互動的，一個迴路可以在沒有人啟動的情況下開始與結束。</li>
+  <li>代理把診斷寫成階段 1：規劃格式的 <code>intent.md</code>，涵蓋異常與相關證據、建議的結果、受影響的系統，以及待解問題。從那裡開始，這個發現就像其他東西一樣走進管線。</li>
+  <li>服務負責人或值班工程師分診佇列，把面向產品的發現轉給產品負責人。現在修、排程，或略過。略過會用來調校控制帶，幫助降低噪音。</li>
+  <li>修正上線後，為這則事故加一個評估（持續評估手法），確保往後這類問題受到保護。</li>
+</ol>
+
+<h4>範例：監控 CI 測試失敗率的 bands.yaml</h4>
+
+<pre><code>metric: ci_test_failure_rate
+baseline: rolling_30d
+rules: western_electric
+tiers:
+  1sigma: { action: log }
+  2sigma: { action: diagnose,
+            tools: "Read,Grep,Bash(gh run view *)" }
+  3sigma: { action: propose,
+            routes: [pull_request, runbook:rollback-deploy] }</code></pre>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>等級邊界從受版本控管的設定強制執行，權限與受管理設定則拒絕生產存取。叫用、發現與分診決定都連同時間戳記錄下來。服務負責人分診並核准發現，隨之而來的變更走正常的 PR 審查關卡，而代理可以觸發的執行手冊都是事先核准過的。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+從控制帶被突破到 <code>intent.md</code> 進入分診佇列的時間，對比過去從事故到事後檢討行動的時間。偵測腳本的日誌帶有突破的時間戳與事故等級。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+變成已合併修正的發現佔比（分診佇列對照實際 PR 歷史），以及同類事故的重複發生次數，後者應該隨著修正為評估套件加入案例而下降。</p>
+
+<h4>例子（Examples）</h4>
+
+<ul>
+  <li>當 CI 測試失敗率突破 3σ，代理隔離不穩定的測試，或開一個回復 PR，由審查關卡做決定。</li>
+  <li>部署後 5xx 比率突破 3σ，且視窗內有部署時，代理觸發既有的回復管線。</li>
+  <li>當 PR 週期時間觸發偏離規則，代理為工程主管寫一份報告，顯示這套工具鏈（harness）對流程指標與生產指標一樣管用。</li>
+</ul>
+
+<blockquote>
+  <p>偵測保持確定性。控制帶被突破時才叫用 Claude，由等級決定它可以做什麼。</p>
+</blockquote>
+
+<h3>定期程式碼庫掃描（Recurring codebase scans）</h3>
+
+<p>安全掃描是針對特定模型下某個程式碼庫的某個時點快照，而兩邊都會過時：程式碼每週都在變，每一代模型都會找到上一代漏掉的弱點。AI 原生的答案是讓掃描依排程運行，叫用路徑上沒有人，並把找到的東西送上與其他程式碼庫變更相同的關卡。</p>
+
+<p><a href="https://claude.com/product/claude-security">Claude Security</a> 是排程掃描的託管形式。接上一個 GitHub 儲存庫，掃描就會在 Anthropic 基礎設施上以 Claude Mythos 5 運行，每一項發現都會先經過驗證才回報，並附上信心評分。建議的修補在 Claude Code on the web 上審查與套用。組織拿到發現，不需要自己存取模型。</p>
+
+<p><strong>傳統做法（Traditional）</strong><br>
+安全掃描是一個事件，在發布或稽核前啟動一次。報告送進追蹤系統，待辦清單靠人工一條條消化，直到下一次事件。期間寫的程式碼，只能靠 PR 審查剛好攔到什麼算什麼。</p>
+
+<p><strong>AI 原生做法（AI-native）</strong><br>
+掃描依排程對每個已連接的儲存庫運行，使用當下最強的模型，發現先經過驗證才有人讀。每一項發現的處理方式跟控制帶被突破一樣：能放進一個 PR 的修正走審查關卡，更大的就變成 <code>intent.md</code>。覆蓋率從上次運行當天起算，而不是從第一次。</p>
+
+<h4>開始動手（Getting started）</h4>
+
+<p><strong>前置條件（Prerequisites）</strong><br>
+PR 審查關卡與用 hook 當核准關卡（<a href="#sd-s5">階段 5：部署</a>），好讓發現像其他變更一樣經過審查。單一 PR 放不下的發現，則需要 <a href="#sd-s1">階段 1：規劃</a>的 <code>intent.md</code> 格式。</p>
+
+<p><strong>基礎設施（Infrastructure）</strong><br>
+Claude Security 以公開 beta 提供給 Claude Enterprise 組織。它需要在目標儲存庫（雲端託管的 github.com）上安裝 Anthropic GitHub App、啟用 Claude Code on the Web、開啟 Extra Usage 並設定支出上限、為執行掃描的人準備 premium（進階）席次，並由管理員在 <code>claude.ai/admin-settings/claude-code</code> 開啟這項功能。掃描按用量計費，費率依 Mythos 5，所以支出上限應該對應儲存庫的規模與數量。</p>
+
+<h4>怎麼執行（How to execute it）</h4>
+
+<ol>
+  <li>安全主管連接儲存庫，並依 repo、服務或團隊整理成專案，讓發現的擁有權從一開始就清楚。</li>
+  <li>對最關鍵的儲存庫跑第一次完整掃描，包括那些以前被其他工具或更早的模型掃過的。把第一次掃描當成基線。第一次掃描很可能在被認為乾淨的程式碼裡找到問題。</li>
+  <li>為每個專案設定排程。對活躍開發的服務來說，每週是合理的預設值；儲存庫龐大或混雜多種內容時，把掃描範圍限定在某個目錄或分支。</li>
+  <li>帶著信心評分分診發現。略過時要寫理由，讓略過留下紀錄，同一項發現在下一次運行不會以新的身分回來。</li>
+  <li>對於範圍有限的發現，在 Claude Code on the Web 打開建議的修補，審查它，並像其他變更一樣送進 PR 審查關卡。提出修正的代理沒有路徑核准它。</li>
+  <li>對於超過一個修補的更大問題，例如架構弱點或跨服務重複出現的模式，用階段 1 的格式寫成 <code>intent.md</code>，從規劃階段開始走。</li>
+  <li>修正發布到生產環境後，為該弱點類別在持續評估手法的套件裡加一個評估，讓引導代理的設定從此針對該類別接受測試。</li>
+  <li>把發現匯出成 CSV 或 Markdown，或使用 webhook，讓組織既有的追蹤與稽核系統繼續當作紀錄系統，稽核人員本來就預期在那裡看到它們。</li>
+</ol>
+
+<h4>治理考量（Governance considerations）</h4>
+
+<p>掃描在組織的管理控制下運行，也就是連接哪些儲存庫、誰持有掃描席次、支出上限，全都集中設定。每一項發現都有驗證結果與信心評分，每一次略過都有理由，所以掃描歷史就是一份稽核紀錄，記載找到什麼、修好什麼、以及有意識地接受了什麼。</p>
+
+<p>修正透過 PR 審查關卡與分支保護到達生產環境，而不是由掃描本身送進去。Claude Security 是對既有靜態分析與相依性掃描的補充。確定性的檢查留在 CI，模型驅動的掃描則涵蓋那些檢查原本就不是設計來找的、依脈絡而定的弱點。</p>
+
+<h4>怎麼衡量（How to measure it）</h4>
+
+<p><strong>領先指標（Leading indicator）</strong><br>
+已連接儲存庫中排在排程上的比例，以及從發現回報到修補進入 PR 審查關卡的時間，取自掃描歷史與 PR 中繼資料。</p>
+
+<p><strong>落後指標（Lagging indicator）</strong><br>
+排程掃描找到的弱點，對比在生產環境或由外部報告找到的，取自事故追蹤系統；以及已經跑過幾輪的儲存庫上，每次掃描的發現數趨勢，這個數字應該隨著修正與評估累積而下降。</p>
+
+<h3>用 Claude Tag 擔起 on-call（Claude on call with Claude Tag）</h3>
+
+<p>事故也可能從其他管道進來，例如 Slack 或 Teams 這類職場通訊應用程式。事故可能看起來像晚上十點在事故頻道上的一則訊息，要求一個緊急修正，而現在可以立刻處理。Claude Tag（公開 beta，目前在 Slack 提供）讓 Claude 以自己的身分成為那些頻道的成員，所以每一則新事故都有第一個回應者，回應本身也成為迴路與未來事故記憶的一部分。</p>
+
+<p>對話與組織知識留在頻道裡，頻道裡任何人都能引導並處理這次回應。任何團隊成員都可以測試假設、探索新選項，並即時調查，頻道歷史也讓稽核更容易。透過 MCP 的存取，Claude 驗證指標回到基線並在討論串裡確認，把事後檢討寫進受版本控管的經驗教訓檔案，供未來的調查讀取。</p>
+
+<p>事故不是 Claude Tag 唯一接手的工作。在票上被標記、透過 MCP，或在頻道裡被要求，Claude 都以同樣方式分診工作。範圍小、界線清楚的修正以 PR 的形式經由審查關卡進來，更大的則寫成 <code>intent.md</code> 供階段 1：規劃使用，到那時迴路就開始自己餵養自己。見：<a href="https://claude.com/blog/ai-ci-cd-on-call">Claude Tag 如何在 Anthropic 為 CI/CD 做 on-call</a>。</p>
+
+<figure>
+  <img src="assets/fe6d780d.png" alt="圖示：頻道就是稽核軌跡，請求、診斷、人為授權與修正都留在事故處理的地方">
+  <figcaption><em>頻道就是稽核軌跡：請求、診斷、人為授權與修正，全都留在事故被處理的地方。</em></figcaption>
+</figure>
+
+<h2 id="sd-c9">結語（Closing thoughts）</h2>
+
+<p>模型與工具鏈變得更先進，讓組織不只能改造產出程式碼的方式，更能改造整個軟體開發生命週期。</p>
+
+<p>這場轉型讓人的判斷保持在流程核心，也把大型企業組織的治理與法規要求納入考量。</p>
+
+<p>這份指南整理了我們 Applied AI 團隊每天為客戶執行的許多真實最佳實務，希望它對你是一份實用、可動手的資源。</p>
+
+<p>迴路持續運行。人的判斷留在它之上。</p>
+
+<h3>資源與致謝（Resources and acknowledgments）</h3>
+
+<p>底下的說明文件是平台團隊設定這些控制時需要的，大致依你會推出的順序排列。</p>
+
+<ul>
+  <li><a href="https://code.claude.com/docs/en/admin-setup">為你的組織設定 Claude Code：管理決策地圖；從這裡開始</a>（<code>code.claude.com/docs/en/admin-setup</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/settings">設定參考與優先順序，包含每一個受管理專用的鍵</a>（<code>code.claude.com/docs/en/settings</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/server-managed-settings">從 Claude 管理主控台下發的伺服器端受管理設定</a>（<code>code.claude.com/docs/en/server-managed-settings</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/permissions">權限</a>（<code>code.claude.com/docs/en/permissions</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/sandboxing">沙箱：OS 層級的檔案系統與網路隔離</a>（<code>code.claude.com/docs/en/sandboxing</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/hooks-guide">hook 指南</a>（<code>code.claude.com/docs/en/hooks-guide</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/hooks">hook 參考</a>（<code>code.claude.com/docs/en/hooks</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/skills">skill</a>（<code>code.claude.com/docs/en/skills</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/plugin-marketplaces">外掛與私有市集：skill 與 hook 如何在組織內散布</a>（<code>code.claude.com/docs/en/plugin-marketplaces</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/managed-mcp">受管理 MCP：集中控制代理的工具介面</a>（<code>code.claude.com/docs/en/managed-mcp</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/third-party-integrations">企業部署總覽：Bedrock、Vertex、Foundry</a>（<code>code.claude.com/docs/en/third-party-integrations</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/network-config">企業網路設定</a>（<code>code.claude.com/docs/en/network-config</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/monitoring-usage">監控（OpenTelemetry）</a>（<code>code.claude.com/docs/en/monitoring-usage</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/analytics">分析儀表板</a>（<code>code.claude.com/docs/en/analytics</code>）</li>
+  <li><a href="https://platform.claude.com/docs/en/manage-claude/compliance-api">Compliance API：Enterprise 活動饋送、對話擷取與刪除</a>（<code>platform.claude.com/docs/en/manage-claude/compliance-api</code>）</li>
+  <li><a href="https://code.claude.com/docs/en/security">安全模型</a>（<code>code.claude.com/docs/en/security</code>）</li>
+</ul>
+
+<p>感謝 Jim Blackhurst、Will Steuk 與 Jamal Arif 對這份指南的貢獻；這份指南受到他們先前工作的啟發，並建立在其中許多內容之上。</p>
+
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://claude.com/blog/the-ai-native-sdlc-playbook">The AI-Native SDLC playbook</a>（2026-08-21）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

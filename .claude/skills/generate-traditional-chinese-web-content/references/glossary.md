@@ -217,6 +217,65 @@ they are frequently mistranslated.
 | black box | 黑箱 |
 | greenfield rewrite | 幾乎從頭改寫 |
 
+## AI-native SDLC (Anthropic, 2026-08)
+
+| English | 繁中 |
+|---|---|
+| SDLC (software development lifecycle) | 軟體開發生命週期（SDLC） |
+| AI-native SDLC | AI 原生的 SDLC |
+| agentic SDLC | 代理式 SDLC |
+| play (playbook entry) | 手法 |
+| stage | 階段 |
+| intent | 意圖 |
+| proto-spec | 原型規格 |
+| artifact | 產出物 |
+| source of truth | 真實來源 |
+| requirements | 需求 |
+| design | 設計 |
+| build / test / deploy / maintain | 建置／測試／部署／維護 |
+| governance | 治理 |
+| control band | 控制帶 |
+| confidence gate | 信心關卡 |
+| approval gate | 核准關卡 |
+| branch protection | 分支保護 |
+| code owner | 程式碼擁有者（code owner） |
+| separation of duties | 職責分離 |
+| change board | 變更審查委員會 |
+| sign-off | 簽核 |
+| handoff | 交接 |
+| pipeline | 管線 |
+| runbook | runbook（保留原文） |
+| rollback path | 回復路徑 |
+| blast radius | 影響半徑 |
+| pass rate | 通過率 |
+| quarantine (flaky test) | 隔離（不穩定的測試） |
+| flaky test | 不穩定的測試 |
+| triage | 分診 |
+| audit trail | 稽核軌跡 |
+| managed settings | 受管理設定 |
+| plugin marketplace | 外掛市集 |
+| marketplace | 市集 |
+| pull request review pass | 審查輪 |
+| nit | Nit |
+| harness | 工具鏈 |
+| on-call | on-call |
+| first responder | 第一個回應者 |
+| post-mortem | 事後檢討 |
+| lessons file | 經驗教訓檔案 |
+| leading indicator | 領先指標 |
+| lagging indicator | 落後指標 |
+| DORA (DevOps Research and Assessment) | DevOps 研究與評估協會（DORA） |
+| Western Electric rules | Western Electric 規則 |
+
+| codebase | 程式碼庫 |
+| drift | 偏離 |
+| human review | 人為審查 |
+| human approval | 人為核准 |
+| guardrail | 護欄 |
+| artifact | 產出物 |
+| changelog | changelog（變更紀錄） |
+| on-call | on-call |
+
 ## Kept in English
 
 Acronyms and product or project names: LLM, API, SDK, CLI, JSON, HTML, CSS,
