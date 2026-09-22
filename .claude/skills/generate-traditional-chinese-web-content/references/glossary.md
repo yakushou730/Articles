@@ -297,6 +297,12 @@ URL, MCP, ACI, HCI, GUI, SWE-bench, Claude, Claude Haiku, Claude Sonnet,
 Anthropic, AWS, GitHub, Rivet, Vellum, Model Context Protocol, Strands Agents SDK,
 Claude Agent SDK, DAG, RAG, YAML, XML, TypeScript, Python, Airflow, Prefect,
 Dagster, Inngest, Windmill, BAML, Stripe, HumanLayer.
+| harness | 工具鏈（harness） |
+| observability | 可觀測性（observability） |
+| progressive disclosure | 漸進式揭露（progressive disclosure） |
+| invariant | 不變量（invariant） |
+| legibility | 可讀性（legibility） |
+| system of record | 系統的記錄依據（system of record） |
 
 ## Style rules
 
