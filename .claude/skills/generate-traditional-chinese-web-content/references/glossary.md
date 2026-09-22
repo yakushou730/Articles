@@ -275,6 +275,20 @@ they are frequently mistranslated.
 | artifact | 產出物 |
 | changelog | changelog（變更紀錄） |
 | on-call | on-call |
+| tokenization | 分詞（tokenization） |
+| token | token（保留原文） |
+| neural network | 神經網路（neural network） |
+| reinforcement learning | 強化學習（reinforcement learning） |
+| fine-tuning | 微調（fine-tuning） |
+| quantization | 量化（quantization） |
+| knowledge distillation | 知識蒸餾（knowledge distillation） |
+| hallucination | 幻覺（hallucination） |
+| context engineering | 脈絡工程（context engineering） |
+| embedding | 嵌入（embedding） |
+| vector database | 向量資料庫（vector database） |
+| retrieval-augmented generation | 檢索增強生成（retrieval-augmented generation） |
+| agentic AI | 代理式 AI（agentic AI） |
+| open protocol | 開放協定（open protocol） |
 
 ## Kept in English
 

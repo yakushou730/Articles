@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI／ML 必懂的 30 個術語（30 Essential AI & Machine Learning Terms）</title>
+<meta name="description" content="一份完整、視覺化的 AI／ML 詞彙表，解釋神經網路、Transformer、RAG、代理式 AI 等 30 個開發者常用概念。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="AI,機器學習,LLM,代理,工具鏈">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">詞彙表（Glossary）</p>
+  <h1>開發者必懂的 30 個 AI／ML 術語（Top 30 AI/ML Terms Every Developer Should Know）</h1>
+  <p class="pubdate">2025 年 12 月 7 日</p>
+</header>
+
+<main id="main-content">
+<p class="lede">剛開始接觸 AI 與機器學習（Machine Learning）時，滿滿的術語常讓人吃不消。「Transformer」、「反向傳播」（backpropagation）、「RAG」到處都有人講，基礎沒打穩就容易迷路。</p>
+
+<p>無論你是用 AI 開發應用的開發者、正要鑽進 ML 的工程師，還是只想搞懂 ChatGPT、Claude 這類工具背後技術的人，這份指南都合用。我挑出的 <strong>30 個術語</strong>（terms），在研究論文、技術討論與真實 AI 專案裡反覆出現。</p>
+
+<p>每個術語都有明確定義、說明它為什麼重要，並附上真實 AI 系統裡的實例。我們就從最底層開始建立 AI 詞彙。</p>
+
+<p>這篇文章是一份實用的視覺化詞彙表，收錄 30 個現代開發者該懂的 AI／ML 概念。</p>
+
+<h3>目錄（Table of Contents）</h3>
+
+<ul>
+  <li><a href="#foundational">1. 基礎概念（Foundational Concepts）</a>
+    <ul>
+      <li><a href="#machine-learning">1.1 機器學習（Machine Learning）</a></li>
+      <li><a href="#deep-learning">1.2 深度學習（Deep Learning）</a></li>
+      <li><a href="#neural-network">1.3 神經網路（Neural Network）</a></li>
+      <li><a href="#reinforcement-learning">1.4 強化學習（Reinforcement Learning）</a></li>
+    </ul>
+  </li>
+  <li><a href="#architecture">2. 架構與模型設計（Architecture &amp; Model Design）</a>
+    <ul>
+      <li><a href="#transformer">2.1 Transformer</a></li>
+      <li><a href="#encoder-decoder">2.2 編碼器／解碼器（Encoder/Decoder）</a></li>
+      <li><a href="#moe">2.3 專家混合（Mixture of Experts，MoE）</a></li>
+      <li><a href="#tokenization">2.4 分詞（Tokenization）</a></li>
+    </ul>
+  </li>
+  <li><a href="#attention">3. 注意力機制（Attention Mechanisms）</a>
+    <ul>
+      <li><a href="#self-attention">3.1 自我注意力（Self-Attention）</a></li>
+      <li><a href="#multi-head-attention">3.2 多頭注意力（Multi-Head Attention）</a></li>
+    </ul>
+  </li>
+  <li><a href="#training">4. 訓練與最佳化（Training &amp; Optimization）</a>
+    <ul>
+      <li><a href="#gradient-descent">4.1 梯度下降（Gradient Descent）</a></li>
+      <li><a href="#backpropagation">4.2 反向傳播（Backpropagation）</a></li>
+      <li><a href="#loss-function">4.3 損失函數（Loss Function）</a></li>
+      <li><a href="#training-inference">4.4 訓練與推論（Training vs Inference）</a></li>
+      <li><a href="#hyperparameter">4.5 超參數（Hyperparameter）</a></li>
+    </ul>
+  </li>
+  <li><a href="#finetuning">5. 微調與效率（Fine-Tuning &amp; Efficiency）</a>
+    <ul>
+      <li><a href="#fine-tuning">5.1 微調（Fine-tuning）</a></li>
+      <li><a href="#lora">5.2 LoRA／QLoRA</a></li>
+      <li><a href="#quantization">5.3 量化（Quantization）</a></li>
+      <li><a href="#knowledge-distillation">5.4 知識蒸餾（Knowledge Distillation）</a></li>
+    </ul>
+  </li>
+  <li><a href="#evaluation">6. 模型評估（Model Evaluation）</a>
+    <ul>
+      <li><a href="#overfitting">6.1 過擬合／欠擬合（Overfitting / Underfitting）</a></li>
+      <li><a href="#regularization">6.2 正則化（Regularization）</a></li>
+      <li><a href="#hallucination">6.3 幻覺（Hallucination）</a></li>
+    </ul>
+  </li>
+  <li><a href="#prompting">7. 提示與推理（Prompting &amp; Reasoning）</a>
+    <ul>
+      <li><a href="#prompt-engineering">7.1 提示工程（Prompt Engineering）</a></li>
+      <li><a href="#context-engineering">7.2 脈絡工程（Context Engineering）</a></li>
+      <li><a href="#chain-of-thought">7.3 思維鏈（Chain-of-Thought，CoT）</a></li>
+    </ul>
+  </li>
+  <li><a href="#infrastructure">8. 基礎設施與檢索（Infrastructure &amp; Retrieval）</a>
+    <ul>
+      <li><a href="#embedding">8.1 嵌入（Embedding）</a></li>
+      <li><a href="#vector-database">8.2 向量資料庫（Vector Database）</a></li>
+      <li><a href="#rag">8.3 RAG</a></li>
+    </ul>
+  </li>
+  <li><a href="#modern">9. 現代 AI 系統（Modern AI Systems）</a>
+    <ul>
+      <li><a href="#mcp">9.1 MCP（Model Context Protocol）</a></li>
+      <li><a href="#agentic-ai">9.2 代理式 AI（Agentic AI）</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3>為什麼是這 30 個術語？</h3>
+
+<p>不管是打造第一個 AI 代理（agent）、把 LLM 整合進應用程式，還是想聽懂 ML 團隊在講什麼，這份詞彙表收的都是每天會碰到的核心詞。我按基礎概念到代理式 AI（agentic AI）這類現代做法排列，並附上互動式視覺化，把抽象概念變得具體。</p>
+
+<h2 id="foundational">1. 基礎概念（Foundational Concepts）</h2>
+
+<p>進入進階主題之前，先把 AI 與機器學習的基本積木立起來。</p>
+
+<figure>
+  <img src="assets/mermaid-0.png" alt="AI 與機器學習的概念階層（Artificial Intelligence → Machine Learning）">
+  <figcaption>AI 與機器學習的概念階層（Artificial Intelligence → Machine Learning）</figcaption>
+</figure>
+
+<h3 id="machine-learning">1.1 機器學習（Machine Learning）</h3>
+
+<p>AI 的一個子集，系統<strong>從資料中學習模式</strong>，而不是靠人工寫死的規則。與其寫下「如果信件內容有『免費送錢』就標成垃圾信」這種規則，我們改為提供數千個範例，讓演算法自己找出模式。</p>
+
+<p><strong>為什麼重要：</strong>ML 是其他一切的底層。推薦系統、詐欺偵測、搜尋引擎，全都用上 ML。搞懂這個核心範式，才知道自己的問題該用哪種方法。</p>
+
+<p>主要分成三類：</p>
+
+<ul>
+  <li><strong>監督式學習（Supervised Learning）</strong>：從有標籤的範例學習（輸入 → 輸出配對）</li>
+  <li><strong>非監督式學習（Unsupervised Learning）</strong>：在沒有標籤的資料中找模式</li>
+  <li><strong>強化學習（Reinforcement Learning）</strong>：靠嘗試錯誤與獎勵學習</li>
+</ul>
+
+<h3 id="deep-learning">1.2 深度學習（Deep Learning）</h3>
+
+<p>機器學習的子集，用<strong>多層神經網路</strong>（所以叫「深度」）學習複雜模式。這個「深度」讓模型學到階層式表徵：淺層偵測簡單特徵（邊緣、顏色），深層再把它們組合成複雜概念（人臉、物體）。</p>
+
+<p>現代 AI 的重大突破大多靠深度學習：影像辨識、語音合成、語言模型、玩遊戲的代理。</p>
+
+<h3 id="neural-network">1.3 神經網路（Neural Network）</h3>
+
+<p>仿人類大腦的運算系統，由<strong>分層排列、彼此相連的節點（神經元）</strong>組成。每條連線都帶著一個權重，會隨著學習調整。</p>
+
+<figure>
+  <img src="assets/viz-1.png" alt="神經網路架構（Neural Network Architecture）">
+  <figcaption>神經網路架構（Neural Network Architecture）</figcaption>
+</figure>
+
+<h3 id="reinforcement-learning">1.4 強化學習（Reinforcement Learning，RL）</h3>
+
+<p>一種學習範式：<strong>代理透過與環境互動來學習</strong>，依動作拿到獎勵或懲罰。監督式學習會直接給正確答案，RL 代理則是在嘗試錯誤中自己找出最佳策略，就像學騎腳踏車，摔幾次、調整一下就會了。</p>
+
+<p>主要元件：<strong>代理</strong>（學習者）、<strong>環境</strong>（互動對象）、<strong>狀態</strong>（當下處境）、<strong>動作</strong>（代理能做的事）、<strong>獎勵</strong>（回饋訊號）。</p>
+
+<figure>
+  <img src="assets/mermaid-1.png" alt="代理與環境之間的強化學習迴路（The RL loop）">
+  <figcaption>代理與環境之間的強化學習迴路（The RL loop）</figcaption>
+</figure>
+
+<p><em>RL 迴路：代理觀察狀態、採取動作、拿到獎勵、學習，然後重複。</em></p>
+
+<p><strong>為什麼重要：</strong>AI 幾項最亮眼的成果都來自 RL。AlphaGo 用 RL 擊敗圍棋世界冠軍，而圍棋的可能盤面比宇宙裡的原子還多。到了今天，RL 是<strong>代理式 AI 系統</strong>的核心：代理得規劃多步驟動作、使用工具，還要適應變動的環境。我們打造能上網、寫程式、管理工作流的 AI 代理時，用的就是 RL 的原理。</p>
+
+<p>AlphaGo 這類遊戲代理，以及學習複雜動作的機器人系統，背後的訓練方法都是 RL。近來 <strong>RLHF（Reinforcement Learning from Human Feedback，人類回饋強化學習）</strong>成了對齊 LLM 的關鍵：GPT-4、Claude 這些模型就是這樣學會當個有幫助而非有害的助手。流程是代理產生回應、人類評分，模型再從這個回饋訊號學習。</p>
+
+<h2 id="architecture">2. 架構與模型設計（Architecture &amp; Model Design）</h2>
+
+<p>認識模型架構，有助於為任務挑對方法。</p>
+
+<h3 id="transformer">2.1 Transformer</h3>
+
+<p>2017 年論文《Attention Is All You Need》提出的神經網路架構。它用自我注意力平行處理整個序列，<strong>改變了語言模型的打造方式</strong>。RNN 得依序處理 token，Transformer 則能一次看到所有 token。</p>
+
+<p><strong>為什麼重要：</strong>今天在用的主要 LLM（GPT-4、Claude、Gemini、LLaMA）全都建立在 Transformer 架構上。搞懂 Transformer，才明白模型為什麼有脈絡上限、為什麼跑起來這麼貴，以及注意力機制怎麼運作。這是現代 AI 裡最重要的一個架構。</p>
+
+<figure>
+  <img src="assets/mermaid-2.png" alt="Transformer 架構（Transformer architecture）">
+  <figcaption>Transformer 架構（Transformer architecture）</figcaption>
+</figure>
+
+<p><em>Transformer 架構把輸入經過嵌入、多個注意力區塊後產生輸出。GPT（2018）、BERT（2018）、Claude 與 Gemini 全都是基於 Transformer。</em></p>
+
+<h3 id="encoder-decoder">2.2 編碼器／解碼器（Encoder/Decoder）</h3>
+
+<p>序列到序列任務裡兩個互補的元件：</p>
+
+<ul>
+  <li><strong>編碼器（Encoder）</strong>：把輸入壓縮成稠密表徵（理解）</li>
+  <li><strong>解碼器（Decoder）</strong>：從這個表徵生成輸出（生成）</li>
+</ul>
+
+<figure>
+  <img src="assets/viz-2.png" alt="編碼器－解碼器架構，以翻譯為例（Encoder-Decoder Architecture）">
+  <figcaption>編碼器－解碼器架構，以翻譯為例（Encoder-Decoder Architecture）</figcaption>
+</figure>
+
+<p>BERT 只用編碼器（理解），GPT 只用解碼器（生成），T5 兩者都用（翻譯、摘要）。</p>
+
+<h3 id="moe">2.3 專家混合（Mixture of Experts，MoE）</h3>
+
+<p>一種架構：<strong>存在多個專門的「專家」網路，但每個輸入只啟用其中一部分</strong>。由「路由器」網路決定該用哪些專家。MoE 讓模型可以做得很大，運算卻很省。</p>
+
+<figure>
+  <img src="assets/viz-3.png" alt="專家混合的稀疏啟用（Mixture of Experts — Sparse Activation）">
+  <figcaption>專家混合的稀疏啟用（Mixture of Experts — Sparse Activation）</figcaption>
+<p>輸入 token：「code」</p>
+
+<p>Mixtral 8x7B 有 8 個專家網路，但每個 token 只用 2 個。總參數 47B，單次前向傳遞實際只啟用 13B。</p>
+
+<h3 id="tokenization">2.4 分詞（Tokenization）</h3>
+
+<p>把<strong>文字切成模型能處理的小單位（token）</strong>的過程。現代分詞器用 BPE（Byte Pair Encoding）或 SentencePiece 這類子詞演算法。</p>
+
+<figure>
+  <img src="assets/viz-4.png" alt="互動式分詞器，BPE 風格（Interactive Tokenizer）">
+  <figcaption>互動式分詞器，BPE 風格（Interactive Tokenizer）</figcaption>
+</figure>
+
+<p>例如：「unhappiness」→ [「un」、「happiness」]。子詞分詞讓模型看懂詞的各個部分，也能靠組合已知子詞來處理罕見詞。</p>
+
+<p><strong>為什麼重要：</strong>搞懂分詞，就能解釋 GPT-4 為什麼算字母常算錯：它看到的不是單一字元，而是一塊塊 token。</p>
+
+<h2 id="attention">3. 注意力機制（Attention Mechanisms）</h2>
+
+<p>Transformer 之所以這麼有效，關鍵就在注意力。</p>
+
+<h3 id="self-attention">3.1 自我注意力（Self-Attention）</h3>
+
+<p>一種機制，讓<strong>序列中的每個位置都能關注其他所有位置</strong>，並衡量彼此的相關程度。對每個 token，模型會算出：</p>
+
+<ul>
+  <li><strong>Query（Q）</strong>：我在找什麼？</li>
+  <li><strong>Key（K）</strong>：我包含什麼？</li>
+  <li><strong>Value（V）</strong>：我有什麼資訊？</li>
+</ul>
+
+<figure>
+  <img src="assets/viz-5.png" alt="注意力公式（The Attention Formula）">
+  <figcaption>注意力公式（The Attention Formula）</figcaption>
+</figure>
+
+<figure>
+  <img src="assets/viz-6.png" alt="自我注意力熱圖：「The cat sat on the mat」（Self-Attention Heatmap）">
+  <figcaption>自我注意力熱圖：「The cat sat on the mat」（Self-Attention Heatmap）</figcaption>
+</figure>
+
+<h3 id="multi-head-attention">3.2 多頭注意力（Multi-Head Attention）</h3>
+
+<p><strong>平行執行多組自我注意力</strong>，每組有各自學到的權重（也就是不同的「頭」）。多個頭讓模型能同時關注不同表徵子空間裡的資訊。</p>
+
+<figure>
+  <img src="assets/viz-7.png" alt="多頭注意力（Multi-Head Attention）">
+  <figcaption>多頭注意力（Multi-Head Attention）</figcaption>
+</figure>
+
+<p>某個頭可能專注語法關係（主詞與動詞的一致性），另一個關注語意關係（詞義），再一個捕捉位置模式。</p>
+
+<h2 id="training">4. 訓練與最佳化（Training &amp; Optimization）</h2>
+
+<p>理解模型如何從資料中學習。</p>
+
+<figure>
+  <img src="assets/mermaid-3.png" alt="訓練迴路（The training loop）">
+  <figcaption>訓練迴路（The training loop）</figcaption>
+</figure>
+
+<p><em>訓練迴路：前向傳遞 → 計算損失 → 反向傳播 → 更新權重 → 重複。</em></p>
+
+<h3 id="gradient-descent">4.1 梯度下降（Gradient Descent）</h3>
+
+<p>一種最佳化演算法，<strong>反覆調整模型參數以最小化損失函數</strong>。它先算出梯度（損失上升最陡的方向），再朝反方向移動。</p>
+
+<figure>
+  <img src="assets/viz-8.png" alt="梯度下降：找出最小值（Gradient Descent — Finding the Minimum）">
+  <figcaption>梯度下降：找出最小值（Gradient Descent — Finding the Minimum）</figcaption>
+</figure>
+
+<p>變體：<strong>SGD</strong>（隨機梯度下降）、<strong>Adam</strong>（自適應學習率）、<strong>AdamW</strong>（加上權重衰減）。</p>
+
+<h3 id="backpropagation">4.2 反向傳播（Backpropagation）</h3>
+
+<p>利用微積分的連鎖律，把誤差<strong>從輸出往輸入的方向反向傳遞，藉此計算神經網路的梯度</strong>。這樣就能看出每個權重對誤差的貢獻有多大。</p>
+
+<h3 id="loss-function">4.3 損失函數（Loss Function）</h3>
+
+<p>用來<strong>衡量模型預測錯得多離譜</strong>的函數。訓練的目標就是把這個損失壓到最低。常見的損失函數有：</p>
+
+<ul>
+  <li><strong>交叉熵（Cross-Entropy）</strong>：分類任務</li>
+  <li><strong>MSE（Mean Squared Error，均方誤差）</strong>：迴歸任務</li>
+  <li><strong>對比損失（Contrastive Loss）</strong>：嵌入學習</li>
+</ul>
+
+<h3 id="training-inference">4.4 訓練與推論（Training vs Inference）</h3>
+
+<p><strong>訓練：</strong>透過調整權重從資料中學習。成本高昂（數週到數月、數千張 GPU）。<strong>推論：</strong>用訓練好的模型做預測。很快（毫秒等級、單張 GPU）。</p>
+
+<p>GPT-4 只訓練過一次，代價驚人。之後每一次 API 呼叫都是推論，快得多，也便宜得多。</p>
+
+<h3 id="hyperparameter">4.5 超參數（Hyperparameter）</h3>
+
+<p><strong>控制訓練過程、但不是從資料學來</strong>的設定值：</p>
+
+<ul>
+  <li><strong>學習率（Learning rate）</strong>：梯度下降的步長</li>
+  <li><strong>批次大小（Batch size）</strong>：更新權重前處理的樣本數</li>
+  <li><strong>層數／頭數</strong>：模型架構</li>
+  <li><strong>Dropout 比率</strong>：正則化強度</li>
+</ul>
+
+<h2 id="finetuning">5. 微調與效率（Fine-Tuning &amp; Efficiency）</h2>
+
+<p>有效率地調整與最佳化模型的技術。</p>
+
+<h3 id="fine-tuning">5.1 微調（Fine-tuning）</h3>
+
+<p>拿<strong>預訓練好的模型，再用特定資料集或任務繼續訓練</strong>。比起從零開始訓練，這樣把通用知識搬進專門領域更有效率。</p>
+
+<p>類型有：<strong>全參數微調</strong>（所有權重）、<strong>參數高效微調</strong>（只動一部分權重）、<strong>指令微調</strong>（學會遵循指令）。</p>
+
+<h3 id="lora">5.2 LoRA／QLoRA</h3>
+
+<p><strong>LoRA</strong>（Low-Rank Adaptation，低秩適應）：不動全部權重，改為加上小的可訓練「適配器」矩陣。原始權重凍結，只訓練適配器。</p>
+
+<p><strong>QLoRA</strong>：把 LoRA 與 4-bit 量化結合，一張 48GB GPU 就能微調 65B 模型。</p>
+
+<h3 id="quantization">5.3 量化（Quantization）</h3>
+
+<p><strong>降低模型權重的精度</strong>（例如 FP32 → INT8 → INT4），以減少記憶體用量、加快推論。現代量化方法（GPTQ、AWQ）保住品質的程度出乎意料地好。</p>
+
+<p><strong>為什麼重要：</strong>這就是在電競筆電上跑得動 Llama 70B 的原因。4-bit 量化讓這件事成真。</p>
+
+<h3 id="knowledge-distillation">5.4 知識蒸餾（Knowledge Distillation）</h3>
+
+<p>訓練<strong>較小的「學生」模型去模仿較大的「老師」模型</strong>的行為。學生學的是老師的軟性機率分布，而不只是硬標籤，因此能吸收單靠訓練資料得不到的細緻知識。</p>
+
+<p><strong>為什麼重要：</strong>我們常想要 70B 參數模型的智力，卻因為成本或延遲限制只能部署 7B 模型。蒸餾補上了這個落差。學生不只學到「這是貓」，還學到「這是 90% 的貓、8% 的狗、2% 的狐狸」，一併繼承老師對相似概念的理解。</p>
+
+<p>真實案例：<strong>DistilBERT</strong> 用少 40% 的參數，保住 BERT 97% 的效能。微軟的 <strong>Phi 系列模型</strong>有一部分是用更大模型生成的合成資料訓練出來的。手機和筆電上能跑得動可用的模型，靠的就是這套技術：把巨型模型的知識壓縮成更小、能部署的版本。</p>
+
+<h2 id="evaluation">6. 模型評估（Model Evaluation）</h2>
+
+<p>理解模型的表現與失效模式。</p>
+
+<h3 id="overfitting">6.1 過擬合／欠擬合（Overfitting / Underfitting）</h3>
+
+<p><strong>過擬合：</strong>模型把訓練資料背了下來，遇到新資料就失手（訓練準確率高，測試準確率低）。<strong>欠擬合：</strong>模型太簡單，抓不到模式（兩邊都差）。</p>
+
+<figure>
+  <img src="assets/viz-9.png" alt="訓練與驗證損失曲線（Training vs Validation Loss Curves）">
+  <figcaption>訓練與驗證損失曲線（Training vs Validation Loss Curves）</figcaption>
+</figure>
+
+<p>過擬合的徵兆：訓練損失持續下降，驗證損失卻開始上升。</p>
+
+<h3 id="regularization">6.2 正則化（Regularization）</h3>
+
+<p>在訓練時加入限制，藉此<strong>避免過擬合</strong>的做法：</p>
+
+<ul>
+  <li><strong>Dropout</strong>：訓練時隨機關閉部分神經元</li>
+  <li><strong>L1／L2 正則化</strong>：懲罰過大的權重</li>
+  <li><strong>早停（Early stopping）</strong>：驗證損失開始上升就停</li>
+  <li><strong>資料增強（Data augmentation）</strong>：製造訓練資料的變化版本</li>
+</ul>
+
+<h3 id="hallucination">6.3 幻覺（Hallucination）</h3>
+
+<p>AI 模型生成<strong>聽起來合理、實際上卻不正確</strong>的資訊。LLM 特別容易出現這種情況，因為它們受的訓練是產出流暢的文字，不保證文字為真。</p>
+
+<p><strong>為什麼重要：</strong>這正是正式上線的 AI 系統需要 RAG、護欄（guardrails）與人為監督的主因。</p>
+
+<p>緩解手段：RAG（讓回應有文件依據）、思維鏈（攤開推理過程）、信心校準、人類回饋。</p>
+
+<h2 id="prompting">7. 提示與推理（Prompting &amp; Reasoning）</h2>
+
+<p>讓語言模型給出更好輸出的技巧。</p>
+
+<h3 id="prompt-engineering">7.1 提示工程（Prompt Engineering）</h3>
+
+<p><strong>精心設計輸入，引導 LLM 行為</strong>的實作。主要技巧：</p>
+
+<ul>
+  <li><strong>零樣本（Zero-shot）</strong>：直接提問，不給範例</li>
+  <li><strong>少樣本（Few-shot）</strong>：在提示裡附上範例</li>
+  <li><strong>角色扮演（Role-playing）</strong>：「你是一位專家……」</li>
+  <li><strong>結構化輸出（Structured output）</strong>：要求 JSON、markdown 等格式</li>
+</ul>
+
+<h3 id="context-engineering">7.2 脈絡工程（Context Engineering）</h3>
+
+<p>範圍更廣的做法：<strong>管理餵給 AI 系統的所有資訊</strong>，包括系統提示、檢索到的文件、對話歷史、工具輸出、使用者偏好。</p>
+
+<p>提示工程關注的是使用者那則訊息怎麼寫，脈絡工程看的是全貌：系統提示要放什麼？RAG 該檢索哪些文件？對話歷史塞多少才不超出脈絡視窗？工具輸出或範例要不要放進去？</p>
+
+<p><strong>為什麼重要：</strong>對正式上線的 AI 系統來說，脈絡工程往往比挑哪個模型更要緊。脈絡設計得好，小模型經常勝過脈絡給得差的大模型。我用 ADK 打造代理的經驗裡，脈絡管理做不做得好，常常就是展示品與可上線系統的分野。</p>
+
+<h3 id="chain-of-thought">7.3 思維鏈（Chain-of-Thought，CoT）</h3>
+
+<p>一種提示技巧，模型在給出最終答案前<strong>先一步步攤開推理過程</strong>。只要加上一句「Let's think step by step」，數學與邏輯任務的準確率就能提升 10-40%。</p>
+
+<h2 id="infrastructure">8. 基礎設施與檢索（Infrastructure &amp; Retrieval）</h2>
+
+<p>打造把 LLM 接上外部知識的系統。</p>
+
+<h3 id="embedding">8.1 嵌入（Embedding）</h3>
+
+<p>在連續空間裡用<strong>稠密向量表示資料</strong>，相似的東西會靠在一起。文字嵌入捕捉語意：「king」和「queen」很近，「king」和「apple」很遠。</p>
+
+<figure>
+  <img src="assets/viz-10.png" alt="嵌入空間：把詞當成向量（Embedding Space — Words as Vectors）">
+  <figcaption>嵌入空間：把詞當成向量（Embedding Space — Words as Vectors）</figcaption>
+</figure>
+
+<p>最著名的例子：embedding("king") - embedding("man") + embedding("woman") ≈ embedding("queen")</p>
+
+<h3 id="vector-database">8.2 向量資料庫（Vector Database）</h3>
+
+<p><strong>專門用來儲存與查詢高維向量</strong>的資料庫。它採用近似最近鄰（ANN）演算法，在數百萬筆嵌入中快速做相似度搜尋。</p>
+
+<p>常見選擇：Pinecone、Weaviate、ChromaDB、Milvus、pgvector（PostgreSQL 擴充套件）。</p>
+
+<h3 id="rag">8.3 檢索增強生成（Retrieval-Augmented Generation，RAG）</h3>
+
+<p>一種技巧：生成回應之前，<strong>先檢索相關文件並放進 LLM 的脈絡</strong>。這讓回應有事實依據、減少幻覺，也能取用私有或最新的資訊。</p>
+
+<figure>
+  <img src="assets/mermaid-4.png" alt="RAG 流程（RAG pipeline）">
+  <figcaption>RAG 流程（RAG pipeline）</figcaption>
+</figure>
+
+<p><em>RAG 流程：查詢 → 嵌入 → 搜尋向量資料庫 → 取出相關文件 → 擴充提示 → 生成有依據的回應。</em></p>
+
+<h2 id="modern">9. 現代 AI 系統（Modern AI Systems）</h2>
+
+<p>今天的 AI 系統是怎麼打造的。</p>
+
+<h3 id="mcp">9.1 MCP（Model Context Protocol）</h3>
+
+<p>Anthropic 推出的<strong>開放協定</strong>，用標準方式讓 AI 應用程式連接外部資料來源與工具。與其為每項服務各寫一套整合，MCP 提供一個通用介面。</p>
+
+<p>有了 MCP，AI 助手就能透過標準化的「MCP 伺服器」連接 Google Drive、Slack、GitHub、資料庫等服務，直接插上就能用。</p>
+
+<h3 id="agentic-ai">9.2 代理式 AI（Agentic AI）</h3>
+
+<p>能<strong>自主規劃、做決策、使用工具並採取行動</strong>來完成目標的 AI 系統。它不只回答問題，還能進行多步驟推理與執行。</p>
+
+<figure>
+  <img src="assets/mermaid-5.png" alt="代理式 AI 迴路（Agentic AI loop）">
+  <figcaption>代理式 AI 迴路（Agentic AI loop）</figcaption>
+</figure>
+
+<p><em>代理式 AI 迴路：接收目標 → 規劃步驟 → 使用工具執行操作 → 觀察結果 → 持續迭代，直到目標完成。</em></p>
+
+<p>代理式 AI 可以研究主題 → 寫程式 → 測試 → 修正錯誤 → 部署，全程自主完成，只需極少的人為介入。</p>
+
+<h2 id="conclusion">結語（Conclusion）</h2>
+
+<p>這 30 個術語構成現代 AI 開發的詞彙。無論你是在用 LLM、訓練自訂模型，還是設計 AI 系統，理解這些概念都能幫助你和團隊有效溝通，做出更好的技術決策。</p>
+
+<p>把這份詞彙表存起來，當作日後查閱的參考。AI 領域變化很快，但這些基礎概念依然適用。</p>
+
+<h2 id="resources">資源（Resources）</h2>
+
+<ul>
+  <li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>：最初的 Transformer 論文</li>
+  <li><a href="https://arxiv.org/abs/2106.09685">LoRA: Low-Rank Adaptation</a>：參數高效微調</li>
+  <li><a href="https://arxiv.org/abs/2201.11903">Chain-of-Thought Prompting</a>：逐步推理</li>
+  <li><a href="https://arxiv.org/abs/2005.11401">RAG: Retrieval-Augmented Generation</a>：讓 LLM 以知識為依據</li>
+  <li><a href="https://modelcontextprotocol.io/">Model Context Protocol (MCP)</a>：AI 整合的開放協定</li>
+</ul>
+<h3>留言（Comments）</h3>
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://arjunprabhulal.com/ai-ml-essential-terms/">Top 30 AI/ML Terms Every Developer Should Know</a>（2025-12-07）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

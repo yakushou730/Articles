@@ -222,6 +222,34 @@ Apply every high and medium finding yourself, then re-run the render check
 (step 5) if markup or images changed. Report the reviewer's findings and your
 resolution in the final answer.
 
+### 8. Commit and push
+
+After the translation, render verification, and reviewer resolution all pass,
+automatically commit and push the completed work. Do not commit or push when
+the duplicate-source check rejects the URL or when any required verification
+fails.
+
+1. Check the working tree and identify only the files changed by this
+   translation workflow. This normally includes the new `<slug>/` article
+   folder and any glossary or index files explicitly updated by the workflow.
+2. Stage those explicit paths only. Never use `git add -A` or stage unrelated
+   user changes.
+3. If there are no staged changes, report that there is nothing to commit and
+   do not create an empty commit.
+4. Create a commit using this message format:
+
+   ```text
+   Add Traditional Chinese translation: <slug>
+   ```
+
+5. Push the current branch to its configured upstream with `git push`.
+6. Report the commit hash and push result. If commit or push fails, report the
+   exact command failure and do not claim completion.
+
+The commit and push are part of the successful workflow, not an optional
+follow-up. Perform them only after all article files, local images, glossary
+updates, index updates, and review fixes are complete.
+
 ## Rules
 
 - Never translate a page you could not fetch — report the failure instead of
