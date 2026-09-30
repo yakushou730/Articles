@@ -290,6 +290,41 @@ they are frequently mistranslated.
 | agentic AI | 代理式 AI（agentic AI） |
 | open protocol | 開放協定（open protocol） |
 
+## Harness engineering for coding agent users (Martin Fowler, 2026-04-02)
+
+| English | 繁中 |
+|---|---|
+| harness engineering | 工具鏈工程 |
+| harness | 工具鏈（harness） |
+| bounded context | 受約束的脈絡（bounded context） |
+| feedforward control | 前饋控制 |
+| feedback control | 回饋控制 |
+| guide | 引導 |
+| sensor | 感測器 |
+| computational | 運算式 |
+| inferential | 推論式 |
+| steering loop | 操舵迴路 |
+| steer | 操舵 |
+| governor (cybernetic) | 調節器（governor） |
+| regulation category | 調節類別 |
+| maintainability harness | 可維護性工具鏈 |
+| architecture fitness harness | 架構適應性工具鏈 |
+| behaviour harness | 行為工具鏈 |
+| harnessability | 可工具鏈化程度 |
+| harness template | 工具鏈模板 |
+| service template | 服務模板 |
+| topology | 拓樸 |
+| ambient affordances | 環境賦予的可能（ambient affordances） |
+| Ashby's Law of Requisite Variety | Ashby 的必要多樣性定律 |
+| approved fixtures | 已核准的夾具（approved fixtures） |
+| review toil | 審查的粗活 |
+| structural test | 結構測試 |
+| mutation testing | 突變測試 |
+| semantic judgment | 語意判斷 |
+| significant revisions | 重要修訂 |
+| janitor army | 清潔工大軍 |
+| load-bearing convention | 承重的慣例 |
+
 ## Kept in English
 
 Acronyms and product or project names: LLM, API, SDK, CLI, JSON, HTML, CSS,
