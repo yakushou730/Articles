@@ -90,6 +90,11 @@ Translate every prose block into Traditional Chinese. Rules:
   `<strong>` / `<em>`; do not flatten them.
 - Do not add content, examples, opinions, or "clarifications" absent from the
   source. Do not soften claims. Translate faithfully.
+- **Match the source's register.** A technical article stays a technical
+  article: formal English gets formal Chinese. Do not reach for spoken
+  vocabulary (其實、你也可以、試試、吧) or clip a sentence into a fragment to
+  sound natural — that trades fidelity for a voice the source does not have.
+  Register is set here, not repaired in step 3.
 - Use a consistent register: technical prose, 繁體中文, full-width punctuation
   （，。「」）with half-width punctuation inside English spans.
 
@@ -118,8 +123,51 @@ flow better. Where the source hedges, hedge; where it is blunt, be blunt.
 Fidelity outranks naturalness — if a faithful phrasing is stiff, reshape the
 syntax, do not cut the content.
 
-Also vary sentence length and paragraph endings; three consecutive sentences of
-similar length read as generated.
+#### The register floor（語域下限）
+
+A subtractive pass has no floor of its own, so this one gets an explicit gate:
+**the register may never drop below the source's.** Every rule above removes
+something; each cut looks harmless alone, and the sum is a technical article
+that reads like a chat message. 其實、你也可以、你要、試試、吧、喔、啦、很棒、
+就對了 — none of these belong in technical prose unless the source is itself
+that casual. Full list: `references/de-ai-patterns.md` section C.
+
+**Do not confuse sentence choice with sentence length.** "Vary sentence
+length" means avoid five clauses of equal weight in a row; it does not mean
+delete words until the sentence is short. Two consecutive clipped sentences
+(≤12 Chinese characters each) read as shredded, not crisp:
+
+- Bad — `但代價高，而且是機率性的。不可能每次提交都跑。`
+- Better — `但代價高，而且是機率性的，不可能每次提交都跑。`
+
+When a sentence cannot be shortened without losing a claim, leave it long.
+The claim wins.
+
+#### Read every paragraph aloud（段落通順）
+
+Then read each paragraph as a whole, not sentence by sentence. The defects
+below are invisible to a per-sentence pass because each sentence is fine on
+its own:
+
+- **Merge, don't chop** — regenerating a sentence should leave a paragraph
+  that flows when read continuously.
+- **Dangling references** — a pronoun or bare noun whose antecedent was
+  dropped in an earlier edit. If a reader has to back up to parse it, fix it.
+- **Lost connectives** — Chinese often needs an explicit 因此／但／而 where
+  English relied on juxtaposition; and conversely, a spelled-out connective
+  where the source simply put two clauses side by side is padding.
+- **Uniform rhythm** — three paragraphs ending the same way.
+
+#### Verify with the linter
+
+```bash
+python3 .claude/skills/generate-traditional-chinese-web-content/scripts/check_register.py <article.html>
+```
+
+Exit 0 means no mechanical defect remains. It hard-fails on em-dash over
+budget, `當…時`, a short AI-vocabulary list, and nothing else; everything
+requiring taste is printed only with `--soft`. Do not "fix" a soft finding
+that is faithful to the source — the linter gates mechanics, not style.
 
 ### 4. Render with the shipped template
 
@@ -170,9 +218,11 @@ Fix any failure before proceeding. Do not report success from inspection alone.
 
 ### 7. Review with a subagent
 
-Spawn a `reviewer` subagent in the same turn the file is finished. The reviewer
-checks **fidelity and readability separately** — a translation can be accurate
-and still read as machine output, and those are different findings.
+Spawn a `reviewer` subagent in the same turn the file is finished. Run
+`scripts/check_register.py` first — the reviewer should be spending its effort
+on judgment, not on counting em dashes the linter already counts. The reviewer
+checks **fidelity, register, and readability separately** — a translation can
+be accurate and still read as machine output, and those are different findings.
 
 Give it the source URL, the generated file path, and this brief:
 
@@ -204,18 +254,34 @@ Non-goals: do not rewrite or restyle; do not edit files.
 10. Translationese — calqued pronouns (其／它的 with an obvious referent),
    當…時 for "when", light verbs (進行／做出／加以 + noun), 被 passives,
    two 的 in a short span. Quote each instance.
-11. Readability — read the prose as a native reader would. Flag any sentence
-   that must be re-read to parse, any paragraph where three consecutive
-   sentences have similar length, and any passage that reads like a translated
-   English sentence rather than a Chinese one. Judge this against
-   `references/de-ai-patterns.md`.
+11. Register consistency — the translation's register must sit at or above the
+   source's, never below. Quote any 其實、你也可以、你要、試試、吧、喔、啦、
+   很棒、就對了, and say whether the English at that point is itself that
+   casual. A colloquial rendering of a formal English sentence is a defect;
+   a colloquial rendering of a colloquial English sentence is not. State this
+   per instance.
+12. Fragmentation — flag any paragraph containing two or more consecutive
+   clipped sentences (roughly ≤12 Chinese characters each) that read as
+   chopped rather than crisp, and any paragraph where merging two short
+   sentences would restore the source's clause structure. Quote the run.
+   Balance this against category 11: do not recommend merging a short
+   sentence the source itself keeps short for emphasis.
+13. Readability — read the prose as a native reader would. Flag sentences that
+   must be re-read to parse, pronouns or bare nouns whose antecedent was
+   dropped, missing 因此／但／而 where Chinese needs a connective, paragraphs
+   ending uniformly, and any passage that reads like a translated English
+   sentence rather than a Chinese one. Judge this against
+   `references/de-ai-patterns.md` sections C and D.
 
 # Acceptance
 Output a findings list. Each finding: severity (high/medium/low), location
-(quote or heading), the problem, and the concrete fix. For AI-flavor and
-translationese findings, quote the offending text verbatim. State explicitly
-if a category is clean. For the fidelity categories (1-8), verify against the
-source; for 9-11, judge the Chinese as prose. Do not restate the document.
+(quote or heading), the problem, and the concrete fix. For AI-flavor,
+translationese, register, and fragmentation findings, quote the offending text
+verbatim and say whether the source sentence at that point carries the same
+register — a colloquial rendering of formal English is a defect, a colloquial
+rendering of colloquial English is not. State explicitly if a category is
+clean. For the fidelity categories (1-8), verify against the source; for 9-13,
+judge the Chinese as prose. Do not restate the document.
 ```
 
 Apply every high and medium finding yourself, then re-run the render check
@@ -224,10 +290,10 @@ resolution in the final answer.
 
 ### 8. Commit and push
 
-After the translation, render verification, and reviewer resolution all pass,
-automatically commit and push the completed work. Do not commit or push when
-the duplicate-source check rejects the URL or when any required verification
-fails.
+After the translation, render verification, linter, and reviewer resolution all
+pass, automatically commit and push the completed work. Do not commit or push
+when the duplicate-source check rejects the URL or when any required
+verification fails.
 
 1. Check the working tree and identify only the files changed by this
    translation workflow. This normally includes the new `<slug>/` article
@@ -258,6 +324,10 @@ updates, index updates, and review fixes are complete.
 - Never leave the page dependent on the source CDN for images.
 - Never let the de-AI pass add facts or drop claims. It removes machine flavor
   and translationese; it does not editorialize, and it does not invent a voice.
+- Never let the de-AI pass lower the register below the source's, or chop a
+  paragraph into clipped fragments. Both are the pass overshooting, not the
+  pass working: subtract only what the source's own register does not need.
+  Run `scripts/check_register.py` before committing; exit 1 means unfinished.
 - Never machine-translate and ship. A draft that mirrors English sentence
   structure is unfinished work, not a translation.
 - The reviewer reviews; it does not edit. The main agent owns all edits.
