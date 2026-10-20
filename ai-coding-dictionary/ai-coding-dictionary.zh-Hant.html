@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 編碼詞典（AI Coding Dictionary）</title>
+<meta name="description" content="把代理式編碼（agentic coding）的術語整理成可快速掃讀的繁體中文定義，涵蓋模型、工作階段與脈絡視窗、工具、失敗模式、交接、記憶與引導、工作模式，共 71 個條目。">
+<!-- Tags for the root index page. Written as a comma-separated list; the
+     index is rebuilt from this on push, so editing this line is how a tag
+     gets changed. Reuse existing tags where one fits. -->
+<meta name="tags" content="代理,工具鏈,脈絡工程,記憶與脈絡,LLM">
+<style>
+  :root{
+    --bg:#faf9f5;
+    --fg:#141413;
+    --fg-soft:#5c5b57;
+    --rule:#e3e1da;
+    --accent:#c15f3c;
+    --code-bg:#f0eee6;
+    --max:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141413;
+      --fg:#f0eee6;
+      --fg-soft:#a8a59c;
+      --rule:#33312c;
+      --accent:#e0895f;
+      --code-bg:#1f1e1b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Songti TC","Noto Serif TC","PingFang TC","Microsoft JhengHei",Georgia,serif;
+    font-size:1.0625rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1.75rem;
+    margin-bottom:2.5rem;
+  }
+  .kicker{
+    font-family:ui-sans-serif,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .9rem;
+  }
+  h1{
+    font-size:2.15rem;
+    line-height:1.3;
+    margin:0 0 .8rem;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .pubdate{color:var(--fg-soft);font-size:.92rem;margin:0}
+  .count{color:var(--fg-soft);font-size:.85rem;margin:-.6rem 0 1.2rem}
+  h2{
+    font-size:1.45rem;
+    line-height:1.4;
+    margin:3.25rem 0 1rem;
+    font-weight:600;
+    padding-top:.25rem;
+  }
+  h3{
+    font-size:1.15rem;
+    margin:2.5rem 0 .85rem;
+    font-weight:600;
+  }
+  h2+h3{margin-top:1.25rem}
+  p{margin:0 0 1.15rem}
+  ul,ol{margin:0 0 1.25rem;padding-left:1.5rem}
+  li{margin:.4rem 0}
+  li>ul,li>ol{margin:.4rem 0 .3rem}
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--fg-soft);text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+  strong{font-weight:650}
+  em{font-style:italic}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88em;
+    background:var(--code-bg);
+    padding:.1em .35em;
+    border-radius:4px;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-size:.88rem;
+    line-height:1.65;
+  }
+  pre code{background:none;padding:0;font-size:inherit}
+  blockquote{
+    margin:1.75rem 0;
+    padding:.9rem 1.25rem;
+    border-left:3px solid var(--accent);
+    background:var(--code-bg);
+    border-radius:0 6px 6px 0;
+    color:var(--fg-soft);
+    font-size:.97rem;
+  }
+  blockquote p:last-child{margin-bottom:0}
+  figure{margin:2.25rem 0}
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:#fff;
+  }
+  figcaption{
+    text-align:center;
+    color:var(--fg-soft);
+    font-size:.86rem;
+    margin-top:.7rem;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.5rem 0;
+    font-size:.94rem;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:.55rem .75rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--code-bg);font-weight:600}
+  hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0}
+  .lede{font-size:1.15rem;line-height:1.75}
+  footer.mastfoot{
+    margin-top:4rem;
+    padding-top:1.5rem;
+    border-top:1px solid var(--rule);
+    color:var(--fg-soft);
+    font-size:.88rem;
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .wrap{max-width:none;padding:0}
+    figure img{border:0}
+    a{text-decoration:none;color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">AI Hero · 詞典（Dictionary）</p>
+  <h1>用白話講清楚 AI 編碼的詞彙（The vocabulary of AI coding, in plain English）</h1>
+  <p class="pubdate">最後更新：2026 年 9 月 24 日</p>
+</header>
+
+<main id="main-content">
+
+<p class="lede">這裡把讓代理式編碼（agentic coding）真正開竅的術語，整理成可以快速掃讀的定義。以下共 71 個條目，也可以直接跳到某個章節。</p>
+
+<p>GitHub 上的原始清單：<a href="https://github.com/mattpocock/dictionary-of-ai-coding">mattpocock/dictionary-of-ai-coding</a>（5,175 顆星）。</p>
+
+<ul>
+  <li><a href="#the-model">模型（The Model）</a>：16 個條目</li>
+  <li><a href="#sessions-context-windows-turns">工作階段、脈絡視窗與輪次（Sessions, Context Windows &amp; Turns）</a>：8 個條目</li>
+  <li><a href="#tools-environment">工具與環境（Tools &amp; Environment）</a>：10 個條目</li>
+  <li><a href="#failure-modes">失敗模式（Failure Modes）</a>：9 個條目</li>
+  <li><a href="#handoffs">交接（Handoffs）</a>：9 個條目</li>
+  <li><a href="#memory-and-steering">記憶與引導（Memory and Steering）</a>：6 個條目</li>
+  <li><a href="#patterns-of-work">工作模式（Patterns of Work）</a>：13 個條目</li>
+</ul>
+
+<h2 id="the-model">模型（The Model）</h2>
+<p class="count">16 個條目</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/ai">AI</a></h3>
+<p>一個會移動的標籤，不是一項技術。它指向電腦當下能做、而且令人印象深刻的新事情，目前是大型語言模型（large language models）。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/model">模型（Model）</a></h3>
+<p>參數本身。無狀態，只做下一 token 預測，別無其他。單靠自己做不到任何代理式（agentic）的事。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/parameters">參數（Parameters）</a></h3>
+<p>模型內部的數字，常有數十億個，在訓練期間調整。模型知道的一切都住在這些數字裡，也稱權重（weights）。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/training">訓練（Training）</a></h3>
+<p>設定模型參數的過程：讓模型接觸大量文本，並調整參數以改善下一 token 預測。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/inference">推論（Inference）</a></h3>
+<p>執行訓練好的模型以產生輸出，每次向模型供應商（model provider）發出請求時都會發生。參數維持不變。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/effort">推理力度（Effort）</a></h3>
+<p>控制模型回答前做多少推理的旋鈕。力度越高，花掉越多輸出 token，換取攻克難題的更好機會。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/token">Token</a></h3>
+<p>模型讀寫的原子單位。大小約略是一個詞，但不完全相等。脈絡視窗（context window）的大小、成本與延遲都以 token 計算。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/next-token-prediction">下一 token 預測（Next-token prediction）</a></h3>
+<p>模型實際在做的事。從脈絡取樣一個下一 token，附加上去，再跑一次。這是它唯一的運作方式。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/non-determinism">非決定性（Non-determinism）</a></h3>
+<p>同樣的輸入可能產生不同的輸出。這既來自模型生成文字的方式，也來自供應商如何處理請求。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/model-provider">模型供應商（Model provider）</a></h3>
+<p>為推論提供模型的一方。通常是遠端服務（Anthropic、OpenAI、Google），也可以是本機（Ollama、llama.cpp）。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/harness">工具鏈（Harness）</a></h3>
+<p>模型之外、把模型變成代理（agent）的一切：工具、系統提示（system prompt）、脈絡視窗管理、權限、hook。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/model-provider-request">模型供應商請求（Model provider request）</a></h3>
+<p>從工具鏈到模型供應商的一次來回。工具鏈送出脈絡，供應商回傳一個回應。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/input-tokens">輸入 token（Input tokens）</a></h3>
+<p>工具鏈在每次模型供應商請求中送出的 token。計費費率低於輸出 token。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/output-tokens">輸出 token（Output tokens）</a></h3>
+<p>模型生成並回傳的 token。計費費率高於輸入 token，因為產出它們耗費更多算力。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/prefix-cache">前綴快取（Prefix cache）</a></h3>
+<p>供應商端的儲存，讓連續請求跳過重複處理共享的前綴，並以較低費率計算那些 token。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/cache-tokens">快取 token（Cache tokens）</a></h3>
+<p>供應商透過前綴快取、從先前請求快取住的輸入 token，計費費率低了許多。</p>
+
+<h2 id="sessions-context-windows-turns">工作階段、脈絡視窗與輪次（Sessions, Context Windows &amp; Turns）</h2>
+<p class="count">8 個條目</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/stateless">無狀態（Stateless）</a></h3>
+<p>不把資訊帶到後續。模型跨請求是無狀態的；代理跨工作階段（session）預設也是無狀態的。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/context">脈絡（Context）</a></h3>
+<p>代理現在能取用的相關資訊，也就是代理所知、與任務相關的部分。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/context-window">脈絡視窗（Context window）</a></h3>
+<p>模型在每次模型供應商請求中看到的全部內容。有限、因模型而異，是模型感知外界的唯一介面。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/stateful">有狀態（Stateful）</a></h3>
+<p>把資訊帶到後續。工作階段跨輪次是有狀態的；代理可以透過記憶系統（memory system）做到跨工作階段有狀態。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/agent">代理（Agent）</a></h3>
+<p>以工具、系統提示（system prompt）與脈絡視窗裝備起來的模型，能和使用者一來一往。是動起來的模型。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/system-prompt">系統提示（System prompt）</a></h3>
+<p>工具鏈加在每次模型供應商請求最前面的指令，是代理的常設任務簡報。通常在一個工作階段內保持穩定。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/session">工作階段（Session）</a></h3>
+<p>與代理互動的一段有界執行。從空白開始、逐步累積，在清除、關閉或壓縮成新的工作階段時結束。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/turn">輪次（Turn）</a></h3>
+<p>一則使用者訊息，加上代理回應時所做的一切，直到把控制權交還使用者。其中包含一次或多次模型供應商請求。</p>
+
+<h2 id="tools-environment">工具與環境（Tools &amp; Environment）</h2>
+<p class="count">10 個條目</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/environment">環境（Environment）</a></h3>
+<p>代理所作用的世界：工具鏈之外的一切，代理透過工具結果感知它，透過工具呼叫改變它。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/filesystem">檔案系統（Filesystem）</a></h3>
+<p>代理讀取、寫入與執行所在的檔案與目錄樹，是寫程式代理的預設環境。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/tool">工具（Tool）</a></h3>
+<p>工具鏈開放給代理呼叫的函式：Read、Write、Bash、Search。代理藉此感知並作用於環境。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/tool-call">工具呼叫（Tool call）</a></h3>
+<p>模型的輸出，指名某個工具及其引數，本身只是結構化文字。工具鏈必須讀取並執行它。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/tool-result">工具結果（Tool result）</a></h3>
+<p>工具鏈執行工具呼叫後送回的內容：檔案內容、輸出或錯誤。這是代理看見環境的唯一途徑。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/mcp">MCP</a></h3>
+<p>把外部工具伺服器接上工具鏈的協定，讓代理取得工具鏈內建以外的工具。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/permission-request">權限請求（Permission request）</a></h3>
+<p>工具鏈在執行未預先核准的工具呼叫前，向使用者顯示的請求。這是把人放進迴路的機制。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/permission-mode">權限模式（Permission mode）</a></h3>
+<p>代理模式中負責權限管制的那一部分：哪些工具呼叫會觸發權限請求，哪些會自動執行。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/agent-mode">代理模式（Agent mode）</a></h3>
+<p>一組預設，把權限模式與注入系統提示的行為指令綁在一起。可以在工作階段中途切換。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/sandbox">沙箱（Sandbox）</a></h3>
+<p>代理在其內部執行的隔離環境：容器、虛擬機或受限的 shell。它限制代理行動的影響半徑（blast radius）。</p>
+
+<h2 id="failure-modes">失敗模式（Failure Modes）</h2>
+<p class="count">9 個條目</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/sycophancy">諂媚（Sycophancy）</a></h3>
+<p>信心十足地迎合使用者的模型輸出。成因是訓練把模型塑造成偏好人類喜歡的答案，包括附和。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/hallucination">幻覺（Hallucination）</a></h3>
+<p>信心十足卻錯誤的模型輸出。有兩種：事實性（憑空捏造事實），以及忠實性（沒有忠於已載入的脈絡）。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/parametric-knowledge">參數知識（Parametric knowledge）</a></h3>
+<p>模型從訓練得來的知識，存放在參數中。在訓練時凍結。對應於脈絡知識（contextual knowledge）。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/knowledge-cutoff">知識截止（Knowledge cutoff）</a></h3>
+<p>超過這個日期，模型就沒有參數知識。截止後才出現的函式庫與 API 是捏造陷阱，除非載入文件。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/contextual-knowledge">脈絡知識（Contextual knowledge）</a></h3>
+<p>代理現在能直接從脈絡讀到的事實。對應於參數知識。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/attention-relationship">注意力關係（Attention relationship）</a></h3>
+<p>兩個 token 之間的配對：有意義的配對彼此影響，比不相關的配對更多。N 個 token 的脈絡約有 N² 個這種配對。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/attention-budget">注意力預算（Attention budget）</a></h3>
+<p>每個 token 能往外分配到脈絡其餘部分的影響力有限。額度以單一 token 計算，脈絡變長也不會增加。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/attention-degradation">注意力衰減（Attention degradation）</a></h3>
+<p>工作階段變長時，每個 token 的注意力預算攤到更多競爭者上，有意義關係上的訊號因此縮小。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/smart-zone">聰明區（Smart zone）</a></h3>
+<p>工作階段初期，代理敏銳而專注。隨著工作階段變長，它漂進笨區：更馬虎、更健忘、更多錯誤。</p>
+
+<h2 id="handoffs">交接（Handoffs）</h2>
+<p class="count">9 個條目</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/clearing">清除（Clearing）</a></h3>
+<p>結束目前的工作階段，另起一個新的。下一則訊息從空白的工作階段與空白的脈絡視窗開始。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/handoff">交接（Handoff）</a></h3>
+<p>把代理的脈絡從一個工作階段轉移到另一個，且沒有回頭路。承載機制不一：產出物、壓縮，或其他方式。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/primary-source">一手來源（Primary source）</a></h3>
+<p>事物本身：程式碼、對話紀錄、原始資料。完整且具權威性，但載入脈絡的代價高。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/secondary-source">二手來源（Secondary source）</a></h3>
+<p>對一手來源的轉述，隔了一層：摘要、文件、壓縮摘要。載入便宜，但本質上會失真。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/handoff-artifact">交接產出物（Handoff artifact）</a></h3>
+<p>用作交接承載機制的文件，由一個工作階段寫下，供另一個工作階段閱讀。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/spec">規格（Spec）</a></h3>
+<p>描述一件橫跨多個工作階段的工作的交接產出物：要建什麼，而不是每個工作階段怎麼做自己負責的那一份。由票（ticket）組成。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/ticket">票（ticket）</a></h3>
+<p>界定一個工作階段範圍的交接產出物。可獨立存在，也可掛在規格之下。可以阻擋同層的票，也可能受同層的票阻擋。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/compaction">壓縮（Compaction）</a></h3>
+<p>在記憶體內完成的交接：前一個工作階段的歷史摘要成新工作階段的起點。有損：用細節換取餘裕。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/autocompact">自動壓縮（Autocompact）</a></h3>
+<p>脈絡視窗接近全滿時，由工具鏈自動觸發的壓縮。</p>
+
+<h2 id="memory-and-steering">記憶與引導（Memory and Steering）</h2>
+<p class="count">6 個條目</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/memory-system">記憶系統（Memory system）</a></h3>
+<p>試圖讓代理跨工作階段有狀態的系統，做法是持久化到環境，並在工作階段開始時重新載入。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/agents-md">AGENTS.md</a></h3>
+<p>存在於環境中的檔案，工具鏈在工作階段開始時把它載入脈絡視窗。它是專案對代理的常設任務簡報。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/progressive-disclosure">漸進式揭露（Progressive disclosure）</a></h3>
+<p>只載入代理現在需要的脈絡，其餘的用脈絡指標（context pointer）標示，需要時再拉進來。概念借自 UI 設計。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/context-pointer">脈絡指標（Context pointer）</a></h3>
+<p>一份文件中的提及，指向另一份文件，讓代理只在任務需要時才把它拉進脈絡。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/skill">Skill</a></h3>
+<p>打包成一個單位的可教能力，平時留在脈絡視窗外，直到脈絡指標為了眼前任務把它拉進來。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/subagent">子代理（Subagent）</a></h3>
+<p>由另一個代理透過工具呼叫啟動的代理。在自己的工作階段中執行，回報單一工具結果。無法再啟動子代理。</p>
+
+<h2 id="patterns-of-work">工作模式（Patterns of Work）</h2>
+<p class="count">13 個條目</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/human-in-the-loop">人為介入（Human-in-the-loop）</a></h3>
+<p>一種工作模式：一個或多個人類在工作階段中與代理並肩作業，即時審查、導正或協作。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/afk">AFK</a></h3>
+<p>一種工作模式：使用者啟動工作階段後離開，讓代理無人看管地執行（away from keyboard）。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/automated-check">自動化檢查（Automated check）</a></h3>
+<p>在環境中執行的確定性驗證：測試、型別檢查、lint、建置、pre-commit hook。只有通過或失敗，不做判斷。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/automated-review">自動化審查（Automated review）</a></h3>
+<p>由一個代理審查另一個代理的成果，常用不同的模型或系統提示。非決定性：它會形成判斷。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/human-review">人為審查（Human review）</a></h3>
+<p>使用者閱讀代理產出的程式碼，並據此形成判斷。讀 diff 算數；只讀摘要不算。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/vibe-coding">氛圍編碼（Vibe coding）</a></h3>
+<p>一種工作模式：使用者不經人為審查就接受代理的程式碼。使用者把 diff 當成看不透的黑箱。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/design-concept">設計概念（Design concept）</a></h3>
+<p>對要建什麼的共同理解，存在於使用者與代理之間，但獨立於任何產出物。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/grilling">盤問（Grilling）</a></h3>
+<p>發展設計概念的一種技巧：代理以蘇格拉底式提問訪談使用者，一次一個決策。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/prototyping">原型製作（Prototyping）</a></h3>
+<p>對話的保真度太低、需要一個具體產出物才能討論時，先請代理做一個粗略可用的版本。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/dx">開發者體驗（DX）</a></h3>
+<p>開發者體驗：程式碼庫與其工具鏈讓人類做好工作的容易程度，包含文件、回饋速度、錯誤呈現。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/ax">代理體驗（AX）</a></h3>
+<p>代理體驗：環境為代理提供的條件有多好，讓代理能把工作做好，包含檢查、架構，以及不必花脈絡就能取得的資訊。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/software-factory">軟體工廠（Software factory）</a></h3>
+<p>一種工作系統：由觸發器而非人類啟動代理工作階段，讓更多工作以 AFK 執行，並把 HITL 時間留給真正需要的地方。</p>
+
+<h3><a href="https://www.aihero.dev/ai-coding-dictionary/dark-factory">暗工廠（Dark factory）</a></h3>
+<p>一個程式碼庫，或其中一部分，由軟體工廠寫程式碼，且永遠沒有人審查。</p>
+
+<h2>想要的不只是詞彙？（Want more than vocabulary?）</h2>
+
+<p>加入 <a href="https://www.aihero.dev/newsletter">AI Hero</a>，取得實用技能、AI 工程的思考，以及讓你保持領先的資源。</p>
+
+<p>不會寄垃圾郵件。隨時可退訂。</p>
+
+</main>
+
+<footer class="mastfoot">
+  <p>本文為 <a href="https://www.aihero.dev/ai-coding-dictionary">The vocabulary of AI coding, in plain English.</a>（2026-09-24）的繁體中文翻譯，僅供本機閱讀。專有名詞與關鍵術語保留原文並以括號標註。</p>
+</footer>
+
+</div>
+</body>
+</html>

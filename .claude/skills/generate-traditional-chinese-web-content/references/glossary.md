@@ -339,6 +339,50 @@ Dagster, Inngest, Windmill, BAML, Stripe, HumanLayer.
 | legibility | 可讀性（legibility） |
 | system of record | 系統的記錄依據（system of record） |
 
+## AI Coding Dictionary (AI Hero, 2026-09-24)
+
+| English | 繁中 |
+|---|---|
+| harness | 工具鏈 |
+| model provider | 模型供應商 |
+| model provider request | 模型供應商請求 |
+| effort (reasoning effort) | 推理力度 |
+| next-token prediction | 下一 token 預測 |
+| non-determinism | 非決定性 |
+| parameters / weights | 參數／權重 |
+| inference | 推論 |
+| prefix cache | 前綴快取 |
+| cache tokens | 快取 token（cache tokens） |
+| input tokens / output tokens | 輸入 token／輸出 token |
+| stateless / stateful | 無狀態／有狀態 |
+| turn | 輪次 |
+| environment | 環境 |
+| tool call | 工具呼叫 |
+| tool result | 工具結果 |
+| sycophancy | 諂媚 |
+| parametric knowledge | 參數知識 |
+| knowledge cutoff | 知識截止 |
+| contextual knowledge | 脈絡知識 |
+| attention relationship | 注意力關係 |
+| attention budget | 注意力預算 |
+| attention degradation | 注意力衰減 |
+| smart zone / dumb zone | 聰明區／笨區 |
+| clearing | 清除 |
+| primary source / secondary source | 一手來源／二手來源 |
+| handoff artifact | 交接產出物 |
+| autocompact | 自動壓縮 |
+| memory system | 記憶系統 |
+| progressive disclosure | 漸進式揭露 |
+| context pointer | 脈絡指標 |
+| vibe coding | 氛圍編碼 |
+| design concept | 設計概念 |
+| grilling | 盤問 |
+| prototyping | 原型製作 |
+| DX (developer experience) | 開發者體驗（DX） |
+| AX (agent experience) | 代理體驗（AX） |
+| software factory | 軟體工廠 |
+| dark factory | 暗工廠 |
+
 ## Style rules
 
 - Full-width punctuation in Chinese prose（，。「」：；？）, half-width inside
