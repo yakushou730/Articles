@@ -324,6 +324,13 @@ they are frequently mistranslated.
 | significant revisions | 重要修訂 |
 | janitor army | 清潔工大軍 |
 | load-bearing convention | 承重的慣例 |
+| code review | 程式碼審查 |
+| merge queue | 合併佇列 |
+| feature flag | 功能旗標 |
+| incident | 事故 |
+| revert | 回復 |
+| classifier | 分類器 |
+| rounds-to-pass | 通過所需輪數 |
 
 ## Kept in English
 

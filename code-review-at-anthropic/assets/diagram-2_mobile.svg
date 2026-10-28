@@ -1,0 +1,46 @@
+<svg width="300" height="304" viewBox="0 0 300 304" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:system-ui,-apple-system,sans-serif}</style>
+<text x="2" y="14" font-size="13" style="fill:#4c4b45">問題落入各層</text>
+<path d="M82 22 L82 278" fill="none" stroke-width="1" stroke-dasharray="3 3" style="stroke:#c15f3c"></path>
+<path d="M24 22 L24 45" fill="none" stroke-width="1" stroke-dasharray="3 3" opacity=".55" style="stroke:#c15f3c"></path>
+<path d="M140 22 L140 45" fill="none" stroke-width="1" stroke-dasharray="3 3" opacity=".55" style="stroke:#c15f3c"></path>
+<path d="M40.6 55.5 L40.6 85" fill="none" stroke-width="1" stroke-dasharray="3 3" opacity=".55" style="stroke:#c15f3c"></path>
+<path d="M126.2 95.5 L126.2 125" fill="none" stroke-width="1" stroke-dasharray="3 3" opacity=".55" style="stroke:#c15f3c"></path>
+<path d="M54.4 135.5 L54.4 165" fill="none" stroke-width="1" stroke-dasharray="3 3" opacity=".55" style="stroke:#c15f3c"></path>
+<path d="M116.5 175.5 L116.5 205" fill="none" stroke-width="1" stroke-dasharray="3 3" opacity=".55" style="stroke:#c15f3c"></path>
+<path d="M35.1 215.5 L35.1 245" fill="none" stroke-width="1" stroke-dasharray="3 3" opacity=".55" style="stroke:#c15f3c"></path>
+<polygon points="2,60 140,60 162,44 24,44" stroke-width="1" style="fill:#1414131c;stroke:#14141338"></polygon>
+<ellipse cx="82" cy="52" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<ellipse cx="40.6" cy="52" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<text x="174" y="56.5" font-size="13" style="fill:#141413">驗證</text>
+<polygon points="2,100 140,100 162,84 24,84" stroke-width="1" style="fill:#1414131c;stroke:#14141338"></polygon>
+<ellipse cx="82" cy="92" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<ellipse cx="126.2" cy="92" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<text x="174" y="96.5" font-size="13" style="fill:#141413">必要 CI</text>
+<polygon points="2,140 140,140 162,124 24,124" stroke-width="1" style="fill:#1414131c;stroke:#14141338"></polygon>
+<ellipse cx="82" cy="132" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<ellipse cx="54.4" cy="132" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<text x="174" y="136.5" font-size="13" style="fill:#141413">AI 審查</text>
+<polygon points="2,180 140,180 162,164 24,164" stroke-width="1" style="fill:#1414131c;stroke:#14141338"></polygon>
+<ellipse cx="82" cy="172" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<ellipse cx="116.5" cy="172" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<text x="174" y="176.5" font-size="13" style="fill:#141413">安全審查</text>
+<polygon points="2,220 140,220 162,204 24,204" stroke-width="1" style="fill:#1414131c;stroke:#14141338"></polygon>
+<ellipse cx="82" cy="212" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<ellipse cx="35.1" cy="212" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<text x="174" y="216.5" font-size="13" style="fill:#141413">人為核准</text>
+<polygon points="2,260 140,260 162,244 24,244" stroke-width="1" style="fill:#1414131c;stroke:#14141338"></polygon>
+<ellipse cx="82" cy="252" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<ellipse cx="131.7" cy="252" rx="10" ry="3.5" stroke-width="1" style="fill:#faf9f5;stroke:#14141338"></ellipse>
+<text x="174" y="256.5" font-size="13" style="fill:#141413">合併佇列與旗標</text>
+<path d="M82 48.5 L82 255.5" fill="none" stroke-width="1" stroke-dasharray="3 3" style="stroke:#c15f3c"></path>
+<circle cx="24" cy="50" r="4.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<circle cx="140" cy="50" r="4.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<circle cx="40.6" cy="90" r="4.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<circle cx="126.2" cy="130" r="4.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<circle cx="54.4" cy="170" r="4.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<circle cx="116.5" cy="210" r="4.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<circle cx="35.1" cy="250" r="4.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<path d="M48 276 Q82 304 116 276" fill="none" stroke-width="1" style="stroke:#c15f3c"></path>
+<circle cx="82" cy="286" r="5.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<text x="174" y="290.5" font-size="13" font-weight="500" style="fill:#c15f3c">快速回復</text>
+</svg>

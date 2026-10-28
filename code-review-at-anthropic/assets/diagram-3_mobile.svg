@@ -1,0 +1,32 @@
+<svg width="300" height="306" viewBox="0 0 300 306" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:system-ui,-apple-system,sans-serif}</style>
+<text x="46" y="14" font-size="14" font-weight="500" style="fill:#141413">事故或回復</text>
+<text x="46" y="32" font-size="13" style="fill:#65645e">導致問題的變更</text>
+<text x="46" y="66" font-size="14" font-weight="500" style="fill:#141413">專家確認的案例</text>
+<text x="46" y="84" font-size="13" style="fill:#65645e">專家確認 bug</text>
+<text x="46" y="118" font-size="14" font-weight="500" style="fill:#141413">加入評估集</text>
+<text x="46" y="136" font-size="13" style="fill:#65645e">每起事故新增一個案例</text>
+<text x="46" y="170" font-size="14" font-weight="500" style="fill:#141413">每日執行評估</text>
+<text x="46" y="188" font-size="13" style="fill:#65645e">對照每個案例評分</text>
+<text x="46" y="222" font-size="14" font-weight="500" style="fill:#141413">分數提高了嗎？</text>
+<text x="46" y="240" font-size="13" style="fill:#65645e">提高就保留，否則捨棄</text>
+<text x="46" y="274" font-size="14" font-weight="500" style="fill:#141413">變更審查者</text>
+<text x="46" y="292" font-size="13" style="fill:#65645e">提示、工具或模型</text>
+<path d="M30 19.5 L30 51.5" fill="none" stroke-width="1" stroke-linejoin="round" style="stroke:#65645e"></path>
+<path d="M26.5 47.5 L30 51.5 L33.5 47.5" fill="none" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" style="stroke:#65645e"></path>
+<path d="M30 71.5 L30 103.5" fill="none" stroke-width="1" stroke-linejoin="round" style="stroke:#65645e"></path>
+<path d="M26.5 99.5 L30 103.5 L33.5 99.5" fill="none" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" style="stroke:#65645e"></path>
+<path d="M30 123.5 L30 155.5" fill="none" stroke-width="1" stroke-linejoin="round" style="stroke:#65645e"></path>
+<path d="M26.5 151.5 L30 155.5 L33.5 151.5" fill="none" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" style="stroke:#65645e"></path>
+<path d="M30 175.5 L30 207.5" fill="none" stroke-width="1" stroke-linejoin="round" style="stroke:#65645e"></path>
+<path d="M26.5 203.5 L30 207.5 L33.5 203.5" fill="none" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" style="stroke:#65645e"></path>
+<path d="M30 227.5 L30 259.5" fill="none" stroke-width="1" stroke-linejoin="round" style="stroke:#65645e"></path>
+<path d="M26.5 255.5 L30 259.5 L33.5 255.5" fill="none" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" style="stroke:#65645e"></path>
+<path d="M20 269.5 L8 269.5 L8 165.5 L20 165.5" fill="none" stroke-width="1" stroke-linejoin="round" style="stroke:#65645e"></path>
+<path d="M16 162 L20 165.5 L16 169" fill="none" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" style="stroke:#65645e"></path>
+<circle cx="30" cy="9.5" r="5.5" stroke-width="2" style="fill:#3d3d3a;stroke:#faf9f5"></circle>
+<circle cx="30" cy="61.5" r="5.5" stroke-width="2" style="fill:#3d3d3a;stroke:#faf9f5"></circle>
+<circle cx="30" cy="113.5" r="5.5" stroke-width="2" style="fill:#3d3d3a;stroke:#faf9f5"></circle>
+<circle cx="30" cy="165.5" r="5.5" stroke-width="2" style="fill:#c15f3c;stroke:#faf9f5"></circle>
+<circle cx="30" cy="217.5" r="5.5" stroke-width="2" style="fill:#3d3d3a;stroke:#faf9f5"></circle>
+<circle cx="30" cy="269.5" r="5.5" stroke-width="2" style="fill:#3d3d3a;stroke:#faf9f5"></circle>
+</svg>
